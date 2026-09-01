@@ -1,0 +1,8 @@
+# Local wrangler state / caches
+.wrangler/
+node_modules/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log

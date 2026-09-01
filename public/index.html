@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaine Cohen — Security, Identity &amp; AI</title>
+<meta name="description" content="Kaine Cohen — security consultant, AI learner, and writer working at the intersection of access, trust, and risk. Microsoft 365, identity, and the practical realities of AI adoption.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* Typography */
+    --font-display:'Fraunces', serif;
+    --font-mono:'IBM Plex Mono', monospace;
+    --font-body:'Inter', sans-serif;
+
+    /* Colour — paper/ink system */
+    --ink:#14171C;
+    --paper:#F3F1EC;
+    --card:#F8F4EE;
+    --paper-dim:#E7E4DB;
+    --line:#D8D4C8;
+    --muted:#6B6A63;
+    --signal:#3B5BFF;
+    --shadow:rgba(20,23,28,0.06);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    font-family:var(--font-body);
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:inherit; }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  .wrap{ max-width:960px; margin:0 auto; padding:42px 24px 80px; }
+
+  /* ---- top bar ---- */
+  .topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:18px;
+    margin-bottom:56px;
+  }
+  .brand{
+    font-family:var(--font-mono);
+    font-size:0.8rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .nav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:18px;
+    font-size:0.92rem;
+    color:var(--muted);
+  }
+  .nav a{
+    text-decoration:none;
+    border-bottom:1px solid transparent;
+    transition:color 0.2s ease, border-color 0.2s ease;
+  }
+  .nav a:hover{ border-color:var(--signal); color:var(--ink); }
+
+  /* ---- hero ---- */
+  .hero{ padding-top:8px; }
+  .eyebrow{
+    margin:0 0 18px;
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--signal);
+  }
+  h1{
+    font-family:var(--font-display);
+    font-weight:480;
+    font-size:clamp(2.6rem, 6.5vw, 5rem);
+    line-height:1.04;
+    letter-spacing:-0.02em;
+    max-width:16ch;
+  }
+  h1 em{ font-style:italic; font-weight:340; color:var(--signal); }
+
+  .intro{
+    max-width:52ch;
+    margin-top:24px;
+    font-size:clamp(1.1rem, 2vw, 1.4rem);
+    color:var(--muted);
+  }
+  .note{
+    max-width:60ch;
+    margin-top:18px;
+    font-size:1rem;
+    color:#2C2F35;
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:28px;
+  }
+  .button{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 18px;
+    text-decoration:none;
+    border-radius:100px;
+    font-size:0.95rem;
+    font-weight:500;
+    border:1px solid var(--line);
+    background:var(--paper);
+    transition:transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .button:hover{ transform:translateY(-1px); border-color:var(--signal); background:#EDEEFB; }
+  .button.primary{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+  .button.primary:hover{ background:var(--signal); border-color:var(--signal); color:#fff; }
+  .button:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; }
+
+  /* ---- sections ---- */
+  .section{ margin-top:84px; }
+  .section-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:14px;
+    border-bottom:1px solid var(--line);
+    margin-bottom:28px;
+  }
+  .section-head h2{
+    margin:0;
+    font-family:var(--font-display);
+    font-weight:480;
+    font-size:clamp(1.6rem, 3vw, 2.3rem);
+    letter-spacing:-0.02em;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:18px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:22px 20px;
+    box-shadow:0 8px 18px var(--shadow);
+  }
+  a.card{
+    text-decoration:none;
+    transition:transform 0.2s ease, border-color 0.2s ease;
+  }
+  a.card:hover{ transform:translateY(-2px); border-color:var(--signal); }
+  a.card:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; }
+  .card .kicker{
+    font-family:var(--font-mono);
+    color:var(--signal);
+    font-size:0.72rem;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .card p{ margin:0; color:var(--muted); font-size:0.95rem; }
+  .card .more{
+    display:inline-block;
+    margin-top:12px;
+    font-size:0.85rem;
+    color:var(--ink);
+  }
+
+  .story{
+    max-width:68ch;
+    margin-top:18px;
+    font-size:1.02rem;
+    color:var(--muted);
+  }
+  .story strong{ color:var(--ink); }
+
+  .links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .links a{
+    text-decoration:none;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:100px;
+    padding:10px 14px;
+    font-size:0.92rem;
+    background:var(--paper);
+    transition:border-color 0.2s ease;
+  }
+  .links a:hover{ border-color:var(--signal); }
+
+  footer{
+    margin-top:76px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-family:var(--font-mono);
+    font-size:0.75rem;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+
+  @media (max-width:640px){
+    .topbar{ flex-direction:column; align-items:flex-start; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">Kaine Cohen</div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#about">About</a>
+        <a href="#focus">Focus</a>
+        <a href="/ca-builder">CA Builder</a>
+        <a href="#writing">Writing</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="about">
+        <p class="eyebrow">Security, identity, AI</p>
+        <h1>I write about <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
+
+        <p class="intro">
+          I'm a security consultant, an AI learner, and a writer trying to make sense of how
+          people and systems change together.
+        </p>
+
+        <p class="note">
+          I work where access, trust and risk overlap — mostly in Microsoft 365 identity, and
+          increasingly in how teams adopt AI without losing track of their data.
+        </p>
+
+        <div class="actions">
+          <a class="button primary" href="#writing">Read my writing</a>
+          <a class="button" href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+        </div>
+      </section>
+
+      <section class="section" id="focus">
+        <div class="section-head">
+          <h2>What I'm thinking about</h2>
+        </div>
+
+        <div class="grid">
+          <article class="card">
+            <div class="kicker">Identity</div>
+            <p>Turning on MFA is the easy part. Getting Conditional Access right — without locking yourself out — is the actual work.</p>
+          </article>
+
+          <article class="card">
+            <div class="kicker">Security</div>
+            <p>Most incidents aren't clever. They're a legacy protocol nobody turned off, or a service account with a password from 2019.</p>
+          </article>
+
+          <article class="card">
+            <div class="kicker">AI</div>
+            <p>The interesting question isn't whether Copilot can draft the email. It's what happens to everything it read to do it.</p>
+          </article>
+
+          <a class="card" href="/ca-builder">
+            <div class="kicker">Tooling</div>
+            <p>An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON out.</p>
+            <span class="more">Open the builder →</span>
+          </a>
+        </div>
+
+        <p class="story">
+          <strong>Most of what I write starts as something I got wrong</strong>, or didn't properly
+          understand until I had to explain it to someone else.
+        </p>
+      </section>
+
+      <section class="section" id="writing">
+        <div class="section-head">
+          <h2>Writing</h2>
+        </div>
+
+        <p class="story">
+          I write about identity, security, and the move into AI — usually working something out
+          in public rather than reporting back once it's tidy.
+        </p>
+        <p class="story">
+          Posts there sync automatically from Medium — this page is just a cleaner way to browse them.
+        </p>
+
+        <div class="links">
+          <a href="/writing">View writing</a>
+          <a href="https://medium.com/@kaine.cohen" target="_blank" rel="noopener">Medium ↗</a>
+        </div>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="section-head">
+          <h2>Get in touch</h2>
+        </div>
+
+        <p class="story">
+          Best reached on LinkedIn for anything to do with identity, security, or AI.
+        </p>
+
+        <div class="links">
+          <a href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>© 2026 Kaine Cohen</span>
+      <span>cohenholmes.co.uk</span>
+    </footer>
+  </div>
+</body>
+</html>
