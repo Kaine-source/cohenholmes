@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Writing — Kaine Cohen</title>
 <meta name="description" content="Posts on identity, security and AI engineering by Kaine Cohen, pulled automatically from Medium.">
+<link rel="canonical" href="https://cohenholmes.co.uk/writing">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Writing — Kaine Cohen">
+<meta property="og:description" content="Notes on identity, security and the move into AI engineering.">
+<meta property="og:url" content="https://cohenholmes.co.uk/writing">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -185,6 +191,22 @@
 </div>
 
 <script>
+  function safeHttpsUrl(value) {
+    try {
+      const url = new URL(value, window.location.origin);
+      return url.protocol === 'https:' ? url.href : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function makeTextElement(tag, className, text) {
+    const el = document.createElement(tag);
+    if (className) el.className = className;
+    el.textContent = text || '';
+    return el;
+  }
+
   async function loadPosts() {
     const stateEl = document.getElementById('state');
     const listEl = document.getElementById('posts');
@@ -194,7 +216,7 @@
       if (!res.ok) throw new Error('Feed request failed: ' + res.status);
       const data = await res.json();
 
-      if (!data.posts || data.posts.length === 0) {
+      if (!Array.isArray(data.posts) || data.posts.length === 0) {
         stateEl.textContent = 'No posts found yet.';
         return;
       }
@@ -206,24 +228,38 @@
         li.className = 'post';
         li.style.animationDelay = (i * 0.05) + 's';
 
-        const thumbHtml = post.thumbnail
-          ? `<img class="thumb" src="${post.thumbnail}" alt="" loading="lazy">`
-          : `<div class="thumb placeholder">No image</div>`;
+        const thumbnailUrl = safeHttpsUrl(post.thumbnail);
+        if (thumbnailUrl) {
+          const img = document.createElement('img');
+          img.className = 'thumb';
+          img.src = thumbnailUrl;
+          img.alt = '';
+          img.loading = 'lazy';
+          li.appendChild(img);
+        } else {
+          const placeholder = makeTextElement('div', 'thumb placeholder', 'No image');
+          li.appendChild(placeholder);
+        }
+
+        const body = document.createElement('div');
+        body.className = 'post-body';
+
+        const link = document.createElement('a');
+        link.className = 'title-link';
+        const articleUrl = safeHttpsUrl(post.link);
+        link.href = articleUrl || 'https://medium.com/@kaine.cohen';
+        link.target = '_blank';
+        link.rel = 'noopener';
 
         const date = post.pubDate
           ? new Date(post.pubDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
           : '';
 
-        li.innerHTML = `
-          ${thumbHtml}
-          <div class="post-body">
-            <a class="title-link" href="${post.link}" target="_blank" rel="noopener">
-              <span class="post-date">${date}</span>
-              <h2>${post.title}</h2>
-            </a>
-            <p class="post-snippet">${post.snippet}</p>
-          </div>
-        `;
+        link.appendChild(makeTextElement('span', 'post-date', date));
+        link.appendChild(makeTextElement('h2', '', post.title));
+        body.appendChild(link);
+        body.appendChild(makeTextElement('p', 'post-snippet', post.snippet));
+        li.appendChild(body);
         listEl.appendChild(li);
       });
     } catch (err) {
