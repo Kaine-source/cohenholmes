@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cohen Holmes — Microsoft 365 & Digital Workplace Consulting</title>
+<meta name="description" content="Cohen Holmes delivers expert Microsoft 365, identity, security and Copilot consulting for organisations that need outcomes, not just implementations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & BASE ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+:root {
+  --navy:       #0F1E33;
+  --navy-mid:   #162844;
+  --navy-light: #1E3A5F;
+  --orange:     #C8622A;
+  --orange-lt:  #E07A40;
+  --cream:      #F7F4EF;
+  --white:      #FFFFFF;
+  --ink:        #1A1A2E;
+  --grey:       #5A6070;
+  --grey-lt:    #8A919E;
+  --border:     #E2DDD6;
+  --mono:       'DM Mono', monospace;
+  --serif:      'Cormorant Garamond', serif;
+  --sans:       'DM Sans', sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  font-weight: 300;
+  color: var(--ink);
+  background: var(--cream);
+  overflow-x: hidden;
+}
+
+/* ── NOISE OVERLAY ────────────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── NAV ──────────────────────────────────────────────────────────────────── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  padding: 0 48px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.4s ease, box-shadow 0.4s ease;
+}
+
+nav.scrolled {
+  background: rgba(15, 30, 51, 0.97);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--white);
+  letter-spacing: 0.02em;
+  text-decoration: none;
+}
+
+.nav-logo span {
+  color: var(--orange);
+}
+
+.nav-links {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--white); }
+
+/* ── HERO ─────────────────────────────────────────────────────────────────── */
+#hero {
+  min-height: 100vh;
+  background: var(--navy);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Grid lines background */
+#hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+
+/* Orange accent line */
+#hero::after {
+  content: '';
+  position: absolute;
+  left: 48px;
+  top: 120px;
+  bottom: 80px;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--orange), transparent);
+  opacity: 0.6;
+}
+
+.hero-inner {
+  max-width: 900px;
+  padding-left: 32px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 28px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.2s forwards;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 7vw, 6rem);
+  font-weight: 300;
+  line-height: 1.05;
+  color: var(--white);
+  margin-bottom: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.4s forwards;
+}
+
+.hero-title em {
+  font-style: italic;
+  color: rgba(255,255,255,0.5);
+}
+
+.hero-title .highlight {
+  color: var(--orange);
+  font-style: normal;
+}
+
+.hero-sub {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 56px;
+  max-width: 560px;
+  line-height: 1.5;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.6s forwards;
+}
+
+.hero-ctas {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 0.8s forwards;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--orange);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 14px 32px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+  background: var(--orange-lt);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  color: rgba(255,255,255,0.7);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 300;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 14px 32px;
+  border: 1px solid rgba(255,255,255,0.2);
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.5);
+  color: var(--white);
+}
+
+/* Scroll indicator */
+.scroll-hint {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  opacity: 0;
+  animation: fadeUp 0.8s ease 1.2s forwards;
+}
+
+.scroll-hint span {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+}
+
+.scroll-line {
+  width: 40px;
+  height: 1px;
+  background: rgba(255,255,255,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-line::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: var(--orange);
+  animation: slideLine 2s ease-in-out infinite;
+}
+
+/* ── SECTION BASE ─────────────────────────────────────────────────────────── */
+section {
+  padding: 100px 48px;
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.section-label::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--orange);
+  opacity: 0.5;
+}
+
+.section-title {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300;
+  line-height: 1.15;
+  color: var(--ink);
+  margin-bottom: 20px;
+}
+
+.section-title em {
+  font-style: italic;
+  color: var(--grey-lt);
+}
+
+.section-body {
+  font-size: 1.05rem;
+  font-weight: 300;
+  line-height: 1.75;
+  color: var(--grey);
+  max-width: 640px;
+}
+
+/* ── SERVICES ─────────────────────────────────────────────────────────────── */
+#services {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1px;
+  background: var(--border);
+  margin-top: 64px;
+  border: 1px solid var(--border);
+}
+
+.service-card {
+  background: var(--white);
+  padding: 44px 40px;
+  position: relative;
+  transition: background 0.25s;
+}
+
+.service-card:hover {
+  background: var(--cream);
+}
+
+.service-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 0;
+  background: var(--orange);
+  transition: height 0.3s ease;
+}
+
+.service-card:hover::before {
+  height: 100%;
+}
+
+.service-num {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  color: var(--orange);
+  opacity: 0.7;
+  margin-bottom: 24px;
+}
+
+.service-title {
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 400;
+  color: var(--ink);
+  margin-bottom: 14px;
+  line-height: 1.25;
+}
+
+.service-desc {
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--grey);
+  margin-bottom: 24px;
+}
+
+.service-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--grey-lt);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  background: var(--cream);
+}
+
+/* ── ABOUT ────────────────────────────────────────────────────────────────── */
+#about {
+  background: var(--cream);
+  border-top: 1px solid var(--border);
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 64px;
+  align-items: start;
+}
+
+.about-text p {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--grey);
+  margin-bottom: 20px;
+}
+
+.about-text p strong {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.cert-block {
+  background: var(--white);
+  border: 1px solid var(--border);
+  padding: 36px;
+}
+
+.cert-block-title {
+  font-family: var(--mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--grey-lt);
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.cert-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cert-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: var(--grey);
+  line-height: 1.4;
+}
+
+.cert-list li::before {
+  content: '—';
+  color: var(--orange);
+  font-family: var(--mono);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.brand-line {
+  margin-top: 36px;
+  padding-top: 28px;
+  border-top: 1px solid var(--border);
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-style: italic;
+  color: var(--grey-lt);
+  line-height: 1.6;
+}
+
+/* ── CONTACT ──────────────────────────────────────────────────────────────── */
+#contact {
+  background: var(--navy);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+#contact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+#contact .section-label { color: var(--orange); }
+
+#contact .section-title { color: var(--white); }
+
+#contact .section-body { color: rgba(255,255,255,0.45); max-width: 500px; }
+
+.contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  margin-top: 64px;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.contact-item-label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  margin-bottom: 6px;
+}
+
+.contact-item-value {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+a.contact-item-value:hover {
+  color: var(--orange);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
+
+.form-group input,
+.form-group textarea {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--white);
+  font-family: var(--sans);
+  font-size: 0.9rem;
+  font-weight: 300;
+  padding: 12px 16px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: rgba(255,255,255,0.2);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--orange);
+}
+
+.form-group textarea { min-height: 120px; }
+
+.btn-submit {
+  background: var(--orange);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 14px 32px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  align-self: flex-start;
+}
+
+.btn-submit:hover {
+  background: var(--orange-lt);
+  transform: translateY(-1px);
+}
+
+/* ── FOOTER ───────────────────────────────────────────────────────────────── */
+footer {
+  background: var(--navy-mid);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-logo {
+  font-family: var(--serif);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(255,255,255,0.4);
+}
+
+.footer-logo span { color: var(--orange); opacity: 0.7; }
+
+.footer-copy {
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.2);
+}
+
+/* ── ANIMATIONS ───────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLine {
+  0%   { left: -100%; }
+  50%  { left: 0%; }
+  100% { left: 100%; }
+}
+
+.reveal {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.animate {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.reveal.animate.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ───────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  nav { padding: 0 24px; }
+  .nav-links { display: none; }
+
+  #hero { padding: 100px 24px 80px; }
+  #hero::after { left: 24px; top: 100px; }
+  .hero-inner { padding-left: 20px; }
+
+  section { padding: 72px 24px; }
+
+  .about-grid,
+  .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+
+  footer { padding: 24px; flex-direction: column; align-items: flex-start; }
+}
+
+/* ── PRINT / PDF STYLES ───────────────────────────────────────────────────── */
+@media print {
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  nav { position: relative; background: var(--navy) !important; }
+  
+  #hero {
+    min-height: auto !important;
+    padding: 60px 48px !important;
+    background: var(--navy) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  #hero::before, #hero::after, .scroll-hint { display: none; }
+
+  .hero-label, .hero-title, .hero-sub, .hero-ctas { 
+    opacity: 1 !important; 
+    animation: none !important;
+  }
+
+  .reveal { opacity: 1 !important; transform: none !important; }
+
+  #contact {
+    background: var(--navy) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  footer {
+    background: var(--navy-mid) !important;
+    -webkit-print-color-adjust: exact !important;
+  }
+
+  .service-card { break-inside: avoid; }
+  .services-grid { grid-template-columns: 1fr 1fr !important; }
+  .about-grid, .contact-grid { grid-template-columns: 1fr 1fr !important; }
+  
+  body::before { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ──────────────────────────────────────────────────────────────────── -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">Cohen<span>&</span>Holmes</a>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────────── -->
+<section id="hero">
+  <div class="hero-inner">
+    <p class="hero-label">Microsoft 365 &amp; Digital Workplace Consulting</p>
+    <h1 class="hero-title">
+      Intelligent outcomes<br>
+      <em>depend on</em><br>
+      <span class="highlight">connected foundations.</span>
+    </h1>
+    <p class="hero-sub">Security, identity and Copilot consulting for organisations that need outcomes, not just implementations.</p>
+    <div class="hero-ctas">
+      <a href="#services" class="btn-primary">Our Services</a>
+      <a href="#contact" class="btn-secondary">Get in Touch</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ── SERVICES ──────────────────────────────────────────────────────────────── -->
+<section id="services">
+  <div class="section-inner">
+    <p class="section-label reveal">What We Do</p>
+    <h2 class="section-title reveal">Expert M365 consulting,<br><em>built around your risk.</em></h2>
+    <p class="section-body reveal">We work alongside in-house IT teams and Microsoft partners to deliver security-led, governance-first M365 engagements — anchored in your organisation's specific context, not a generic playbook.</p>
+
+    <div class="services-grid">
+
+      <div class="service-card reveal">
+        <p class="service-num">01</p>
+        <h3 class="service-title">Identity &amp; Security</h3>
+        <p class="service-desc">MFA strategy, Conditional Access policy design, Entra ID hardening, PIM configuration and legacy authentication remediation. We assess your identity posture and leave you with a defensible baseline.</p>
+        <div class="service-tags">
+          <span class="tag">Entra ID</span>
+          <span class="tag">Conditional Access</span>
+          <span class="tag">PIM</span>
+          <span class="tag">MFA</span>
+          <span class="tag">Zero Trust</span>
+        </div>
+      </div>
+
+      <div class="service-card reveal">
+        <p class="service-num">02</p>
+        <h3 class="service-title">Copilot Readiness</h3>
+        <p class="service-desc">End-to-end Copilot for M365 readiness assessments covering data governance, sensitivity labelling, oversharing remediation, and adoption planning — so your pilot lands safely and delivers value.</p>
+        <div class="service-tags">
+          <span class="tag">Copilot M365</span>
+          <span class="tag">Purview</span>
+          <span class="tag">Sensitivity Labels</span>
+          <span class="tag">Adoption</span>
+        </div>
+      </div>
+
+      <div class="service-card reveal">
+        <p class="service-num">03</p>
+        <h3 class="service-title">Governance &amp; Compliance</h3>
+        <p class="service-desc">Information protection policies, DLP configuration, Microsoft Purview deployment and compliance posture reviews. Governance that's tuned to your environment, not just switched on.</p>
+        <div class="service-tags">
+          <span class="tag">Purview</span>
+          <span class="tag">DLP</span>
+          <span class="tag">Defender for Cloud</span>
+          <span class="tag">Sentinel</span>
+        </div>
+      </div>
+
+      <div class="service-card reveal">
+        <p class="service-num">04</p>
+        <h3 class="service-title">Defender &amp; Endpoint</h3>
+        <p class="service-desc">Microsoft Defender for Endpoint deployment, MCAS configuration, attack surface reduction, and Intune-driven device compliance. Security operations that scale with your organisation.</p>
+        <div class="service-tags">
+          <span class="tag">Defender for Endpoint</span>
+          <span class="tag">Intune</span>
+          <span class="tag">MCAS</span>
+          <span class="tag">ASR</span>
+        </div>
+      </div>
+
+      <div class="service-card reveal">
+        <p class="service-num">05</p>
+        <h3 class="service-title">AI &amp; Automation</h3>
+        <p class="service-desc">Copilot Studio agent design, Power Platform governance, and custom AI tooling built on the Microsoft ecosystem. Helping organisations move from AI curiosity to AI outcome.</p>
+        <div class="service-tags">
+          <span class="tag">Copilot Studio</span>
+          <span class="tag">Power Platform</span>
+          <span class="tag">Azure AI</span>
+          <span class="tag">Agents</span>
+        </div>
+      </div>
+
+      <div class="service-card reveal">
+        <p class="service-num">06</p>
+        <h3 class="service-title">Technical Assessment</h3>
+        <p class="service-desc">Structured, data-driven M365 assessments using automated tenant collection and detailed reporting. Clear findings, clear recommendations, clear next steps — not slide decks full of caveats.</p>
+        <div class="service-tags">
+          <span class="tag">Readiness Review</span>
+          <span class="tag">Graph API</span>
+          <span class="tag">Reporting</span>
+          <span class="tag">Roadmap</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── ABOUT ──────────────────────────────────────────────────────────────────── -->
+<section id="about">
+  <div class="section-inner">
+    <p class="section-label reveal">About</p>
+    <h2 class="section-title reveal">Morpeth-based.<br><em>Outcome-obsessed.</em></h2>
+
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p>Cohen &amp; Holmes is an independent Microsoft 365 and Digital Workplace consultancy based in <strong>Morpeth, Northumberland</strong>. We specialise in the intersection of security, identity and AI — helping mid-market and enterprise organisations get more from their M365 investment without compromising on governance.</p>
+        <p>Our approach is direct and technical. We assess what's actually in your tenant, identify what matters, and deliver recommendations you can act on. No generic frameworks, no unnecessary complexity — just clear thinking and deep M365 expertise.</p>
+        <p>We hold certifications across the Microsoft security and AI stack and work alongside internal IT teams, Microsoft partners and managed service providers across the UK.</p>
+        <p class="brand-line">"Intelligent Outcomes depend on Connected Foundations."</p>
+      </div>
+
+      <div class="cert-block reveal">
+        <p class="cert-block-title">Certifications &amp; Specialisations</p>
+        <ul class="cert-list">
+          <li>Microsoft 365 Certified: Administrator Expert (MS-102)</li>
+          <li>Microsoft Certified: Identity &amp; Access Administrator (SC-300)</li>
+          <li>Microsoft Certified: Information Protection &amp; Compliance (SC-400)</li>
+          <li>Microsoft Certified: Security Operations Analyst (SC-200)</li>
+          <li>Microsoft Certified: Azure AI Engineer Associate (AI-102)</li>
+          <li>Microsoft Certified: Azure Administrator Associate (AZ-104)</li>
+          <li>Microsoft Sentinel &amp; Defender for Cloud</li>
+          <li>Copilot Studio — Agent Design &amp; Deployment</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ────────────────────────────────────────────────────────────────── -->
+<section id="contact">
+  <div class="section-inner">
+    <p class="section-label reveal">Get in Touch</p>
+    <h2 class="section-title reveal">Let's talk about<br><em>your M365 environment.</em></h2>
+    <p class="section-body reveal">Whether you're planning a Copilot pilot, concerned about your identity posture, or just want a second opinion — we're happy to have a conversation.</p>
+
+    <div class="contact-grid">
+      <div class="contact-details reveal">
+        <div>
+          <p class="contact-item-label">Email</p>
+          <a href="/cdn-cgi/l/email-protection#b4dcd1d8d8dbf4d7dbdcd1dadcdbd8d9d1c79ad7db9ac1df" class="contact-item-value"><span class="__cf_email__" data-cfemail="85ede0e9e9eac5e6eaede0ebedeae9e8e0f6abe6eaabf0ee">[email&#160;protected]</span></a>
+        </div>
+        <div>
+          <p class="contact-item-label">Location</p>
+          <p class="contact-item-value">Morpeth, Northumberland</p>
+        </div>
+        <div>
+          <p class="contact-item-label">Serving</p>
+          <p class="contact-item-value">UK &amp; Remote</p>
+        </div>
+        <div>
+          <p class="contact-item-label">Website</p>
+          <a href="https://cohenholmes.co.uk" class="contact-item-value">cohenholmes.co.uk</a>
+        </div>
+      </div>
+
+      <form class="contact-form reveal" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" placeholder="Your name" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" placeholder="Tell us what you're working on..."></textarea>
+        </div>
+        <button type="submit" class="btn-submit">Send Message →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────────────────────── -->
+<footer>
+  <p class="footer-logo">Cohen<span>&</span>Holmes</p>
+  <p class="footer-copy">© 2026 Cohen &amp; Holmes. Morpeth, Northumberland. cohenholmes.co.uk</p>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Scroll reveal — only animate if user hasn't indicated reduced motion preference
+const reveals = document.querySelectorAll('.reveal');
+
+if (window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+  reveals.forEach(el => el.classList.add('animate'));
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+
+  reveals.forEach(el => observer.observe(el));
+  
+  // Safety fallback — ensure all visible after 1s
+  setTimeout(() => {
+    reveals.forEach(el => el.classList.add('visible'));
+  }, 1000);
+}
+
+// Form handler (placeholder — wire to Formspree or similar)
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = e.target.que

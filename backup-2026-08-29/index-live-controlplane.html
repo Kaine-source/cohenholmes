@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kaine Cohen — Identity, Security & AI</title>
+<meta name="description" content="Kaine Cohen. Microsoft 365 identity & security consultant, moving into AI engineering. Based in Morpeth, UK.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171C;
+    --paper:#F3F1EC;
+    --paper-dim:#E7E4DB;
+    --line:#D8D4C8;
+    --signal:#3B5BFF;
+    --muted:#6B6A63;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .wrap{
+    max-width:760px;
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  header{
+    padding:64px 0 40px;
+  }
+  .mark{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+
+  main{ padding-bottom:80px; }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:480;
+    font-size:clamp(38px, 6vw, 58px);
+    line-height:1.08;
+    letter-spacing:-0.01em;
+    margin:18px 0 22px;
+    opacity:0;
+    animation:rise 0.7s 0.1s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:340;
+    color:var(--signal);
+  }
+  .lede{
+    font-size:18px;
+    max-width:52ch;
+    color:#2C2F35;
+    opacity:0;
+    animation:rise 0.7s 0.28s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+
+  @keyframes rise{
+    from{opacity:0; transform:translateY(10px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  .config{
+    margin-top:48px;
+    background:#181B21;
+    color:#D9DCE3;
+    border-radius:10px;
+    padding:22px 26px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13.5px;
+    line-height:1.9;
+    opacity:0;
+    animation:rise 0.7s 0.44s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .config .k{ color:#8A93A6; }
+  .config .v{ color:#EDEFF3; }
+  .config .accent{ color:#7C93FF; }
+
+  .links{
+    margin-top:36px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    opacity:0;
+    animation:rise 0.7s 0.6s cubic-bezier(.2,.7,.2,1) forwards;
+  }
+  .links a{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 18px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:14.5px;
+    font-weight:500;
+    background:var(--paper);
+    transition:border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  }
+  .links a:hover{
+    border-color:var(--signal);
+    background:#EDEEFB;
+    transform:translateY(-1px);
+  }
+  .links a.primary{
+    background:var(--ink);
+    color:var(--paper);
+    border-color:var(--ink);
+  }
+  .links a.primary:hover{
+    background:var(--signal);
+    border-color:var(--signal);
+    color:#fff;
+  }
+  .links a:focus-visible, .config:focus-visible{
+    outline:2px solid var(--signal);
+    outline-offset:2px;
+  }
+
+  .divider{
+    height:1px;
+    background:var(--line);
+    margin:56px 0 40px;
+  }
+
+  .note{
+    font-size:15px;
+    color:var(--muted);
+    max-width:56ch;
+  }
+  .note a{ color:var(--ink); }
+
+  footer{
+    padding:32px 0 48px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="mark">Kaine Cohen</div>
+  </header>
+
+  <main>
+    <h1>Identity is the <em>control plane.</em><br>Everything else follows.</h1>
+
+    <p class="lede">
+      Senior Microsoft 365 Security Consultant working across Entra ID, Conditional Access
+      and Purview — now building toward AI engineering and architecture.
+    </p>
+
+    <div class="config" aria-label="Profile summary">
+      <div><span class="k">role</span>       <span class="v">Senior M365 Security Consultant, SoftwareOne</span></div>
+      <div><span class="k">focus</span>      <span class="v">Entra ID · Conditional Access · Purview · <span class="accent">AI Engineering</span></span></div>
+      <div><span class="k">certified</span>  <span class="v">SC-400 <span class="k">·</span> SC-300 (in progress)</span></div>
+    </div>
+
+    <nav class="links" aria-label="Elsewhere">
+      <a class="primary" href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a href="/writing.html">Writing →</a>
+    </nav>
+
+    <div class="divider"></div>
+
+    <p class="note">
+      This domain previously hosted a consultancy sandbox. It's now a personal page —
+      if you were expecting a services site, that content's been retired for now.
+    </p>
+  </main>
+
+  <footer>
+    <span>© 2026 Kaine Cohen</span>
+    <span>cohenholmes.co.uk</span>
+  </footer>
+</div>
+
+</body>
+</html>

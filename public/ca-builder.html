@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conditional Access Policy Builder — Kaine Cohen</title>
+<meta name="description" content="An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON, the licence tier each policy needs, and how CA connects to Purview, Defender for Cloud Apps and Entra Suite.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171C;
+    --paper:#F3F1EC;
+    --paper-dim:#E7E4DB;
+    --line:#D8D4C8;
+    --signal:#3B5BFF;
+    --muted:#6B6A63;
+    --panel:#181B21;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+
+  .wrap{ max-width:1100px; margin:0 auto; padding:0 28px; }
+
+  header{ padding:56px 0 8px; }
+  .mark{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .back{
+    display:inline-block;
+    margin-top:14px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    text-decoration:none;
+  }
+  .back:hover{ color:var(--signal); }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:480;
+    font-size:clamp(30px, 5vw, 44px);
+    line-height:1.1;
+    letter-spacing:-0.01em;
+    margin:20px 0 12px;
+  }
+  .lede{
+    font-size:16px;
+    color:var(--muted);
+    max-width:64ch;
+    margin-bottom:14px;
+  }
+  .disclaimer{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px 14px;
+    max-width:64ch;
+    margin-bottom:28px;
+  }
+
+  main{ padding-bottom:80px; }
+
+  .preset-bar{
+    background:#F8F4EE;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:22px;
+  }
+  .preset-bar label.lbl{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--signal);
+    margin-bottom:8px;
+  }
+  .preset-bar select{ width:100%; max-width:460px; }
+  .preset-bar .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+
+  .preset-info{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin-top:16px;
+  }
+  @media (max-width:620px){ .preset-info{ grid-template-columns:1fr; } }
+  .preset-info .box{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+  }
+  .preset-info h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.09em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .preset-info p{ font-size:13px; line-height:1.55; color:var(--ink); }
+  .preset-info .lic{ font-weight:500; }
+  .preset-info a{
+    display:inline-block;
+    margin-top:8px;
+    font-size:12px;
+    color:var(--signal);
+    text-decoration:none;
+  }
+  .preset-info a:hover{ text-decoration:underline; }
+
+  .ctx-help{
+    margin-top:8px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .ctx-help summary{
+    cursor:pointer;
+    color:var(--signal);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+  }
+  .ctx-help[open] summary{ margin-bottom:8px; }
+  .ctx-help ol{ margin:0 0 8px 18px; line-height:1.7; }
+  .ctx-help .eg{
+    background:var(--paper-dim);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:12px;
+    color:var(--ink);
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:32px;
+    align-items:start;
+  }
+  @media (max-width:880px){
+    .layout{ grid-template-columns:1fr; }
+    .output{ position:static !important; }
+  }
+
+  fieldset{
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:18px 20px 20px;
+    margin-bottom:18px;
+    background:#F8F4EE;
+  }
+  legend{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--signal);
+    padding:0 8px;
+  }
+  .field{ margin-top:14px; }
+  .field:first-of-type{ margin-top:6px; }
+  label.lbl{
+    display:block;
+    font-size:13px;
+    font-weight:500;
+    margin-bottom:6px;
+  }
+  .hint{ font-size:12px; color:var(--muted); margin-top:4px; }
+
+  input[type=text], input[type=number], select{
+    width:100%;
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:9px 11px;
+  }
+  input[type=text]:focus, input[type=number]:focus, select:focus{
+    outline:2px solid var(--signal);
+    outline-offset:1px;
+  }
+
+  .checks{ display:flex; flex-wrap:wrap; gap:8px 16px; }
+  .checks label{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    font-size:13px;
+    cursor:pointer;
+  }
+  .checks input{ accent-color:var(--signal); width:15px; height:15px; }
+
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .row2{ grid-template-columns:1fr; } }
+
+  .hidden{ display:none; }
+
+  .tagbadge{
+    display:inline-block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:9.5px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    border-radius:4px;
+    padding:1px 5px;
+    vertical-align:middle;
+    margin-left:6px;
+  }
+  .tagbadge.p2{ color:#8A5A00; background:#F3E2C0; border:1px solid #E4C98A; }
+  .tagbadge.purview{ color:#2C5E4A; background:#D9EDE2; border:1px solid #B4D8C6; }
+  .tagbadge.mdca{ color:#3A4A8A; background:#DEE3F6; border:1px solid #BCC6EC; }
+
+  .output{ position:sticky; top:24px; }
+  .tabs{ display:flex; gap:6px; margin-bottom:0; }
+  .tab{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    padding:9px 14px;
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:8px 8px 0 0;
+    background:var(--paper-dim);
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .tab[aria-selected="true"]{
+    background:var(--panel);
+    color:#EDEFF3;
+    border-color:var(--panel);
+  }
+  .panel{
+    background:var(--panel);
+    color:#D9DCE3;
+    border-radius:0 10px 10px 10px;
+    padding:20px 22px;
+    min-height:320px;
+  }
+  .panel pre{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    word-break:break-word;
+  }
+  .json-key{ color:#8A93A6; }
+  .json-str{ color:#9ECBFF; }
+  .json-num{ color:#E8B978; }
+  .json-bool{ color:#7C93FF; }
+
+  #summary{ font-size:14.5px; line-height:1.8; color:#E4E6EB; }
+  #summary strong{ color:#fff; font-weight:500; }
+  #summary .muted{ color:#9AA0AC; }
+
+  .license{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.08);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    line-height:1.9;
+    color:#9AA0AC;
+  }
+  .license b{ color:#CDD3DE; font-weight:500; }
+  .license .tag{
+    display:inline-block;
+    background:rgba(124,147,255,0.16);
+    color:#AEBBFF;
+    border-radius:4px;
+    padding:1px 6px;
+    margin-right:6px;
+  }
+  .license .tag.p2{ background:#F3E2C0; color:#8A5A00; }
+  .license .tag.purview{ background:#D9EDE2; color:#1F4536; }
+  .license .tag.mdca{ background:#DEE3F6; color:#2B3A72; }
+
+  .panel-actions{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:8px 14px;
+    border-radius:100px;
+    border:1px solid rgba(255,255,255,0.2);
+    background:transparent;
+    color:#D9DCE3;
+    cursor:pointer;
+  }
+  .btn:hover{ border-color:var(--signal); color:#fff; }
+  .btn.primary{ background:var(--signal); border-color:var(--signal); color:#fff; }
+
+  /* ---- baseline model ---- */
+  .model{
+    margin-top:48px;
+    border-top:1px solid var(--line);
+    padding-top:32px;
+  }
+  .model h2{
+    font-family:'Fraunces', serif;
+    font-weight:480;
+    font-size:24px;
+    margin-bottom:8px;
+  }
+  .model > p{ color:var(--muted); font-size:14px; max-width:72ch; margin-bottom:22px; }
+  .model-policy{
+    background:#F8F4EE;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    margin-bottom:12px;
+  }
+  .model-policy .head{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .model-policy .num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--signal);
+    font-weight:500;
+  }
+  .model-policy .name{ font-weight:500; font-size:15px; }
+  .model-policy .scope{ font-size:12px; color:var(--muted); }
+  .model-policy details{ margin-top:10px; }
+  .model-policy summary{
+    cursor:pointer;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--signal);
+  }
+  .model-policy details[open] summary{ margin-bottom:8px; }
+  .model-policy dl{ margin:0; font-size:13px; line-height:1.6; }
+  .model-policy dt{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.07em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:8px;
+  }
+  .model-policy dt:first-child{ margin-top:0; }
+  .model-policy dd{ margin:2px 0 0; color:var(--ink); }
+  .model-load{
+    margin-top:12px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:7px 14px;
+    border-radius:100px;
+    border:1px solid var(--line);
+    background:var(--paper);
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .model-load:hover{ border-color:var(--signal); background:#EDEEFB; }
+  .model-rules{
+    margin-top:20px;
+    font-size:13px;
+    line-height:1.7;
+    color:var(--muted);
+  }
+  .model-rules strong{ color:var(--ink); }
+  .model-rules ul{ margin:6px 0 0 18px; }
+
+  /* ---- CA in context ---- */
+  .context{
+    margin-top:48px;
+    border-top:1px solid var(--line);
+    padding-top:32px;
+  }
+  .context h2{
+    font-family:'Fraunces', serif;
+    font-weight:480;
+    font-size:24px;
+    margin-bottom:8px;
+  }
+  .context > p{ color:var(--muted); font-size:14px; max-width:70ch; margin-bottom:20px; }
+  .context table{ border-collapse:collapse; width:100%; font-size:13.5px; }
+  .context th, .context td{
+    text-align:left;
+    vertical-align:top;
+    padding:12px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .context th{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .context td:first-child{ font-weight:500; white-space:nowrap; }
+  .context code{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    background:var(--paper-dim);
+    padding:1px 5px;
+    border-radius:4px;
+  }
+  .context .prod{ color:var(--muted); font-size:12px; }
+  @media (max-width:720px){
+    .context table, .context tbody, .context tr, .context td{ display:block; width:100%; }
+    .context thead{ display:none; }
+    .context tr{ border:1px solid var(--line); border-radius:10px; margin-bottom:12px; padding:6px 4px; }
+    .context td{ border:none; padding:6px 14px; }
+    .context td:first-child{ font-size:15px; padding-top:12px; }
+  }
+
+  footer{
+    padding:32px 0 48px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px;
+    border-top:1px solid var(--line);
+    margin-top:40px;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="mark">Kaine Cohen</div>
+    <a class="back" href="/">← Home</a>
+    <h1>Conditional Access Policy Builder</h1>
+    <p class="lede">
+      Describe a Conditional Access policy in plain terms and get the equivalent Microsoft Graph
+      <code>conditionalAccessPolicy</code> JSON as you type, a readable summary, and the Entra ID
+      licence tier it needs. Below the builder: how CA connects to Purview, Defender for Cloud Apps
+      and Entra Suite.
+    </p>
+    <p class="disclaimer">
+      Learning / demo tool. Output mirrors the Graph beta schema shape but is not validated against a
+      tenant. Always review in report-only mode before enforcing. GUIDs are passed through as entered.
+    </p>
+  </header>
+
+  <main>
+
+    <div class="preset-bar">
+      <label class="lbl" for="preset">Start from a Microsoft baseline</label>
+      <select id="preset">
+        <option value="" selected>— pick a starting point —</option>
+        <optgroup label="MFA &amp; authentication strength">
+          <option value="mfa-all">Require MFA for all users</option>
+          <option value="mfa-admins">Require MFA for admin roles</option>
+          <option value="phishres-admins">Phishing-resistant MFA for admin roles</option>
+          <option value="mfa-guests">Require MFA for guests &amp; external users</option>
+        </optgroup>
+        <optgroup label="Device &amp; session">
+          <option value="require-device">Require compliant or hybrid-joined device</option>
+          <option value="mobile-app-protection">Require app protection policy on mobile</option>
+          <option value="unmanaged-contain">Contain unmanaged devices (MFA + short sign-in frequency + no persistent browser)</option>
+          <option value="unmanaged-mdca">Unmanaged browser → block downloads (Defender for Cloud Apps)</option>
+        </optgroup>
+        <optgroup label="Legacy &amp; baseline">
+          <option value="block-legacy">Block legacy authentication</option>
+          <option value="mfa-azure-mgmt">Require MFA for Azure management</option>
+        </optgroup>
+        <optgroup label="Risk-based (P2 / Purview)">
+          <option value="risky-signin">Risky sign-in → require MFA</option>
+          <option value="risky-user">High user risk → secure password change</option>
+          <option value="insider-elevated">Block elevated insider risk (Purview)</option>
+        </optgroup>
+        <optgroup label="Data &amp; step-up">
+          <option value="authctx-stepup">Step up on a sensitive action (auth context c1)</option>
+        </optgroup>
+      </select>
+      <p class="hint">Fills the form with a known-good starting point — adjust anything below. Based on Microsoft's documented Conditional Access templates.</p>
+      <div class="preset-info hidden" id="presetInfo">
+        <div class="box">
+          <h3>When you'd use this</h3>
+          <p id="presetScenario"></p>
+        </div>
+        <div class="box">
+          <h3>Required licence (per Microsoft documentation)</h3>
+          <p class="lic" id="presetLicence"></p>
+          <a id="presetDoc" href="#" target="_blank" rel="noopener">Verify in Microsoft docs ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="layout">
+
+      <!-- ============ FORM ============ -->
+      <form id="caForm" aria-label="Policy inputs">
+
+        <fieldset>
+          <legend>Basics</legend>
+          <div class="field">
+            <label class="lbl" for="displayName">Policy name</label>
+            <input type="text" id="displayName" value="Require MFA for all users" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="lbl" for="state">State</label>
+            <select id="state">
+              <option value="enabledForReportingButNotEnforced" selected>Report-only</option>
+              <option value="enabled">On</option>
+              <option value="disabled">Off</option>
+            </select>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Assignments · Users</legend>
+          <div class="field">
+            <label class="lbl" for="userInclude">Include</label>
+            <select id="userInclude">
+              <option value="All" selected>All users</option>
+              <option value="GuestsOrExternalUsers">All guest and external users</option>
+              <option value="groups">Select groups (by ID)</option>
+              <option value="roles">Select directory roles</option>
+            </select>
+          </div>
+          <div class="field hidden" id="includeGroupsField">
+            <label class="lbl" for="includeGroups">Include group IDs</label>
+            <input type="text" id="includeGroups" placeholder="comma-separated GUIDs" autocomplete="off">
+          </div>
+          <div class="field hidden" id="includeRolesField">
+            <label class="lbl">Directory roles (admin templates)</label>
+            <div class="checks" id="roles">
+              <label><input type="checkbox" value="62e90394-69f5-4237-9190-012177145e10"> Global Administrator</label>
+              <label><input type="checkbox" value="e8611ab8-c189-46e8-94e1-60213ab1f814"> Privileged Role Administrator</label>
+              <label><input type="checkbox" value="7be44c8a-adaf-4e2a-84d6-ab2649e08a13"> Privileged Authentication Administrator</label>
+              <label><input type="checkbox" value="194ae4cb-b126-40b2-bd5b-6091b380977d"> Security Administrator</label>
+              <label><input type="checkbox" value="b1be1c3e-b65d-4f19-8427-f6fa0d97feb9"> Conditional Access Administrator</label>
+              <label><input type="checkbox" value="c4e39bd9-1100-46d3-8c65-fb160da0071f"> Authentication Administrator</label>
+              <label><input type="checkbox" value="29232cdf-9323-42fd-ade2-1d097af3e4de"> Exchange Administrator</label>
+              <label><input type="checkbox" value="f28a1f50-f6e7-4571-818b-6a12f2af6b6c"> SharePoint Administrator</label>
+              <label><input type="checkbox" value="fe930be7-5e62-47db-91af-98c3a49a38b1"> User Administrator</label>
+              <label><input type="checkbox" value="729827e3-9c14-49f7-bb1b-9608f156bbb8"> Helpdesk Administrator</label>
+            </div>
+            <p class="hint">Well-known role template IDs. Microsoft's "require MFA for admins" template targets these privileged roles.</p>
+          </div>
+          <div class="field">
+            <label class="lbl" for="excludeGroups">Exclude group IDs</label>
+            <input type="text" id="excludeGroups" placeholder="comma-separated GUIDs" autocomplete="off">
+          </div>
+          <div class="field">
+            <div class="checks">
+              <label><input type="checkbox" id="excludeBreakglass" checked> Exclude a break-glass / emergency access group</label>
+            </div>
+            <p class="hint">Adds a placeholder GUID to <code>excludeGroups</code> — replace with your real emergency access account group.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Assignments · Target resources</legend>
+          <div class="field">
+            <label class="lbl" for="appInclude">Cloud apps — include</label>
+            <select id="appInclude">
+              <option value="All" selected>All cloud apps</option>
+              <option value="Office365">Office 365 (bundle)</option>
+              <option value="apps">Select apps (by ID)</option>
+              <option value="None">None</option>
+            </select>
+          </div>
+          <div class="field hidden" id="includeAppsField">
+            <label class="lbl" for="includeApps">Include app IDs</label>
+            <input type="text" id="includeApps" placeholder="comma-separated app GUIDs" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="lbl" for="excludeApps">Exclude app IDs</label>
+            <input type="text" id="excludeApps" placeholder="comma-separated app GUIDs" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="lbl" for="authContext">Authentication context IDs</label>
+            <input type="text" id="authContext" placeholder="e.g. c1, c2" autocomplete="off">
+            <p class="hint">The bridge from Purview — sensitivity labels and sensitive SharePoint sites stamp an auth context (<code>c1</code>–<code>c99</code>); this policy steps up on it. Targets a context instead of specific apps.</p>
+            <details class="ctx-help">
+              <summary>New to auth context? Where the IDs come from →</summary>
+              <ol>
+                <li>Entra admin center → <strong>Conditional Access → Authentication context</strong> → <strong>New authentication context</strong>.</li>
+                <li>Give it a display name (e.g. <em>"Compliant device required"</em>) and tick <strong>Publish to apps</strong>.</li>
+                <li>Entra assigns a read-only <strong>ID</strong> — <code>c1</code>, <code>c2</code>, … <code>c99</code>. That short ID is what you paste above.</li>
+                <li>Tag a resource with it: a Purview <strong>sensitivity label</strong>, a SharePoint <strong>site</strong>, a Defender for Cloud Apps <strong>session policy</strong>, a custom app, or a <strong>PIM</strong> role activation.</li>
+                <li>This policy, targeting that context, fires whenever someone hits the tagged resource.</li>
+              </ol>
+              <div class="eg"><strong>Example:</strong> label a SharePoint site "Highly Confidential" → the label requires auth context <code>c1</code> → a CA policy on <code>c1</code> requires a compliant device + phishing-resistant MFA. Normal sites are unaffected.</div>
+            </details>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Conditions</legend>
+
+          <div class="field">
+            <label class="lbl">Client app types</label>
+            <div class="checks" id="clientApps">
+              <label><input type="checkbox" value="browser"> Browser</label>
+              <label><input type="checkbox" value="mobileAppsAndDesktopClients"> Mobile &amp; desktop clients</label>
+              <label><input type="checkbox" value="exchangeActiveSync"> Exchange ActiveSync</label>
+              <label><input type="checkbox" value="other"> Other clients</label>
+            </div>
+            <p class="hint">Leave all unchecked for "all client apps" (<code>["all"]</code>).</p>
+          </div>
+
+          <div class="field row2">
+            <div>
+              <label class="lbl" for="locInclude">Locations — include</label>
+              <select id="locInclude">
+                <option value="" selected>Not configured</option>
+                <option value="All">Any location</option>
+                <option value="AllTrusted">All trusted locations</option>
+                <option value="selected">Selected locations (by ID)</option>
+              </select>
+            </div>
+            <div>
+              <label class="lbl" for="locExclude">Locations — exclude</label>
+              <select id="locExclude">
+                <option value="" selected>None</option>
+                <option value="AllTrusted">All trusted locations</option>
+                <option value="selected">Selected locations (by ID)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field hidden" id="locIncludeIdsField">
+            <label class="lbl" for="locIncludeIds">Include location IDs</label>
+            <input type="text" id="locIncludeIds" placeholder="comma-separated named-location GUIDs" autocomplete="off">
+          </div>
+          <div class="field hidden" id="locExcludeIdsField">
+            <label class="lbl" for="locExcludeIds">Exclude location IDs</label>
+            <input type="text" id="locExcludeIds" placeholder="comma-separated named-location GUIDs" autocomplete="off">
+          </div>
+
+          <div class="field">
+            <label class="lbl">Device platforms</label>
+            <div class="checks" id="platforms">
+              <label><input type="checkbox" value="android"> Android</label>
+              <label><input type="checkbox" value="iOS"> iOS</label>
+              <label><input type="checkbox" value="windows"> Windows</label>
+              <label><input type="checkbox" value="macOS"> macOS</label>
+              <label><input type="checkbox" value="linux"> Linux</label>
+            </div>
+            <p class="hint">Leave all unchecked to omit the platform condition.</p>
+          </div>
+
+          <div class="field">
+            <label class="lbl">Sign-in risk levels <span class="tagbadge p2" title="Requires Entra ID P2 (ID Protection)">P2</span></label>
+            <div class="checks" id="signInRisk">
+              <label><input type="checkbox" value="high"> High</label>
+              <label><input type="checkbox" value="medium"> Medium</label>
+              <label><input type="checkbox" value="low"> Low</label>
+              <label><input type="checkbox" value="none"> No risk</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl">User risk levels <span class="tagbadge p2" title="Requires Entra ID P2 (ID Protection)">P2</span></label>
+            <div class="checks" id="userRisk">
+              <label><input type="checkbox" value="high"> High</label>
+              <label><input type="checkbox" value="medium"> Medium</label>
+              <label><input type="checkbox" value="low"> Low</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="lbl" for="insiderRisk">Insider risk level <span class="tagbadge purview" title="Requires Microsoft Purview Adaptive Protection">Purview</span></label>
+            <select id="insiderRisk">
+              <option value="" selected>Not configured</option>
+              <option value="minor">Minor and above</option>
+              <option value="moderate">Moderate and above</option>
+              <option value="elevated">Elevated only</option>
+            </select>
+            <p class="hint">Risk signal from Purview Insider Risk Management / Adaptive Protection. Emitted as a single string.</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Grant controls</legend>
+          <div class="field">
+            <label class="lbl" for="authStrength">Authentication strength</label>
+            <select id="authStrength">
+              <option value="" selected>Not set — use the checkbox below</option>
+              <option value="00000000-0000-0000-0000-000000000002">Multifactor authentication</option>
+              <option value="00000000-0000-0000-0000-000000000003">Passwordless MFA</option>
+              <option value="00000000-0000-0000-0000-000000000004">Phishing-resistant MFA (passkey / FIDO2, WHfB, CBA)</option>
+            </select>
+            <p class="hint" id="authStrengthHint">Emits <code>authenticationStrength@odata.bind</code>. Can't be combined with "Require multifactor authentication" — that box is ignored while a strength is set.</p>
+          </div>
+          <div class="field">
+            <label class="lbl" for="grantOperator">Require</label>
+            <select id="grantOperator">
+              <option value="OR" selected>Any of the selected controls (OR)</option>
+              <option value="AND">All of the selected controls (AND)</option>
+            </select>
+          </div>
+          <div class="field">
+            <div class="checks" id="grantControls">
+              <label><input type="checkbox" value="block"> Block access</label>
+              <label><input type="checkbox" value="mfa" checked> Require multifactor authentication</label>
+              <label><input type="checkbox" value="compliantDevice"> Require compliant device</label>
+              <label><input type="checkbox" value="domainJoinedDevice"> Require Hybrid Azure AD joined device</label>
+              <label><input type="checkbox" value="approvedApplication"> Require approved client app</label>
+              <label><input type="checkbox" value="compliantApplication"> Require app protection policy</label>
+              <label><input type="checkbox" value="passwordChange"> Require password change</label>
+            </div>
+            <p class="hint">"Block access" overrides everything else. "Require password change" must pair with MFA using AND (Microsoft rule).</p>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Session controls</legend>
+          <div class="field row2">
+            <div>
+              <label class="lbl" for="sifValue">Sign-in frequency</label>
+              <input type="number" id="sifValue" min="0" placeholder="e.g. 8" autocomplete="off">
+            </div>
+            <div>
+              <label class="lbl" for="sifType">Unit</label>
+              <select id="sifType">
+                <option value="hours" selected>Hours</option>
+                <option value="days">Days</option>
+                <option value="everyTime">Every time (0)</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="lbl" for="persistentBrowser">Persistent browser session</label>
+            <select id="persistentBrowser">
+              <option value="" selected>Not configured</option>
+              <option value="always">Always persistent</option>
+              <option value="never">Never persistent</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl" for="cloudAppSecurity">Conditional Access App Control <span class="tagbadge mdca" title="Requires Microsoft Defender for Cloud Apps">Defender for Cloud Apps</span></label>
+            <select id="cloudAppSecurity">
+              <option value="" selected>Not configured</option>
+              <option value="monitorOnly">Monitor only</option>
+              <option value="blockDownloads">Block downloads</option>
+              <option value="mcasConfigured">Use custom policy (configured in Defender for Cloud Apps)</option>
+            </select>
+            <p class="hint">Routes the session through the Defender for Cloud Apps reverse proxy for in-session control (download / print / copy / DLP).</p>
+          </div>
+          <div class="field">
+            <div class="checks">
+              <label><input type="checkbox" id="disableResilience"> Disable resilience defaults (don't extend sessions during an Entra outage)</label>
+            </div>
+          </div>
+        </fieldset>
+
+      </form>
+
+      <!-- ============ OUTPUT ============ -->
+      <div class="output">
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" id="tab-json" aria-selected="true" aria-controls="view-json">Graph JSON</button>
+          <button class="tab" role="tab" id="tab-summary" aria-selected="false" aria-controls="view-summary">Plain English</button>
+        </div>
+
+        <div class="panel">
+          <div id="view-json" role="tabpanel" aria-labelledby="tab-json">
+            <pre id="jsonOut"></pre>
+          </div>
+          <div id="view-summary" role="tabpanel" aria-labelledby="tab-summary" class="hidden">
+            <p id="summary"></p>
+          </div>
+
+          <p class="license" id="licenseNote"></p>
+
+          <div class="panel-actions">
+            <button class="btn primary" id="copyBtn" type="button">Copy JSON</button>
+            <button class="btn" id="resetBtn" type="button">Reset</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ============ BASELINE MODEL ============ -->
+    <section class="model">
+      <h2>A baseline model — deploy in order</h2>
+      <p>
+        A coherent starter set, not a parts bin. Each layer builds on the ones above it. Every
+        policy: report-only → pilot group → all, and exclude your break-glass accounts from all
+        of them. "Load into builder" drops that policy into the form above so you can adjust it.
+      </p>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">01</span><span class="name">Block legacy authentication</span><span class="scope">all users</span></div>
+        <details><summary>Why / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>Legacy auth (POP, IMAP, SMTP AUTH, older Office) can't do MFA or device checks. Every other policy has a bypass until this is in place. Highest priority, lowest risk.</dd>
+            <dt>Watch out</dt><dd>Scan-to-email MFPs, old scanners, LOB apps using SMTP AUTH, shared mailboxes on legacy clients. Find them first — sign-in logs, filter <em>Client app = Other clients</em>.</dd>
+            <dt>Rollout</dt><dd>Report-only 1–2 weeks, review the "Other clients" sign-ins, then enforce.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="block-legacy">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">02</span><span class="name">Phishing-resistant MFA for admins</span><span class="scope">privileged directory roles</span></div>
+        <details><summary>Why / assumes / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>Admin accounts are the highest-value target and the smallest population. Do them first and properly — push and SMS are phishable, so "any MFA" isn't enough here.</dd>
+            <dt>Assumes</dt><dd>Admins have a phishing-resistant method registered (passkey/FIDO2, Windows Hello, or CBA). Provision before enforcing; a Temporary Access Pass covers the gap.</dd>
+            <dt>Watch out</dt><dd>Break-glass accounts excluded (long random password in a safe, not a key). Service accounts with roles — move to workload identity / managed identity instead of carving exclusions.</dd>
+            <dt>Rollout</dt><dd>Pilot with 1–2 admins, then all. Keep TAP available during onboarding.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="phishres-admins">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">03</span><span class="name">Require MFA (or stronger) for all users</span><span class="scope">all users, all apps</span></div>
+        <details><summary>Why / assumes / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>The broad baseline. Everything below refines it.</dd>
+            <dt>Assumes</dt><dd>Users have registered an MFA method. Run a registration campaign first, paired with a registration-enforcement or Identity Protection registration policy.</dd>
+            <dt>Watch out</dt><dd>Guests (policy 7), break-glass (exclude), remaining non-interactive / service sign-ins.</dd>
+            <dt>Rollout</dt><dd>Report-only, watch the "would have required MFA" volume, pilot a group, then all. Most likely to generate helpdesk calls — time it.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="mfa-all">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">04</span><span class="name">Require a managed device for desktop sessions</span><span class="scope">browser + modern clients</span></div>
+        <details><summary>Why / assumes / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>MFA proves <em>who</em>. Device compliance proves the <em>endpoint</em> is patched, encrypted and enrolled. Together they're the Zero Trust baseline for access from a real computer.</dd>
+            <dt>Assumes</dt><dd>Intune (or hybrid join) is deployed and compliance policies are meaningful. Without that, this just blocks people.</dd>
+            <dt>Watch out</dt><dd>macOS / Linux, contractors on their own kit (policy 5), kiosk / shared devices.</dd>
+            <dt>Rollout</dt><dd>Start with the most sensitive apps (finance, HR, admin portals), expand. Report-only essential.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="require-device">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">05</span><span class="name">Contain unmanaged devices</span><span class="scope">MFA + short sign-in frequency + no persistent browser</span></div>
+        <details><summary>Why / optional add / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>Don't block BYOD outright, but an unmanaged browser session shouldn't last 90 days or leave refresh tokens on a personal laptop. This contains it.</dd>
+            <dt>Optional add</dt><dd>Conditional Access App Control (Defender for Cloud Apps) to block downloads in-session — keeps data off the device entirely.</dd>
+            <dt>Watch out</dt><dd>Sign-in frequency + a phishing-resistant strength can double-prompt (known Microsoft quirk). 1–4 hours is usually the sweet spot, not "every time".</dd>
+            <dt>Rollout</dt><dd>Report-only, then enforce alongside policy 4.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="unmanaged-contain">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">06a</span><span class="name">Risky sign-in → require MFA</span><span class="scope">Entra ID P2</span></div>
+        <details><summary>Why / watch out / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>Catches "the credential works but the sign-in looks wrong" — impossible travel, anonymous IP, leaked credentials.</dd>
+            <dt>Watch out</dt><dd>Risk policies lock people out unexpectedly more than any other. Report-only for longer.</dd>
+            <dt>Rollout</dt><dd>Report-only 2–4 weeks minimum, review the risk detections, then enforce.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="risky-signin">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">06b</span><span class="name">High user risk → secure password change</span><span class="scope">Entra ID P2 · MFA + password change, AND</span></div>
+        <details><summary>Why / assumes / rollout</summary>
+          <dl>
+            <dt>Why</dt><dd>The account itself looks compromised. Let the user self-remediate without a helpdesk ticket.</dd>
+            <dt>Assumes</dt><dd>Entra ID P2. No P2? Skip layer 6 — policies 1–5 stand on their own. Confirm SSPR is fully working before enforcing.</dd>
+            <dt>Rollout</dt><dd>Report-only, review, enforce.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="risky-user">Load into builder →</button>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">07</span><span class="name">Guest &amp; external access</span><span class="scope">MFA (+ Terms of Use)</span></div>
+        <details><summary>Why / assumes / watch out</summary>
+          <dl>
+            <dt>Why</dt><dd>Guests authenticate in their home tenant; you can't assume they have MFA. Require it at your resource. Terms of Use gives an auditable acceptance (add it in the portal — not modelled in this tool).</dd>
+            <dt>Assumes</dt><dd>Cross-tenant access settings reviewed — you can trust MFA claims from partner tenants to cut prompts.</dd>
+            <dt>Watch out</dt><dd>B2B one-time-passcode users, guest redemption flows.</dd>
+          </dl>
+        </details>
+        <button class="model-load" type="button" data-preset="mfa-guests">Load into builder →</button>
+      </div>
+
+      <div class="model-rules">
+        <strong>Cross-cutting rules</strong>
+        <ul>
+          <li>Break-glass: two cloud-only Global Admin accounts, excluded from <em>every</em> policy, passwords held offline, sign-in activity alerted on.</li>
+          <li>Never straight to ON. Report-only → pilot group → all, every time.</li>
+          <li>Name policies consistently: <code>CAxx - &lt;persona&gt; - &lt;intent&gt; - &lt;state&gt;</code>.</li>
+          <li>Review quarterly — CA estates drift.</li>
+        </ul>
+        <p style="margin-top:12px"><strong>Deliberately left out:</strong> location-based blocking as a primary control (noisy, VPN-defeated — use named locations for trusted exclusions only), per-country blocks (a real project, not a checkbox), and a policy per app (group sensitive apps and target the group).</p>
+      </div>
+    </section>
+
+    <!-- ============ CA IN CONTEXT ============ -->
+    <section class="context">
+      <h2>How Conditional Access connects to the rest</h2>
+      <p>
+        CA is the enforcement point at sign-in. Other services feed it signals or ride on its
+        session controls — this is where a policy stops being a standalone rule and becomes part
+        of a model.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Service</th><th>How it connects</th><th>In the policy</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Intune</td>
+            <td>Device compliance state feeds the compliant-device grant control.</td>
+            <td><code>grantControls.builtInControls: ["compliantDevice"]</code></td>
+          </tr>
+          <tr>
+            <td>Defender for Cloud Apps <span class="prod">(MDCA)</span></td>
+            <td>Conditional Access App Control routes the session through MDCA's proxy — monitor, block downloads, or a custom session policy.</td>
+            <td><code>sessionControls.cloudAppSecurity</code></td>
+          </tr>
+          <tr>
+            <td>Purview <span class="prod">(Insider Risk / Adaptive Protection)</span></td>
+            <td>Insider risk level becomes a CA condition — block, step up auth, or require terms of use as risk rises.</td>
+            <td><code>conditions.insiderRiskLevels</code></td>
+          </tr>
+          <tr>
+            <td>Purview <span class="prod">(sensitivity labels, sensitive sites)</span></td>
+            <td>A label or protected SharePoint site stamps an authentication context; a CA policy targets that context to force step-up on the sensitive action.</td>
+            <td><code>conditions.applications.includeAuthenticationContextClassReferences</code></td>
+          </tr>
+          <tr>
+            <td>ID Protection <span class="prod">(Entra ID P2)</span></td>
+            <td>Sign-in risk and user risk as conditions; user-risk policies can drive a secure password change.</td>
+            <td><code>conditions.signInRiskLevels</code> / <code>userRiskLevels</code></td>
+          </tr>
+          <tr>
+            <td>Entra Suite <span class="prod">(Global Secure Access)</span></td>
+            <td>"Compliant network" signal — require the user to be connecting through GSA; also scope policy to GSA traffic profiles. (Modelled here in prose; the Graph shape is still settling.)</td>
+            <td><code>conditions</code> — network signal</td>
+          </tr>
+          <tr>
+            <td>PIM</td>
+            <td>Privileged role activation can require a CA authentication context, so elevating a role can demand phishing-resistant MFA.</td>
+            <td>authentication context (as above)</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <footer>
+    <span>© 2026 Kaine Cohen</span>
+    <span>cohenholmes.co.uk</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var BREAKGLASS_PLACEHOLDER = "00000000-0000-0000-0000-000000000000";
+  var AZURE_MGMT_APP = "797f4846-ba00-4fd7-ba43-dac1f8f63013";
+  var STRENGTH_MFA   = "00000000-0000-0000-0000-000000000002";
+  var STRENGTH_PWLESS = "00000000-0000-0000-0000-000000000003";
+  var STRENGTH_PHISH = "00000000-0000-0000-0000-000000000004";
+  var STRENGTH_NAMES = {};
+  STRENGTH_NAMES[STRENGTH_MFA] = "Multifactor authentication";
+  STRENGTH_NAMES[STRENGTH_PWLESS] = "Passwordless MFA";
+  STRENGTH_NAMES[STRENGTH_PHISH] = "Phishing-resistant MFA";
+
+  var ADMIN_ROLES = [
+    "62e90394-69f5-4237-9190-012177145e10","e8611ab8-c189-46e8-94e1-60213ab1f814",
+    "7be44c8a-adaf-4e2a-84d6-ab2649e08a13","194ae4cb-b126-40b2-bd5b-6091b380977d",
+    "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9","c4e39bd9-1100-46d3-8c65-fb160da0071f",
+    "29232cdf-9323-42fd-ade2-1d097af3e4de","f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+    "fe930be7-5e62-47db-91af-98c3a49a38b1","729827e3-9c14-49f7-bb1b-9608f156bbb8"
+  ];
+
+  var form = document.getElementById("caForm");
+  var jsonOut = document.getElementById("jsonOut");
+  var summaryEl = document.getElementById("summary");
+  var licenseEl = document.getElementById("licenseNote");
+  var presetEl = document.getElementById("preset");
+
+  var $ = function(id){ return document.getElementById(id); };
+  var splitIds = function(v){
+    return (v || "").split(",").map(function(s){ return s.trim(); }).filter(Boolean);
+  };
+  var checkedValues = function(containerId){
+    return Array.prototype.slice
+      .call(document.querySelectorAll("#" + containerId + " input:checked"))
+      .map(function(el){ return el.value; });
+  };
+  var setChecks = function(containerId, values){
+    var want = values || [];
+    Array.prototype.slice.call(document.querySelectorAll("#" + containerId + " input")).forEach(function(el){
+      el.checked = want.indexOf(el.value) !== -1;
+    });
+  };
+
+  /* ---- presets (Microsoft Conditional Access templates) ---- */
+  var DOC = "https://learn.microsoft.com/en-us/entra/identity/conditional-access/";
+  var LIC_P1 = "Microsoft Entra ID P1 — included in Business Premium, Microsoft 365 E3 / E5 / F3.";
+  var LIC_P2 = "Microsoft Entra ID P2 — included in Microsoft 365 E5, or the Entra ID P2 add-on.";
+
+  var PRESETS = {
+    "mfa-all": {
+      displayName: "Require MFA for all users", grant: ["mfa"],
+      scenario: "Your baseline. Every user, every app, MFA — the single highest-impact policy most tenants are missing or only half-enforcing.",
+      licence: LIC_P1, doc: DOC + "policy-all-users-mfa-strength"
+    },
+    "mfa-admins": {
+      displayName: "Require MFA for admin roles", userInclude: "roles", roles: ADMIN_ROLES, grant: ["mfa"],
+      scenario: "Admin accounts are the top target and the smallest group. Cover them first, before the broad rollout reaches everyone else.",
+      licence: LIC_P1, doc: DOC + "policy-old-require-mfa-admin"
+    },
+    "phishres-admins": {
+      displayName: "Require phishing-resistant MFA for admin roles", userInclude: "roles", roles: ADMIN_ROLES, authStrength: STRENGTH_PHISH,
+      scenario: "Push and SMS are phishable. For admins, require a method an attacker can't relay — passkey, Windows Hello, or a certificate. Register the method before you enforce.",
+      licence: LIC_P1, doc: DOC + "policy-admin-phish-resistant-mfa"
+    },
+    "mfa-guests": {
+      displayName: "Require MFA for guests and external users", userInclude: "GuestsOrExternalUsers", grant: ["mfa"],
+      scenario: "Guests authenticate in their home tenant, so you can't assume they've done MFA. Require it at your resource and keep an audit trail.",
+      licence: LIC_P1, doc: DOC + "policy-old-require-mfa-guest"
+    },
+    "require-device": {
+      displayName: "Require compliant or hybrid-joined device", clientApps: ["browser","mobileAppsAndDesktopClients"], grant: ["compliantDevice","domainJoinedDevice"], grantOperator: "OR",
+      scenario: "MFA proves who; device compliance proves the endpoint is patched and enrolled. Use for desktop access to sensitive apps once Intune is real.",
+      licence: LIC_P1, doc: DOC + "policy-all-users-device-compliance"
+    },
+    "mobile-app-protection": {
+      displayName: "Require app protection policy on mobile", platforms: ["android","iOS"], clientApps: ["mobileAppsAndDesktopClients"], grant: ["compliantApplication","approvedApplication"], grantOperator: "OR",
+      scenario: "Let people use personal phones, but only through managed apps with an app protection policy — so company data can't be copied out to the personal side.",
+      licence: "Microsoft Entra ID P1 + Microsoft Intune (for the app protection policy).", doc: DOC + "policy-all-users-device-compliance"
+    },
+    "unmanaged-mdca": {
+      displayName: "Unmanaged browser — block downloads", clientApps: ["browser"], grant: ["mfa"], cloudAppSecurity: "blockDownloads",
+      scenario: "Someone's on a personal laptop browser. You don't want to block them, but you don't want files leaving either — route the session through Defender for Cloud Apps and block downloads.",
+      licence: "Microsoft Entra ID P1 + Microsoft Defender for Cloud Apps.", doc: DOC + "concept-conditional-access-session#conditional-access-application-control"
+    },
+    "unmanaged-contain": {
+      displayName: "Contain unmanaged devices", clientApps: ["browser"], grant: ["mfa"], sifValue: 4, sifType: "hours", persistentBrowser: "never",
+      scenario: "Don't block BYOD outright, but an unmanaged browser session shouldn't last 90 days or leave refresh tokens on a personal laptop. MFA + a short sign-in frequency + no persistent browser contains it.",
+      licence: LIC_P1, doc: DOC + "concept-conditional-access-session"
+    },
+    "block-legacy": {
+      displayName: "Block legacy authentication", clientApps: ["exchangeActiveSync","other"], grant: ["block"],
+      scenario: "Legacy protocols (IMAP, POP, SMTP AUTH) can't do MFA, so they're every attacker's way around your other policies. Find the scanners and LOB apps first, then shut it.",
+      licence: LIC_P1, doc: DOC + "policy-block-legacy-authentication"
+    },
+    "mfa-azure-mgmt": {
+      displayName: "Require MFA for Azure management", includeApps: [AZURE_MGMT_APP], grant: ["mfa"],
+      scenario: "The Azure portal, CLI and PowerShell are how the tenant gets reconfigured. Require MFA specifically for that surface even if the broad rollout isn't done.",
+      licence: LIC_P1, doc: DOC + "policy-old-require-mfa-azure-mgmt"
+    },
+    "risky-signin": {
+      displayName: "Require MFA for risky sign-ins", signInRisk: ["high","medium"], grant: ["mfa"],
+      scenario: "ID Protection thinks this sign-in looks wrong — impossible travel, anonymous IP, leaked credentials. Step up to MFA in the moment instead of blocking outright.",
+      licence: LIC_P2, doc: DOC + "policy-risk-based-sign-in"
+    },
+    "risky-user": {
+      displayName: "Require secure password change for high user risk", userRisk: ["high"], grant: ["mfa","passwordChange"], grantOperator: "AND",
+      scenario: "The account itself looks compromised. Force a secure password change (with MFA) so the user can self-remediate without a helpdesk ticket.",
+      licence: LIC_P2, doc: DOC + "policy-risk-based-user"
+    },
+    "insider-elevated": {
+      displayName: "Block access for elevated insider risk", insiderRisk: "elevated", grant: ["block"],
+      scenario: "Purview Adaptive Protection has flagged this user as elevated insider risk — mass downloads, data staged for exfil. Block access while that risk is live.",
+      licence: "Microsoft Entra ID P1 + Microsoft Purview (Adaptive Protection — E5 Compliance / E5).", doc: DOC + "policy-risk-based-insider-block"
+    },
+    "authctx-stepup": {
+      displayName: "Require MFA for a sensitive action", authContext: ["c1"], appInclude: "None", grant: ["mfa"],
+      scenario: "Most work needs normal access; one sensitive action or site needs more. Tag that resource with an auth context and require step-up only there.",
+      licence: LIC_P1, doc: DOC + "concept-conditional-access-cloud-apps#authentication-context"
+    }
+  };
+
+  function applyPreset(key){
+    var p = PRESETS[key];
+    if (!p) return;
+    form.reset();
+    setChecks("grantControls", []);
+    if (p.displayName) $("displayName").value = p.displayName;
+    $("state").value = p.state || "enabledForReportingButNotEnforced";
+    $("userInclude").value = p.userInclude || "All";
+    if (p.roles) setChecks("roles", p.roles);
+    if (p.includeApps){ $("appInclude").value = "apps"; $("includeApps").value = p.includeApps.join(", "); }
+    else if (p.appInclude) $("appInclude").value = p.appInclude;
+    $("authContext").value = (p.authContext || []).join(", ");
+    setChecks("clientApps", p.clientApps || []);
+    setChecks("platforms", p.platforms || []);
+    setChecks("signInRisk", p.signInRisk || []);
+    setChecks("userRisk", p.userRisk || []);
+    $("insiderRisk").value = p.insiderRisk || "";
+    setChecks("grantControls", p.grant || []);
+    $("grantOperator").value = p.grantOperator || "OR";
+    $("authStrength").value = p.authStrength || "";
+    $("cloudAppSecurity").value = p.cloudAppSecurity || "";
+    $("sifValue").value = p.sifValue != null ? p.sifValue : "";
+    if (p.sifType) $("sifType").value = p.sifType;
+    $("persistentBrowser").value = p.persistentBrowser || "";
+    presetEl.value = key;
+    syncVisibility();
+    render();
+  }
+
+  function syncVisibility(){
+    $("includeGroupsField").classList.toggle("hidden", $("userInclude").value !== "groups");
+    $("includeRolesField").classList.toggle("hidden", $("userInclude").value !== "roles");
+    $("includeAppsField").classList.toggle("hidden", $("appInclude").value !== "apps");
+    $("locIncludeIdsField").classList.toggle("hidden", $("locInclude").value !== "selected");
+    $("locExcludeIdsField").classList.toggle("hidden", $("locExclude").value !== "selected");
+  }
+
+  function buildPolicy(){
+    var p = { displayName: $("displayName").value.trim() || "Untitled policy", state: $("state").value };
+
+    var users = { includeUsers: [], excludeUsers: [], includeGroups: [], excludeGroups: [], includeRoles: [] };
+    var ui = $("userInclude").value;
+    if (ui === "groups"){ users.includeGroups = splitIds($("includeGroups").value); }
+    else if (ui === "roles"){ users.includeRoles = checkedValues("roles"); }
+    else { users.includeUsers = [ui]; }
+    users.excludeGroups = splitIds($("excludeGroups").value);
+    if ($("excludeBreakglass").checked && users.excludeGroups.indexOf(BREAKGLASS_PLACEHOLDER) === -1){
+      users.excludeGroups.push(BREAKGLASS_PLACEHOLDER);
+    }
+
+    var apps = { includeApplications: [], excludeApplications: [], includeAuthenticationContextClassReferences: [] };
+    var ai = $("appInclude").value;
+    if (ai === "apps"){ apps.includeApplications = splitIds($("includeApps").value); }
+    else { apps.includeApplications = [ai]; }
+    apps.excludeApplications = splitIds($("excludeApps").value);
+    apps.includeAuthenticationContextClassReferences = splitIds($("authContext").value);
+
+    var conditions = {
+      users: users,
+      applications: apps,
+      clientAppTypes: checkedValues("clientApps")
+    };
+    if (conditions.clientAppTypes.length === 0){ conditions.clientAppTypes = ["all"]; }
+
+    var plats = checkedValues("platforms");
+    if (plats.length){ conditions.platforms = { includePlatforms: plats, excludePlatforms: [] }; }
+
+    var li = $("locInclude").value, le = $("locExclude").value;
+    if (li || le){
+      var loc = { includeLocations: [], excludeLocations: [] };
+      if (li === "selected"){ loc.includeLocations = splitIds($("locIncludeIds").value); }
+      else if (li){ loc.includeLocations = [li]; }
+      if (le === "selected"){ loc.excludeLocations = splitIds($("locExcludeIds").value); }
+      else if (le){ loc.excludeLocations = [le]; }
+      conditions.locations = loc;
+    }
+
+    var risk = checkedValues("signInRisk");
+    if (risk.length){ conditions.signInRiskLevels = risk; }
+    var urisk = checkedValues("userRisk");
+    if (urisk.length){ conditions.userRiskLevels = urisk; }
+    var irisk = $("insiderRisk").value;
+    if (irisk){ conditions.insiderRiskLevels = irisk; }
+
+    p.conditions = conditions;
+
+    /* grant controls */
+    var controls = checkedValues("grantControls");
+    var strength = $("authStrength").value;
+    if (controls.indexOf("block") !== -1){ controls = ["block"]; strength = ""; }
+    if (strength){ controls = controls.filter(function(c){ return c !== "mfa"; }); }
+    if (controls.length || strength){
+      var g = { operator: (controls.length + (strength ? 1 : 0)) === 1 ? "OR" : $("grantOperator").value };
+      if (controls.length) g.builtInControls = controls;
+      if (strength){ g["authenticationStrength@odata.bind"] = "https://graph.microsoft.com/v1.0/policies/authenticationStrengthPolicies/" + strength; }
+      p.grantControls = g;
+    }
+
+    /* session controls */
+    var session = {};
+    var sifType = $("sifType").value;
+    var sifVal = parseInt($("sifValue").value, 10);
+    if (sifType === "everyTime"){
+      session.signInFrequency = { frequencyInterval: "everyTime", isEnabled: true };
+    } else if (!isNaN(sifVal) && sifVal > 0){
+      session.signInFrequency = { value: sifVal, type: sifType, isEnabled: true };
+    }
+    var pb = $("persistentBrowser").value;
+    if (pb){ session.persistentBrowser = { mode: pb, isEnabled: true }; }
+    var cas = $("cloudAppSecurity").value;
+    if (cas){ session.cloudAppSecurity = { cloudAppSecurityType: cas, isEnabled: true }; }
+    if ($("disableResilience").checked){ session.disableResilienceDefaults = true; }
+    if (Object.keys(session).length){ p.sessionControls = session; }
+
+    return prune(p);
+  }
+
+  function prune(obj){
+    if (Array.isArray(obj)){
+      var arr = obj.map(prune).filter(function(v){ return v !== undefined; });
+      return arr.length ? arr : undefined;
+    }
+    if (obj && typeof obj === "object"){
+      var out = {};
+      Object.keys(obj).forEach(function(k){
+        var v = prune(obj[k]);
+        if (v !== undefined) out[k] = v;
+      });
+      return Object.keys(out).length ? out : undefined;
+    }
+    if (obj === "" || obj === null) return undefined;
+    return obj;
+  }
+
+  /* ---- licence floor ---- */
+  function licenceNote(p){
+    var c = p.conditions || {};
+    var out = [];
+    if ((c.signInRiskLevels && c.signInRiskLevels.length) || (c.userRiskLevels && c.userRiskLevels.length)){
+      out.push('<span class="tag p2">Entra ID P2</span> sign-in / user risk needs ID Protection — <b>Microsoft 365 E5</b> or the <b>Entra ID P2</b> add-on.');
+    } else {
+      out.push('<span class="tag">Entra ID P1</span> custom Conditional Access — <b>Business Premium</b>, <b>E3</b>, <b>E5</b>, <b>F3</b>.');
+    }
+    if (c.insiderRiskLevels){
+      out.push('<span class="tag purview">Purview</span> insider risk needs <b>Adaptive Protection</b> (E5 Compliance / E5).');
+    }
+    if (p.sessionControls && p.sessionControls.cloudAppSecurity){
+      out.push('<span class="tag mdca">MDCA</span> App Control needs <b>Defender for Cloud Apps</b>.');
+    }
+    return out.join("<br>");
+  }
+
+  /* ---- plain-English summary ---- */
+  function buildSummary(p){
+    var c = p.conditions || {};
+    var u = c.users || {};
+    var parts = [];
+
+    var who;
+    if (u.includeUsers && u.includeUsers.indexOf("All") !== -1) who = "all users";
+    else if (u.includeUsers && u.includeUsers.indexOf("GuestsOrExternalUsers") !== -1) who = "all guest and external users";
+    else if (u.includeRoles && u.includeRoles.length) who = u.includeRoles.length + " selected admin role" + (u.includeRoles.length > 1 ? "s" : "");
+    else if (u.includeGroups && u.includeGroups.length) who = u.includeGroups.length + " selected group" + (u.includeGroups.length > 1 ? "s" : "");
+    else who = "no one yet";
+    var excl = (u.excludeGroups || []).length;
+    if (excl) who += " <span class=\"muted\">(excluding " + excl + " group" + (excl > 1 ? "s" : "") + ")</span>";
+
+    var apps = c.applications || {};
+    var inc = apps.includeApplications || [];
+    var ctx = apps.includeAuthenticationContextClassReferences || [];
+    var what;
+    if (ctx.length) what = "a sensitive action (auth context " + ctx.join(", ") + ")";
+    else if (inc.indexOf("All") !== -1) what = "all cloud apps";
+    else if (inc.indexOf("Office365") !== -1) what = "Office 365";
+    else if (inc.indexOf("None") !== -1) what = "no apps";
+    else if (inc.indexOf(AZURE_MGMT_APP) !== -1 && inc.length === 1) what = "Azure management";
+    else if (inc.length) what = inc.length + " selected app" + (inc.length > 1 ? "s" : "");
+    else what = "no apps";
+
+    parts.push("When <strong>" + who + "</strong> access <strong>" + what + "</strong>");
+
+    var conds = [];
+    if (c.clientAppTypes && c.clientAppTypes.length && c.clientAppTypes[0] !== "all"){
+      conds.push("from " + c.clientAppTypes.map(labelClient).join(" or "));
+    }
+    if (c.locations){
+      var l = c.locations;
+      if ((l.includeLocations || []).indexOf("All") !== -1 && (l.excludeLocations || []).indexOf("AllTrusted") !== -1){
+        conds.push("from outside trusted locations");
+      } else if ((l.includeLocations || []).indexOf("AllTrusted") !== -1){
+        conds.push("from trusted locations");
+      } else if ((l.includeLocations || []).length){
+        conds.push("from selected locations");
+      }
+    }
+    if (c.platforms && c.platforms.includePlatforms.length){
+      conds.push("on " + c.platforms.includePlatforms.join(", "));
+    }
+    if (c.signInRiskLevels && c.signInRiskLevels.length){
+      conds.push("when sign-in risk is " + c.signInRiskLevels.join(", "));
+    }
+    if (c.userRiskLevels && c.userRiskLevels.length){
+      conds.push("when user risk is " + c.userRiskLevels.join(", "));
+    }
+    if (c.insiderRiskLevels){
+      conds.push("when insider risk is " + c.insiderRiskLevels + " or above");
+    }
+    if (conds.length) parts.push(conds.join(", "));
+
+    var g = p.grantControls;
+    var strengthId = g && g["authenticationStrength@odata.bind"] ? g["authenticationStrength@odata.bind"].split("/").pop() : null;
+    if (g && g.builtInControls && g.builtInControls.indexOf("block") !== -1){
+      parts.push("&rarr; <strong>access is blocked</strong>");
+    } else if (g){
+      var reqs = (g.builtInControls || []).map(labelGrant);
+      if (strengthId) reqs.push("<strong>" + (STRENGTH_NAMES[strengthId] || "an authentication strength") + "</strong>");
+      var joiner = g.operator === "AND" ? " and " : " or ";
+      parts.push("&rarr; require " + reqs.map(function(r){ return r.indexOf("<strong>") === 0 ? r : "<strong>" + r + "</strong>"; }).join(joiner));
+    } else {
+      parts.push("&rarr; <span class=\"muted\">no grant control selected</span>");
+    }
+
+    var s = p.sessionControls;
+    if (s){
+      var bits = [];
+      if (s.signInFrequency){
+        bits.push(s.signInFrequency.frequencyInterval === "everyTime"
+          ? "reauthenticate every time"
+          : "sign-in frequency every " + s.signInFrequency.value + " " + s.signInFrequency.type);
+      }
+      if (s.persistentBrowser){ bits.push("browser session " + s.persistentBrowser.mode + " persistent"); }
+      if (s.cloudAppSecurity){ bits.push("session via Defender for Cloud Apps (" + s.cloudAppSecurity.cloudAppSecurityType + ")"); }
+      if (s.disableResilienceDefaults){ bits.push("resilience defaults off"); }
+      if (bits.length) parts.push("<span class=\"muted\">Session: " + bits.join("; ") + ".</span>");
+    }
+
+    var stateLine = {
+      enabled: "This policy is <strong>on</strong> and enforced.",
+      disabled: "This policy is <strong>off</strong>.",
+      enabledForReportingButNotEnforced: "This policy is in <strong>report-only</strong> mode."
+    }[p.state];
+
+    return parts.join(" ") + ". <br><span class=\"muted\">" + stateLine + "</span>";
+  }
+
+  function labelClient(v){
+    return { browser:"a browser", mobileAppsAndDesktopClients:"mobile or desktop clients",
+      exchangeActiveSync:"Exchange ActiveSync", other:"other/legacy clients" }[v] || v;
+  }
+  function labelGrant(v){
+    return { mfa:"multifactor authentication", compliantDevice:"a compliant device",
+      domainJoinedDevice:"a Hybrid AD joined device", approvedApplication:"an approved client app",
+      compliantApplication:"an app protection policy", passwordChange:"a password change" }[v] || v;
+  }
+
+  function highlight(json){
+    return json
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+      .replace(/: "([^"]*)"/g, ': <span class="json-str">"$1"</span>')
+      .replace(/: (true|false)/g, ': <span class="json-bool">$1</span>')
+      .replace(/: (\d+)/g, ': <span class="json-num">$1</span>');
+  }
+
+  var lastJson = "";
+  function updatePresetInfo(){
+    var p = PRESETS[presetEl.value];
+    var box = $("presetInfo");
+    if (!p){ box.classList.add("hidden"); return; }
+    $("presetScenario").textContent = p.scenario || "";
+    $("presetLicence").textContent = p.licence || "";
+    $("presetDoc").href = p.doc || "#";
+    box.classList.remove("hidden");
+  }
+
+  function render(){
+    syncVisibility();
+    var policy = buildPolicy();
+    lastJson = JSON.stringify(policy, null, 2);
+    jsonOut.innerHTML = highlight(lastJson);
+    summaryEl.innerHTML = buildSummary(policy);
+    licenseEl.innerHTML = licenceNote(policy);
+    updatePresetInfo();
+  }
+
+  form.addEventListener("input", function(e){
+    if (e && e.target && e.target.id !== "preset") presetEl.value = "";
+    render();
+  });
+  form.addEventListener("change", function(e){
+    if (e && e.target && e.target.id !== "preset") presetEl.value = "";
+    render();
+  });
+  presetEl.addEventListener("change", function(){ if (presetEl.value) applyPreset(presetEl.value); });
+
+  Array.prototype.slice.call(document.querySelectorAll(".model-load")).forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var key = btn.getAttribute("data-preset");
+      if (PRESETS[key]){
+        applyPreset(key);
+        document.querySelector(".preset-bar").scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  });
+
+  function selectTab(which){
+    var json = which === "json";
+    $("tab-json").setAttribute("aria-selected", json);
+    $("tab-summary").setAttribute("aria-selected", !json);
+    $("view-json").classList.toggle("hidden", !json);
+    $("view-summary").classList.toggle("hidden", json);
+  }
+  $("tab-json").addEventListener("click", function(){ selectTab("json"); });
+  $("tab-summary").addEventListener("click", function(){ selectTab("summary"); });
+
+  $("copyBtn").addEventListener("click", function(){
+    var btn = this;
+    navigator.clipboard.writeText(lastJson).then(function(){
+      var t = btn.textContent; btn.textContent = "Copied";
+      setTimeout(function(){ btn.textContent = t; }, 1200);
+    }, function(){ btn.textContent = "Copy failed"; });
+  });
+  $("resetBtn").addEventListener("click", function(){
+    form.reset();
+    presetEl.value = "";
+    setTimeout(render, 0);
+  });
+
+  render();
+})();
+</script>
+
+</body>
+</html>

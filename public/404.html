@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Not found — Kaine Cohen</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480&family=IBM+Plex+Mono:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171C;
+    --paper:#F3F1EC;
+    --line:#D8D4C8;
+    --muted:#6B6A63;
+    --signal:#3B5BFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:28px;
+  }
+  .wrap{max-width:44ch;}
+  .mark{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:20px;
+  }
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:480;
+    font-size:clamp(2rem,6vw,3rem);
+    line-height:1.1;
+    letter-spacing:-0.02em;
+    margin-bottom:14px;
+  }
+  h1 em{font-style:italic;font-weight:340;color:var(--signal);}
+  p{color:var(--muted);font-size:1rem;margin-bottom:24px;}
+  a.home{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 18px;
+    border:1px solid var(--line);
+    border-radius:100px;
+    color:var(--ink);
+    text-decoration:none;
+    font-size:0.95rem;
+    font-weight:500;
+    transition:border-color 0.2s ease,background 0.2s ease;
+  }
+  a.home:hover{border-color:var(--signal);background:#EDEEFB;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="mark">Kaine Cohen</div>
+    <h1>That page <em>isn't here</em>.</h1>
+    <p>The link may be old, or the address slightly off. Nothing's broken — the page just doesn't exist.</p>
+    <a class="home" href="/">← Back home</a>
+  </div>
+</body>
+</html>
