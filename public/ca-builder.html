@@ -724,11 +724,10 @@
               <label><input type="checkbox" value="mfa" checked> Require multifactor authentication</label>
               <label><input type="checkbox" value="compliantDevice"> Require compliant device</label>
               <label><input type="checkbox" value="domainJoinedDevice"> Require Hybrid Azure AD joined device</label>
-              <label><input type="checkbox" value="approvedApplication"> Require approved client app</label>
               <label><input type="checkbox" value="compliantApplication"> Require app protection policy</label>
               <label><input type="checkbox" value="passwordChange"> Require password change</label>
             </div>
-            <p class="hint">"Block access" overrides everything else. "Require password change" must pair with MFA using AND (Microsoft rule).</p>
+            <p class="hint">"Block access" overrides everything else. "Require password change" must pair with MFA using AND (Microsoft rule). <strong>"Require approved client app" (<code>approvedApplication</code>) is intentionally omitted</strong> — Microsoft made it read-only for new/edited policies on 30 June 2026; use "Require app protection policy" instead. You may still see it on existing policies.</p>
           </div>
         </fieldset>
 
@@ -1058,8 +1057,8 @@
       licence: LIC_P1, doc: DOC + "policy-all-users-device-compliance"
     },
     "mobile-app-protection": {
-      displayName: "Require app protection policy on mobile", platforms: ["android","iOS"], clientApps: ["mobileAppsAndDesktopClients"], grant: ["compliantApplication","approvedApplication"], grantOperator: "OR",
-      scenario: "Let people use personal phones, but only through managed apps with an app protection policy — so company data can't be copied out to the personal side.",
+      displayName: "Require app protection policy on mobile", platforms: ["android","iOS"], clientApps: ["mobileAppsAndDesktopClients"], grant: ["compliantApplication"],
+      scenario: "Let people use personal phones, but only through managed apps with an app protection policy — so company data can't be copied out to the personal side. (Uses only 'Require app protection policy' — the old 'approved client app' control is read-only for new policies since 30 June 2026.)",
       licence: "Microsoft Entra ID P1 + Microsoft Intune (for the app protection policy).", doc: DOC + "policy-all-users-device-compliance"
     },
     "unmanaged-mdca": {
