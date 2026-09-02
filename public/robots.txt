@@ -1,0 +1,23 @@
+# cohenholmes.co.uk
+#
+# Search engines and AI "answer" engines (the ones that fetch a page to answer a
+# question and cite the source) are welcome to crawl this site. Crawlers that exist
+# only to scrape content into AI training datasets are not.
+#
+# The Content-Signal below states the intent in machine-readable form:
+#   search    = yes   (index it, return links and short excerpts)
+#   ai-input  = yes    (use it for real-time answers / retrieval / grounding)
+#   ai-train  = no     (do not use it to train or fine-tune models)
+
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
+
+# Bulk dataset / training-only scrapers:
+User-agent: CCBot
+Disallow: /
+
+User-agent: Bytespider
+Disallow: /
+
+Sitemap: https://cohenholmes.co.uk/sitemap.xml
