@@ -651,7 +651,7 @@
             </div>
           </div>
           <p class="id-note hidden" id="locIdsNote">
-            "Selected locations" emit distinct placeholders &mdash; <code>&lt;YOUR-INCLUDED-LOCATION-ID&gt;</code> and <code>&lt;YOUR-EXCLUDED-LOCATION-ID&gt;</code> &mdash; so an include and an exclude can't collapse to the same ID. Use the named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations.
+            Each selector set to "Selected locations" emits its own placeholder &mdash; <code>&lt;YOUR-INCLUDED-LOCATION-ID&gt;</code> for include, <code>&lt;YOUR-EXCLUDED-LOCATION-ID&gt;</code> for exclude &mdash; so the two can't collapse to the same ID. Replace with named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations. Setting only an exclude targets <code>includeLocations: ["All"]</code>.
           </p>
 
           <div class="field">
@@ -1173,6 +1173,7 @@
       var loc = { includeLocations: [], excludeLocations: [] };
       if (li === "selected"){ loc.includeLocations = [LOCATION_INCL_PLACEHOLDER]; }
       else if (li){ loc.includeLocations = [li]; }
+      else if (le){ loc.includeLocations = ["All"]; }
       if (le === "selected"){ loc.excludeLocations = [LOCATION_EXCL_PLACEHOLDER]; }
       else if (le){ loc.excludeLocations = [le]; }
       conditions.locations = loc;
