@@ -155,16 +155,16 @@ function el(name, attrs, text){
 
 /* ---- Diagram 2: layer cards ---- */
 var LAYERS = [
-  ["1","Block legacy authentication","Removes the bypass every layer below would otherwise have"],
+  ["1","Block legacy authentication","Explicit and auditable — covers the apps you don't gate with MFA"],
   ["2","Phishing-resistant MFA for admins","Smallest group, highest value: passkeys / FIDO2, not push"],
   ["3","Secure the MFA registration surface","Stop a phished password becoming a registered attacker method"],
   ["4","Require MFA for all users, all apps","The broad baseline; raise to phishing-resistant later"],
   ["5","Require a managed device","MFA proves who; compliance proves the endpoint"],
   ["6","Contain unmanaged devices","MFA + short sign-in frequency + no persistent browser"],
   ["7","Risk-based policies","Sign-in risk and user risk, needs Entra ID P2"],
-  ["8","MFA for guests & external users","You can't assume their home tenant did any MFA"]
+  ["8","MFA for guests & external users","You can't assume their home tenant did any MFA"],
+  ["9","Restrict device code flow","Now in Security Defaults and the Microsoft-managed policies"]
 ];
-var BORDERLINE = ["+","Restrict device code flow","Borderline core after the 2024–25 device-code phishing wave"];
 
 var cards = document.getElementById("cards");
 var y0 = 132, pitch = 138, cw = 726, cx = 150;
@@ -203,7 +203,6 @@ function drawCard(i, row, dashed){
   }
 }
 LAYERS.forEach(function(r,i){ drawCard(i, r, false); });
-drawCard(8, BORDERLINE, true);
 
 /* rollout rail stops */
 var rail = document.getElementById("railStops");
