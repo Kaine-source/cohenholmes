@@ -19,10 +19,10 @@
 
   <line class="flow" x1="215" y1="235" x2="262" y2="235" marker-end="url(#ah)"/>
 
-  <!-- B: credential check -->
+  <!-- B: first-factor check -->
   <rect class="card" x="270" y="175" width="215" height="120" rx="12"/>
-  <text class="lbl" x="377" y="223" text-anchor="middle">Credential check</text>
-  <text class="mono sublbl muted" x="377" y="250" text-anchor="middle">password · passkey · token</text>
+  <text class="lbl" x="377" y="223" text-anchor="middle">First-factor check</text>
+  <text class="mono sublbl muted" x="377" y="250" text-anchor="middle">password · passkey · federation</text>
 
   <line class="flow" x1="485" y1="235" x2="532" y2="235" marker-end="url(#ah)"/>
 
@@ -61,5 +61,5 @@
   <text class="lbl" x="1365" y="223" text-anchor="middle">Application</text>
   <text class="mono muted" x="1365" y="250" text-anchor="middle" style="font-size:12px">Exchange · SharePoint · SaaS</text>
 
-  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:#6B6A63">Conditional Access runs after the credential check and before the token is issued. Nothing reaches the app until it passes.</text>
+  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:#6B6A63">Conditional Access runs after the first factor and before the token is issued. Nothing reaches the app until it passes.</text>
 </svg>
