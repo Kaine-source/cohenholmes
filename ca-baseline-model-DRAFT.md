@@ -9,6 +9,11 @@ to this app, with this risk — *then* allow / block / require MFA / require a c
 device / limit the session. It's the enforcement point almost everything else in the
 Microsoft security stack plugs into.
 
+In Zero Trust terms this is the *verify explicitly* and *assume breach* pillars — the
+gate at sign-in. It is not *least privilege*: what a user can do once they're in is PIM,
+entitlement management and app-side authorisation. CA decides whether the door opens; it
+doesn't decide what's in the room.
+
 Most tenants don't have "no security" — they have *scattered* security: three half-built
 policies someone made in 2022, Security Defaults still on, an MFA registration free-for-all.
 This is a baseline you can deploy **in order**, with the reasoning and the traps attached.
@@ -37,6 +42,9 @@ This is a baseline you can deploy **in order**, with the reasoning and the traps
   something. If devices aren't enrolled, that policy just blocks people.
 - **Have users registered MFA methods?** Run a registration campaign (Authentication
   methods policy) first — policy 3 depends on it.
+- **Third-party MFA wired in via custom controls?** If Duo / RSA / Okta is integrated as
+  an MFA provider through CA *custom controls*, that mechanism is on a retirement path —
+  plan the move to external authentication methods (EAM) before it forces your hand.
 
 ### Mandatory MFA is a floor, not a ceiling
 
@@ -99,6 +107,11 @@ Every policy: **report-only → pilot group → all**. Exclude break-glass from 
 - **Watch out:** guests (policy 8), break-glass (exclude), non-interactive / service
   sign-ins. This is the policy most likely to generate helpdesk calls — time it, and have
   the pilot group be people who'll tell you what broke.
+- **Target state:** "any MFA" is the starting bar, not the finish line. Once this is
+  enforced and passkey/FIDO2 registration is broad, raise the authentication strength on
+  this policy to **Phishing-resistant MFA** for everyone — that's where CISA SCuBA and
+  Microsoft's own guidance point. Sequence it *after* enforcement, never before: pushing
+  passkeys org-wide while MFA-for-all is still in report-only is how you strand people.
 - **Rollout:** report-only, watch the "would have required MFA" volume, pilot, then all.
 
 ### 5. Require a managed device for desktop sessions — browser + modern clients
@@ -146,6 +159,20 @@ Every policy: **report-only → pilot group → all**. Exclude break-glass from 
 - **Watch out:** B2B one-time-passcode users, guest redemption flows.
 - **Rollout:** report-only, then enforce.
 
+### Borderline core: restrict device code flow
+
+Not everyone counts this as baseline, but after the 2024–25 device-code phishing
+campaigns a growing number of 2026 baselines do. Device code flow exists for input-
+constrained devices (a conference-room display, a CLI on a headless box); attackers abuse
+it by starting the flow themselves and social-engineering a user into completing it.
+
+- **Policy:** CA → *Conditions → Authentication flows → Device code flow → Block*, all
+  users, with a tightly scoped exclusion group for the genuine device-code use cases.
+- **Sibling:** *Authentication transfer* (starting a session on one device and passing it
+  to another) — same conditions screen, block it unless you have a reason not to.
+- **Rollout:** report-only first — check the *Authentication flows* column in sign-in
+  logs for legitimate device-code sign-ins before you enforce.
+
 ---
 
 ## Ordering note
@@ -179,8 +206,6 @@ Once 1–8 are enforced, the next layer is contextual and risk-driven:
   elsewhere.
 - **Filter for devices** — target policy by device attributes (model, extensionAttributes)
   for scenarios group membership can't express.
-- **Authentication flows** — lock down device code flow and authentication transfer, both
-  used in recent phishing campaigns.
 - **Continuous access evaluation** — on by default; only touch it to *disable* for a
   specific break-glass path.
 
