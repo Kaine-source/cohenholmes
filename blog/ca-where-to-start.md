@@ -11,25 +11,25 @@ traps attached. It assumes a normal commercial tenant: a few hundred people, Mic
 
 ## What Conditional Access actually is
 
-When someone signs in, two things happen. First the identity platform checks the
-password (or the passkey, or the token). Then, before it hands back the token that
-actually gets them into Exchange or SharePoint or a SaaS app, it runs your Conditional
-Access policies.
+When someone signs in, two things happen. First the identity platform checks the first
+factor — a password, a passkey, or a federated sign-in. Then, before it hands back the
+token that actually gets them into Exchange or SharePoint or a SaaS app, it runs your
+Conditional Access policies.
 
 Each policy is an *if this, then that*. **If** this user, on this device, from this
 network, to this app, with this much risk on the sign-in — **then** allow, or block, or
 require MFA, or require a compliant device, or shorten the session. That's the whole
 model. Everything else is detail.
 
-![A five-step flow: sign-in attempt, credential check, then Conditional Access evaluation
-(conditions, then controls) which either denies access or passes to a token being issued
-and the application. Caption: Conditional Access runs after the credential check and
-before the token is issued.](diagrams/ca-fig1-signin.png)
+![A five-step flow: sign-in attempt, first-factor check, then Conditional Access
+evaluation (conditions, then controls) which either denies access or passes to a token
+being issued and the application. Caption: Conditional Access runs after the first factor
+and before the token is issued.](diagrams/ca-fig1-signin.png)
 
-In Zero Trust language, this is the *verify explicitly* and *assume breach* part, the
-gate at sign-in. It is deliberately **not** *least privilege*: what a person can do once
-they're through is a different set of controls (Privileged Identity Management,
-entitlement management, permissions inside each app). Conditional Access decides whether
+In Zero Trust language, Conditional Access is mainly the *verify explicitly* and *assume
+breach* engine — the gate at sign-in. Microsoft's docs also credit it against *least
+privilege*, but that pillar mostly lives elsewhere: Privileged Identity Management,
+entitlement management, permissions inside each app. Conditional Access decides whether
 the door opens. It doesn't decide what's in the room.
 
 It's also the plug socket for a lot of the rest of the Microsoft stack. Device
@@ -60,17 +60,23 @@ So before any policy goes in:
   P1? You're on Security Defaults, and this is your migration target rather than
   something you can do today.
 - **Look at what's already there.** *Classic* policies stopped enforcing on 10 July
-  2024. If you still have any, copy down what they did and disable them. Microsoft also
-  now auto-creates some policies in your tenant (MFA for admins, the per-user-MFA
-  migration), so you will find policies you didn't make. Read them before you build
-  alongside.
-- **Know your break-glass accounts.** Two cloud-only Global Admin accounts, long unique
-  credentials stored offline, excluded from every policy you're about to create,
-  sign-in activity alerted on. Set these up first. They are the reason a bad policy is
-  an inconvenience instead of a lockout.
-- **Inventory legacy authentication.** Sign-in logs, filter on *Client app = Other
-  clients*. That's your list of scanners, multifunction printers and line-of-business
-  apps still on POP / IMAP / SMTP AUTH. You need it before policy 1.
+  2024. If you still have any, copy down what they did and disable them (you can't
+  re-enable one once it's disabled). Microsoft also auto-creates a set of policies —
+  Microsoft-managed policies — covering block legacy auth, block device code flow, MFA
+  for admins, MFA for all users, and the risk-based policies. They arrive in report-only
+  and Microsoft turns them on after about a month. You'll find policies you didn't make.
+  They're a baseline shortcut *and* the supported way to bridge off Security Defaults, so
+  read each one, exclude your break-glass accounts, and decide whether to adopt or
+  replace it.
+- **Know your break-glass accounts.** Two cloud-only Global Admin accounts on the
+  `.onmicrosoft.com` domain, long unique credentials stored offline, a phishing-resistant
+  method that differs from your normal admin sign-in, excluded from every policy, sign-in
+  activity alerted on. Set these up first. They are the reason a bad policy is an
+  inconvenience instead of a lockout.
+- **Inventory legacy authentication.** Sign-in logs, filter for the legacy protocols on
+  *both* the interactive and non-interactive tabs. That's your list of scanners,
+  multifunction printers and line-of-business apps still on POP / IMAP / SMTP AUTH and
+  Exchange ActiveSync. You need it before policy 1.
 - **Be honest about Intune.** The device-compliance policies below only mean something
   if devices are actually enrolled and the compliance rules actually check something. If
   they're not, "require a compliant device" just means "block everyone."
@@ -78,11 +84,13 @@ So before any policy goes in:
   start requiring it.
 
 One more thing worth knowing. Microsoft now *mandates* MFA on the admin and management
-surface: the Azure portal, the Entra and Intune admin centres, and (from October 2025)
-the CLI and PowerShell. That's a floor, not a ceiling. It only covers those management
-tools. It does nothing for someone opening Outlook, which is most sign-ins, and your
-Conditional Access exclusions don't apply to it. Which means your break-glass accounts
-need a real MFA method (a passkey or a certificate), not just a very long password.
+surface: the Azure portal, the Entra and Intune admin centres, and — from 1 October 2025
+— the Azure CLI, PowerShell, infrastructure-as-code and the REST API, for any create,
+update or delete (reads are exempt). That's a floor, not a ceiling. It only covers those
+management tools (requests to `management.azure.com`, not Microsoft Graph). It does
+nothing for someone opening Outlook, which is most sign-ins, and your Conditional Access
+exclusions don't apply to it. Which means your break-glass accounts need a real MFA
+method — a passkey or a certificate — not just a very long password.
 
 ## The baseline, in order
 
@@ -90,19 +98,21 @@ Every policy below goes in the same way: **report-only first**, then a **pilot g
 then **everyone**. Break-glass excluded from all of them. Don't switch anything straight
 to on.
 
-![The eight baseline layers as a numbered stack: 1 block legacy authentication (start
+![The nine baseline layers as a numbered stack: 1 block legacy authentication (start
 here), 2 phishing-resistant MFA for admins (highest value), 3 secure the MFA registration
 surface, 4 require MFA for all users, 5 require a managed device, 6 contain unmanaged
-devices, 7 risk-based policies (P2), 8 MFA for guests and external users, plus a
-borderline layer: restrict device code flow. A rollout rail runs alongside: report-only,
-pilot group, all users. Break-glass accounts are excluded from every
-layer.](diagrams/ca-fig2-baseline.png)
+devices, 7 risk-based policies (P2), 8 MFA for guests and external users, 9 restrict
+device code flow. A rollout rail runs alongside: report-only, pilot group, all users.
+Break-glass accounts are excluded from every layer.](diagrams/ca-fig2-baseline.png)
 
 ### 1. Block legacy authentication
 
-Legacy protocols can't do MFA and can't do device checks. Until this policy is in place,
-every other policy on this list has a bypass. It's the highest-priority, lowest-risk
-change you'll make.
+Legacy protocols can't do MFA and can't do device checks. Your MFA-for-all policy blocks
+them as a side effect — a legacy client can't satisfy an MFA prompt — but a dedicated
+block policy is cleaner, explicit, auditable, and covers the apps you don't gate with
+MFA. It's Microsoft's first "secure foundation" policy: highest priority, lowest risk.
+Target the *Exchange ActiveSync clients* and *Other clients* client-app types and set the
+grant to *Block*.
 
 The care factor is the inventory you did earlier. A blocked ActiveSync client gets a
 polite error; a blocked SMTP AUTH scanner just goes quiet and someone notices three days
@@ -171,24 +181,30 @@ few hours, and turn off the persistent browser session.
 
 If you've got Defender for Cloud Apps, this is also where you can bolt on session
 control to block downloads in the browser, so the data never lands on the device at
-all. One quirk to know: a short sign-in frequency combined with a phishing-resistant
-strength can double-prompt. One to four hours is the sweet spot, not "every time."
+all. A couple of things to know about sign-in frequency: on a personal (Entra-registered)
+device, unlocking the device doesn't satisfy it the way it does on a managed one, so
+people get prompted on the interval — keep it to a few hours, not minutes, and don't set
+it to "every time" without MFA (that can loop). If your tenant still has the old "Remember
+MFA on trusted devices" setting on, turn it off first.
 
 ### 7. Risk-based policies (needs Entra ID P2)
 
 Two policies:
 
-- **Sign-in risk, medium or high → require MFA.** This catches "the password is right
-  but the sign-in looks wrong": impossible travel, an anonymous IP, a credential that's
-  turned up in a breach dump.
-- **High user risk → secure password change** (MFA *and* a password change; Microsoft
-  mandates the `AND`). This lets a compromised user put themselves right without raising
-  a ticket.
+- **Sign-in risk, medium or high → require MFA and reauthenticate.** This catches "the
+  password is right but the sign-in looks wrong": impossible travel, an anonymous IP, a
+  credential that's turned up in a breach dump. Microsoft's current template pairs the MFA
+  requirement with sign-in frequency set to "every time", so the person re-proves identity
+  on the spot.
+- **High user risk → require risk remediation.** This is the current template: a single
+  grant control that walks the user through the right recovery flow for their
+  authentication method, so it works for passwordless users too. The older "MFA *and* a
+  password change" still works if your estate is all passwords.
 
-No P2? Skip this layer. Policies 1–6 stand on their own. And leave these in report-only
-for a good few weeks before you enforce. Risk policies lock people out more unexpectedly
-than any other kind, and you want to see what your tenant's normal actually looks like
-first.
+No P2? Skip this layer. Policies 1–6 stand on their own. Users have to be registered for
+MFA *before* a risky session hits them, because a risky session isn't allowed to register
+MFA. And leave these in report-only for a good few weeks — risk policies lock people out
+more unexpectedly than any other kind.
 
 ### 8. MFA for guests and external users
 
@@ -197,47 +213,61 @@ require it at your resource. Add a Terms of Use for an auditable acceptance. If 
 reviewed your cross-tenant access settings you can choose to trust MFA claims from
 specific partner tenants and cut the prompt fatigue.
 
-### Borderline: restrict device code flow
+### 9. Restrict device code flow
 
-Not everyone counts this as baseline, but after the device-code phishing campaigns of
-2024–25 more and more people do. Device code flow exists for input-constrained devices
-(a meeting-room screen, a CLI on a headless box), and attackers abuse it by starting the
-flow themselves and talking a user into finishing it.
+This one isn't optional any more. Microsoft's guidance is "block device code flow
+wherever possible", it ships in Security Defaults, and it's one of the Microsoft-managed
+policies. Device code flow exists for input-constrained devices (a meeting-room screen, a
+CLI on a headless box), and attackers abuse it by starting the flow themselves and
+talking a user into finishing it.
 
 Block it under *Conditions → Authentication flows*, with a scoped exclusion for the
-genuine cases, and block *authentication transfer* on the same screen unless you have a
-reason not to. Report-only first so you can see the legitimate device-code sign-ins
-before you cut them off.
+genuine cases (Teams Rooms have their own guidance), and block *authentication transfer*
+on the same screen unless you have a reason not to. Report-only first so you can see the
+legitimate device-code sign-ins before you cut them off.
 
 ## The rules that sit across all of it
 
 - **Break-glass:** two cloud-only Global Admin accounts, excluded from every policy,
   credentials offline, sign-ins alerted on, each with a real phishing-resistant method.
 - **Report-only, then pilot, then all.** Every time. No exceptions for "small" policies.
+- **Keep disabled contingency policies ready** to switch on during an identity outage,
+  named so they stand out (`EM01 - ENABLE IN EMERGENCY: ...`).
+- **Turn on protected actions** so changing a Conditional Access policy needs a fresh MFA.
 - **Name them consistently** (something like `CA01 - All - Block legacy auth - ON`) so
-  the list is readable at a glance and you can tell enforced from report-only.
+  the list is readable at a glance. There's no owner field, so put the owning team in the
+  name too. Mind the ceiling — 240 policies per tenant.
 - **Review quarterly.** Conditional Access estates drift. Exclusions that were meant to
   be temporary become permanent the moment nobody's looking.
 - **Export the JSON** and keep policy definitions in source control, so a change is
-  something you can diff and roll back.
+  something you can diff and roll back. Microsoft endorses the policy-as-code approach now.
 
 ## What I left out on purpose
 
-- **Location-based blocking as a primary control.** It's noisy and a VPN walks straight
-  through it. Named locations are useful as *trusted exclusions* (skip the prompt on the
-  corporate egress IP), not as the thing standing between an attacker and your data.
-- **Per-country blocks.** Only with a concrete reason. "Block everywhere, allow known
-  countries" is a real project, not a checkbox.
+- **Location-based blocking as a primary control.** A proxy or VPN changes the IP that
+  Entra sees, so IP lists are hard to keep honest — device-based controls hold up better.
+  Named locations are still useful as *trusted exclusions* (skip the prompt on the
+  corporate egress IP). Microsoft does recommend the "allow known countries, block the
+  rest" pattern; I'm deprioritising it because it's a real project to run well, not
+  because it's wrong.
 - **A policy per application.** Group your sensitive apps and target the group. Add
-  app-specific policies when a real requirement turns up, not before.
-- **Blocking unknown device platforms.** Reasonable as a later refinement ("any
-  platform, exclude the supported ones, block"), but it's a tidy-up, not a foundation.
+  app-specific policies when a real requirement turns up, not before — and remember the
+  240-policy limit.
+- **Blocking unknown device platforms.** Microsoft actually recommends this ("any
+  platform, exclude the supported ones, block"). I treat it as a refinement rather than a
+  foundation, but it's a reasonable early add.
 
 ## Where to actually start
 
-If you've got P1 and Security Defaults on: policies 1 through 4, in report-only,
-together. Read the report-only impact for a week or two. Then enforce them in order.
-That's a defensible baseline and it's a weekend of work, not a quarter.
+If you've got P1 and Security Defaults on, the first move is a careful one: you can't
+create *any* Conditional Access policy — not even a report-only one — until Security
+Defaults is off, and the moment it's off, nothing is enforcing MFA until your own
+policies are. So disable Security Defaults and, in the same change, keep MFA covered:
+either let Microsoft's "upgrade from Security Defaults" managed policies carry it, or
+enforce policy 4 straight away. Then put policies 5 through 7 — the ones that lock people
+out unexpectedly — into report-only and watch them for a couple of weeks before you
+enforce. Microsoft's own plan runs this over about four weeks. Call it a weekend to get
+the core into report-only, a few weeks to enforce the lot. Not a quarter.
 
 I built a small tool that turns these choices into the Microsoft Graph JSON and tells
 you which licence tier each one needs. It's on my site under

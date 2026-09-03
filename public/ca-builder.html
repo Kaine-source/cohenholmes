@@ -587,9 +587,9 @@
         <fieldset>
           <legend>Assignments · Target resources</legend>
           <div class="field">
-            <label class="lbl" for="appInclude">Cloud apps — include</label>
+            <label class="lbl" for="appInclude">Target resources — include</label>
             <select id="appInclude">
-              <option value="All" selected>All cloud apps</option>
+              <option value="All" selected>All resources (formerly "All cloud apps")</option>
               <option value="Office365">Office 365 (bundle)</option>
               <option value="azure">Azure management (well-known app)</option>
               <option value="apps">Select apps by ID</option>
@@ -633,23 +633,24 @@
 
           <div class="field row2">
             <div>
-              <label class="lbl" for="locInclude">Locations — include</label>
+              <label class="lbl" for="locInclude">Network / locations — include</label>
               <select id="locInclude">
                 <option value="" selected>Not configured</option>
-                <option value="All">Any location</option>
-                <option value="AllTrusted">All trusted locations</option>
-                <option value="selected">Selected locations (by ID)</option>
+                <option value="All">Any network or location</option>
+                <option value="AllTrusted">All trusted networks and locations</option>
+                <option value="selected">Selected networks and locations (by ID)</option>
               </select>
             </div>
             <div>
-              <label class="lbl" for="locExclude">Locations — exclude</label>
+              <label class="lbl" for="locExclude">Network / locations — exclude</label>
               <select id="locExclude">
                 <option value="" selected>None</option>
-                <option value="AllTrusted">All trusted locations</option>
-                <option value="selected">Selected locations (by ID)</option>
+                <option value="AllTrusted">All trusted networks and locations</option>
+                <option value="selected">Selected networks and locations (by ID)</option>
               </select>
             </div>
           </div>
+          <p class="hint">The portal renamed this condition <strong>Network</strong>; the Graph property is still <code>conditions.locations</code>. "All Compliant Network locations" (Global Secure Access) isn't modelled here.</p>
           <p class="id-note hidden" id="locIdsNote">
             Each selector set to "Selected locations" emits its own placeholder &mdash; <code>&lt;YOUR-INCLUDED-LOCATION-ID&gt;</code> for include, <code>&lt;YOUR-EXCLUDED-LOCATION-ID&gt;</code> for exclude &mdash; so the two can't collapse to the same ID. Replace with named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations. Setting only an exclude targets <code>includeLocations: ["All"]</code>.
           </p>
@@ -724,8 +725,9 @@
               <label><input type="checkbox" value="domainJoinedDevice"> Require Hybrid Azure AD joined device</label>
               <label><input type="checkbox" value="compliantApplication"> Require app protection policy</label>
               <label><input type="checkbox" value="passwordChange"> Require password change</label>
+              <label><input type="checkbox" value="riskRemediation"> Require risk remediation</label>
             </div>
-            <p class="hint">"Block access" overrides everything else. "Require password change" must pair with MFA using AND (Microsoft rule). <strong>"Require approved client app" (<code>approvedApplication</code>) is intentionally omitted</strong> — Microsoft made it read-only for new/edited policies on 30 June 2026; use "Require app protection policy" instead. You may still see it on existing policies.</p>
+            <p class="hint">"Block access" overrides everything else. <strong>Require risk remediation</strong> (<code>riskRemediation</code>) is Microsoft's current high-user-risk control — it self-applies an authentication strength and sign-in frequency = every time, and works for passwordless users; it's the modern alternative to "Require password change" (which must pair with MFA using AND). <strong>"Require approved client app" (<code>approvedApplication</code>) is intentionally omitted</strong> — read-only for new/edited policies since 30 June 2026; use "Require app protection policy" instead.</p>
           </div>
         </fieldset>
 
@@ -811,9 +813,10 @@
         <div class="head"><span class="num">01</span><span class="name">Block legacy authentication</span><span class="scope">all users</span></div>
         <details><summary>Why / watch out / rollout</summary>
           <dl>
-            <dt>Why</dt><dd>Legacy auth (POP, IMAP, SMTP AUTH, older Office) can't do MFA or device checks. Every other policy has a bypass until this is in place. Highest priority, lowest risk.</dd>
-            <dt>Watch out</dt><dd>Scan-to-email MFPs, old scanners, LOB apps using SMTP AUTH, shared mailboxes on legacy clients. Find them first — sign-in logs, filter <em>Client app = Other clients</em>.</dd>
-            <dt>Rollout</dt><dd>Report-only 1–2 weeks, review the "Other clients" sign-ins, then enforce.</dd>
+            <dt>Why</dt><dd>Legacy auth (POP, IMAP, SMTP AUTH, older Office) can't do MFA or device checks. An MFA-for-all policy blocks it as a side effect, but a dedicated block policy is explicit, auditable, and covers apps you don't gate with MFA. Microsoft's first "Secure foundation" policy.</dd>
+            <dt>Config</dt><dd>Client apps = <em>Exchange ActiveSync clients</em> + <em>Other clients</em>; grant = <em>Block</em>.</dd>
+            <dt>Watch out</dt><dd>Scan-to-email MFPs, old scanners, LOB apps on SMTP AUTH, shared mailboxes on legacy clients. Find them first — sign-in logs, legacy protocols, <em>both</em> the interactive and non-interactive tabs.</dd>
+            <dt>Rollout</dt><dd>Report-only 1–2 weeks, review, then enforce.</dd>
           </dl>
         </details>
         <button class="model-load" type="button" data-preset="block-legacy">Load into builder →</button>
@@ -825,7 +828,7 @@
           <dl>
             <dt>Why</dt><dd>Admin accounts are the highest-value target and the smallest population. Do them first and properly — push and SMS are phishable, so "any MFA" isn't enough here.</dd>
             <dt>Assumes</dt><dd>Admins have a phishing-resistant method registered (passkey/FIDO2, Windows Hello, or CBA). Provision before enforcing; a Temporary Access Pass covers the gap.</dd>
-            <dt>Watch out</dt><dd>Break-glass accounts excluded (long random password in a safe, not a key). Service accounts with roles — move to workload identity / managed identity instead of carving exclusions.</dd>
+            <dt>Watch out</dt><dd>Break-glass accounts excluded (long random password in a safe, plus a passkey/CBA that differs from your normal admin method). Service accounts with roles — move to workload identity instead of carving exclusions.</dd>
             <dt>Rollout</dt><dd>Pilot with 1–2 admins, then all. Keep TAP available during onboarding.</dd>
           </dl>
         </details>
@@ -833,25 +836,36 @@
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">03</span><span class="name">Require MFA (or stronger) for all users</span><span class="scope">all users, all apps</span></div>
+        <div class="head"><span class="num">03</span><span class="name">Secure the MFA registration surface</span><span class="scope">all users</span></div>
+        <details><summary>Why / how / watch out</summary>
+          <dl>
+            <dt>Why</dt><dd>If an attacker phishes a password, the next thing they do is register <em>their own</em> MFA method. Lock registration to a trusted network or a compliant device. Do this before you push everyone to register in policy 4.</dd>
+            <dt>How</dt><dd>CA policy on the <em>Register security information</em> user action (portal only — user actions aren't modelled in this tool), grant = require MFA / authentication strength + a trusted location or compliant device.</dd>
+            <dt>Watch out</dt><dd>New starters with no method, off-network — issue a Temporary Access Pass. Report-only telemetry is thin for user-action policies, so validate with a live pilot user.</dd>
+          </dl>
+        </details>
+      </div>
+
+      <div class="model-policy">
+        <div class="head"><span class="num">04</span><span class="name">Require MFA (or stronger) for all users</span><span class="scope">all users, all resources</span></div>
         <details><summary>Why / assumes / watch out / rollout</summary>
           <dl>
-            <dt>Why</dt><dd>The broad baseline. Everything below refines it.</dd>
-            <dt>Assumes</dt><dd>Users have registered an MFA method. Run a registration campaign first, paired with a registration-enforcement or Identity Protection registration policy.</dd>
-            <dt>Watch out</dt><dd>Guests (policy 7), break-glass (exclude), remaining non-interactive / service sign-ins.</dd>
-            <dt>Rollout</dt><dd>Report-only, watch the "would have required MFA" volume, pilot a group, then all. Most likely to generate helpdesk calls — time it.</dd>
+            <dt>Why</dt><dd>The broad baseline. Everything below refines it. Target <em>all resources</em> with no exclusions. Once passkey adoption is broad, raise this policy's strength to phishing-resistant for everyone — after enforcement, never before.</dd>
+            <dt>Assumes</dt><dd>The registration campaign ran; policy 3 is protecting registration.</dd>
+            <dt>Watch out</dt><dd>Guests (policy 8), break-glass (exclude), non-interactive / service sign-ins.</dd>
+            <dt>Rollout</dt><dd>Report-only, watch the "would have required MFA" volume, pilot, then all. Most likely to generate helpdesk calls — time it.</dd>
           </dl>
         </details>
         <button class="model-load" type="button" data-preset="mfa-all">Load into builder →</button>
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">04</span><span class="name">Require a managed device for desktop sessions</span><span class="scope">browser + modern clients</span></div>
+        <div class="head"><span class="num">05</span><span class="name">Require a managed device for desktop sessions</span><span class="scope">browser + modern clients</span></div>
         <details><summary>Why / assumes / watch out / rollout</summary>
           <dl>
-            <dt>Why</dt><dd>MFA proves <em>who</em>. Device compliance proves the <em>endpoint</em> is patched, encrypted and enrolled. Together they're the Zero Trust baseline for access from a real computer.</dd>
-            <dt>Assumes</dt><dd>Intune (or hybrid join) is deployed and compliance policies are meaningful. Without that, this just blocks people.</dd>
-            <dt>Watch out</dt><dd>macOS / Linux, contractors on their own kit (policy 5), kiosk / shared devices.</dd>
+            <dt>Why</dt><dd>MFA proves <em>who</em>. Device compliance proves the <em>endpoint</em> is patched, encrypted and enrolled. Grant control: compliant device <em>or</em> Hybrid AD joined.</dd>
+            <dt>Assumes</dt><dd>Intune (or hybrid join) deployed and compliance policies are meaningful. Without that, this just blocks people.</dd>
+            <dt>Watch out</dt><dd>macOS / Linux, contractors on their own kit (policy 6), kiosk / shared devices. A report-only compliant-device policy triggers repeated certificate prompts on macOS/iOS/Android — exclude those platforms from the report-only version.</dd>
             <dt>Rollout</dt><dd>Start with the most sensitive apps (finance, HR, admin portals), expand. Report-only essential.</dd>
           </dl>
         </details>
@@ -859,24 +873,24 @@
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">05</span><span class="name">Contain unmanaged devices</span><span class="scope">MFA + short sign-in frequency + no persistent browser</span></div>
+        <div class="head"><span class="num">06</span><span class="name">Contain unmanaged devices</span><span class="scope">MFA + short sign-in frequency + no persistent browser</span></div>
         <details><summary>Why / optional add / watch out / rollout</summary>
           <dl>
             <dt>Why</dt><dd>Don't block BYOD outright, but an unmanaged browser session shouldn't last 90 days or leave refresh tokens on a personal laptop. This contains it.</dd>
             <dt>Optional add</dt><dd>Conditional Access App Control (Defender for Cloud Apps) to block downloads in-session — keeps data off the device entirely.</dd>
-            <dt>Watch out</dt><dd>Sign-in frequency + a phishing-resistant strength can double-prompt (known Microsoft quirk). 1–4 hours is usually the sweet spot, not "every time".</dd>
-            <dt>Rollout</dt><dd>Report-only, then enforce alongside policy 4.</dd>
+            <dt>Watch out</dt><dd>On personal (Entra-registered) devices, unlocking the device doesn't satisfy sign-in frequency, so users get prompted on the interval — a few hours, not minutes, and not "every time" without MFA. Turn off "Remember MFA on trusted devices" first.</dd>
+            <dt>Rollout</dt><dd>Report-only, then enforce alongside policy 5.</dd>
           </dl>
         </details>
         <button class="model-load" type="button" data-preset="unmanaged-contain">Load into builder →</button>
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">06a</span><span class="name">Risky sign-in → require MFA</span><span class="scope">Entra ID P2</span></div>
+        <div class="head"><span class="num">07a</span><span class="name">Risky sign-in → require MFA + reauthenticate</span><span class="scope">Entra ID P2</span></div>
         <details><summary>Why / watch out / rollout</summary>
           <dl>
-            <dt>Why</dt><dd>Catches "the credential works but the sign-in looks wrong" — impossible travel, anonymous IP, leaked credentials.</dd>
-            <dt>Watch out</dt><dd>Risk policies lock people out unexpectedly more than any other. Report-only for longer.</dd>
+            <dt>Why</dt><dd>Catches "the credential works but the sign-in looks wrong" — impossible travel, anonymous IP, leaked credentials. Microsoft's template pairs the MFA requirement with sign-in frequency = <em>every time</em> (target High and Medium).</dd>
+            <dt>Watch out</dt><dd>Risk policies lock people out unexpectedly more than any other. Users must be registered for MFA before a risky session hits them.</dd>
             <dt>Rollout</dt><dd>Report-only 2–4 weeks minimum, review the risk detections, then enforce.</dd>
           </dl>
         </details>
@@ -884,22 +898,22 @@
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">06b</span><span class="name">High user risk → secure password change</span><span class="scope">Entra ID P2 · MFA + password change, AND</span></div>
+        <div class="head"><span class="num">07b</span><span class="name">High user risk → require risk remediation</span><span class="scope">Entra ID P2</span></div>
         <details><summary>Why / assumes / rollout</summary>
           <dl>
-            <dt>Why</dt><dd>The account itself looks compromised. Let the user self-remediate without a helpdesk ticket.</dd>
-            <dt>Assumes</dt><dd>Entra ID P2. No P2? Skip layer 6 — policies 1–5 stand on their own. Confirm SSPR is fully working before enforcing.</dd>
-            <dt>Rollout</dt><dd>Report-only, review, enforce.</dd>
+            <dt>Why</dt><dd>The account itself looks compromised. Microsoft's current template is the <em>Require risk remediation</em> grant control — it auto-applies an auth strength + reauth and works for passwordless users. The older MFA + secure password change (with AND) still works for password-only estates.</dd>
+            <dt>Assumes</dt><dd>Entra ID P2. No P2? Skip layer 7 — policies 1–6 stand on their own. Confirm SSPR is working before enforcing the password-change variant.</dd>
+            <dt>Rollout</dt><dd>Report-only, review, enforce. <em>Load into builder</em> uses the password-change variant.</dd>
           </dl>
         </details>
         <button class="model-load" type="button" data-preset="risky-user">Load into builder →</button>
       </div>
 
       <div class="model-policy">
-        <div class="head"><span class="num">07</span><span class="name">Guest &amp; external access</span><span class="scope">MFA (+ Terms of Use)</span></div>
+        <div class="head"><span class="num">08</span><span class="name">Guest &amp; external access</span><span class="scope">MFA (+ Terms of Use)</span></div>
         <details><summary>Why / assumes / watch out</summary>
           <dl>
-            <dt>Why</dt><dd>Guests authenticate in their home tenant; you can't assume they have MFA. Require it at your resource. Terms of Use gives an auditable acceptance (add it in the portal — not modelled in this tool).</dd>
+            <dt>Why</dt><dd>Guests authenticate in their home tenant; you can't assume they have MFA. Require it at your resource. Terms of Use gives an auditable acceptance (add it in the portal — not modelled here). Microsoft's phased plan does this early; ordering it eighth just reflects that it's a smaller job than the internal rollout.</dd>
             <dt>Assumes</dt><dd>Cross-tenant access settings reviewed — you can trust MFA claims from partner tenants to cut prompts.</dd>
             <dt>Watch out</dt><dd>B2B one-time-passcode users, guest redemption flows.</dd>
           </dl>
@@ -907,15 +921,27 @@
         <button class="model-load" type="button" data-preset="mfa-guests">Load into builder →</button>
       </div>
 
+      <div class="model-policy">
+        <div class="head"><span class="num">09</span><span class="name">Restrict device code flow</span><span class="scope">all users</span></div>
+        <details><summary>Why / how / watch out</summary>
+          <dl>
+            <dt>Why</dt><dd>No longer optional. Microsoft's line is "block device code flow wherever possible"; it ships in Security Defaults and is a Microsoft-managed policy. Attackers start the flow themselves and social-engineer a user into completing it.</dd>
+            <dt>How</dt><dd>CA → <em>Conditions → Authentication flows → Device code flow → Block</em> (portal only — not modelled in this tool), with a scoped exclusion for genuine device-code cases. Block <em>authentication transfer</em> on the same screen too.</dd>
+            <dt>Watch out</dt><dd>Protocol tracking — once a session has used device code flow it stays tracked, so the block can also stop later requests in that session. Report-only first.</dd>
+          </dl>
+        </details>
+      </div>
+
       <div class="model-rules">
         <strong>Cross-cutting rules</strong>
         <ul>
-          <li>Break-glass: two cloud-only Global Admin accounts, excluded from <em>every</em> policy, passwords held offline, sign-in activity alerted on.</li>
+          <li>Break-glass: two-plus cloud-only Global Admin accounts on <code>.onmicrosoft.com</code>, role permanent-active (not eligible via PIM), excluded from every policy that blocks or restricts sign-in, credentials offline, sign-ins alerted on, a phishing-resistant method that differs from your normal admin sign-in. The mandatory-MFA floor still applies to them.</li>
           <li>Never straight to ON. Report-only → pilot group → all, every time.</li>
-          <li>Name policies consistently: <code>CAxx - &lt;persona&gt; - &lt;intent&gt; - &lt;state&gt;</code>.</li>
-          <li>Review quarterly — CA estates drift.</li>
+          <li>Keep <em>disabled</em> contingency policies ready to enable during an identity outage (<code>EM01 - ENABLE IN EMERGENCY: ...</code>). Turn on <em>protected actions</em> so editing a CA policy needs fresh MFA.</li>
+          <li>Name policies consistently (sequence, apps, response, who, when); encode the owning team too. 240 policies per tenant — consolidate.</li>
+          <li>Export the JSON to source control. Leave resilience defaults on. Review quarterly.</li>
         </ul>
-        <p style="margin-top:12px"><strong>Deliberately left out:</strong> location-based blocking as a primary control (noisy, VPN-defeated — use named locations for trusted exclusions only), per-country blocks (a real project, not a checkbox), and a policy per app (group sensitive apps and target the group).</p>
+        <p style="margin-top:12px"><strong>Deliberately left out:</strong> location / per-country blocking as a primary control (a proxy or VPN changes the IP Entra sees — Microsoft does recommend "allow known countries, block the rest", but it's a real project); a policy per app (group sensitive apps and target the group). Blocking unknown device platforms is a reasonable early add — Microsoft recommends it.</p>
       </div>
     </section>
 
@@ -1205,9 +1231,9 @@
     var sifType = $("sifType").value;
     var sifVal = parseInt($("sifValue").value, 10);
     if (sifType === "everyTime"){
-      session.signInFrequency = { frequencyInterval: "everyTime", isEnabled: true };
+      session.signInFrequency = { frequencyInterval: "everyTime", authenticationType: "primaryAndSecondaryAuthentication", isEnabled: true };
     } else if (!isNaN(sifVal) && sifVal > 0){
-      session.signInFrequency = { value: sifVal, type: sifType, isEnabled: true };
+      session.signInFrequency = { value: sifVal, type: sifType, frequencyInterval: "timeBased", authenticationType: "primaryAndSecondaryAuthentication", isEnabled: true };
     }
     var pb = $("persistentBrowser").value;
     if (pb){ session.persistentBrowser = { mode: pb, isEnabled: true }; }
