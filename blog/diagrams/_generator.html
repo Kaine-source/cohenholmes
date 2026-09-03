@@ -162,7 +162,7 @@ var LAYERS = [
   ["5","Require a managed device","MFA proves who; compliance proves the endpoint"],
   ["6","Contain unmanaged devices","MFA + short sign-in frequency + no persistent browser"],
   ["7","Risk-based policies","Sign-in risk and user risk, needs Entra ID P2"],
-  ["8","MFA for guests &amp; external users","You can't assume their home tenant did any MFA"]
+  ["8","MFA for guests & external users","You can't assume their home tenant did any MFA"]
 ];
 var BORDERLINE = ["+","Restrict device code flow","Borderline core after the 2024–25 device-code phishing wave"];
 
@@ -185,9 +185,7 @@ function drawCard(i, row, dashed){
   g.appendChild(el("text", { x:cx+52, y:y+67, "text-anchor":"middle",
     "font-size":"20px", "font-weight":"700",
     style: "fill:" + (dashed ? "#6B6A63" : "#ffffff"), class:"mono" }, row[0]));
-  var t = el("text", { x:cx+100, y:y+50, "font-size":"19px", "font-weight":"600" });
-  t.innerHTML = row[1];
-  g.appendChild(t);
+  g.appendChild(el("text", { x:cx+100, y:y+50, "font-size":"19px", "font-weight":"600" }, row[1]));
   g.appendChild(el("text", { x:cx+100, y:y+80, "font-size":"14px", fill:"var(--muted)" }, row[2]));
   cards.appendChild(g);
 

@@ -597,7 +597,7 @@
             </select>
           </div>
           <p class="id-note hidden" id="includeAppsNote">
-            Emits <code>includeApplications: ["&lt;YOUR-APP-ID&gt;"]</code> &mdash; replace with the enterprise application (client) IDs you want to target.
+            Emits <code>includeApplications: ["&lt;YOUR-APP-ID&gt;"]</code> &mdash; replace with the application (client) IDs (the <code>appId</code> GUID, not the enterprise app's object ID) you want to target.
           </p>
           <div class="field">
             <label class="lbl" for="authContext">Authentication context IDs</label>
@@ -651,7 +651,7 @@
             </div>
           </div>
           <p class="id-note hidden" id="locIdsNote">
-            "Selected locations" emits <code>["&lt;YOUR-NAMED-LOCATION-ID&gt;"]</code> &mdash; replace with the named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations.
+            "Selected locations" emit distinct placeholders &mdash; <code>&lt;YOUR-INCLUDED-LOCATION-ID&gt;</code> and <code>&lt;YOUR-EXCLUDED-LOCATION-ID&gt;</code> &mdash; so an include and an exclude can't collapse to the same ID. Use the named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations.
           </p>
 
           <div class="field">
@@ -986,7 +986,8 @@
   var BREAKGLASS_PLACEHOLDER = "<YOUR-BREAKGLASS-GROUP-ID>";
   var GROUP_PLACEHOLDER = "<YOUR-PILOT-GROUP-ID>";
   var APP_PLACEHOLDER = "<YOUR-APP-ID>";
-  var LOCATION_PLACEHOLDER = "<YOUR-NAMED-LOCATION-ID>";
+  var LOCATION_INCL_PLACEHOLDER = "<YOUR-INCLUDED-LOCATION-ID>";
+  var LOCATION_EXCL_PLACEHOLDER = "<YOUR-EXCLUDED-LOCATION-ID>";
   var AZURE_MGMT_APP = "797f4846-ba00-4fd7-ba43-dac1f8f63013";
   var STRENGTH_MFA   = "00000000-0000-0000-0000-000000000002";
   var STRENGTH_PWLESS = "00000000-0000-0000-0000-000000000003";
@@ -1170,9 +1171,9 @@
     var li = $("locInclude").value, le = $("locExclude").value;
     if (li || le){
       var loc = { includeLocations: [], excludeLocations: [] };
-      if (li === "selected"){ loc.includeLocations = [LOCATION_PLACEHOLDER]; }
+      if (li === "selected"){ loc.includeLocations = [LOCATION_INCL_PLACEHOLDER]; }
       else if (li){ loc.includeLocations = [li]; }
-      if (le === "selected"){ loc.excludeLocations = [LOCATION_PLACEHOLDER]; }
+      if (le === "selected"){ loc.excludeLocations = [LOCATION_EXCL_PLACEHOLDER]; }
       else if (le){ loc.excludeLocations = [le]; }
       conditions.locations = loc;
     }
