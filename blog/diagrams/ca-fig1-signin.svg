@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg1" width="1500" height="520" viewBox="0 0 1500 520" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#14171C;}.display{font-family:Fraunces,Georgia,serif;}.mono{font-family:"IBM Plex Mono",Consolas,monospace;}.muted{fill:#6B6A63;}.card{fill:#F8F4EE;stroke:#D8D4C8;stroke-width:1.5;}.dim{fill:#E7E4DB;stroke:#D8D4C8;stroke-width:1.5;}.edge{stroke:#6B6A63;stroke-width:1.6;fill:none;}.flow{stroke:#14171C;stroke-width:1.8;fill:none;}.sig-box{fill:#F8F4EE;stroke:#3B5BFF;stroke-width:2.4;}.lbl{font-size:15px;font-weight:600;}.sublbl{font-size:13px;}.kicker{font-size:11px;font-weight:600;letter-spacing:1.5px;}.fig-title{font-size:30px;font-weight:600;}.fig-sub{font-size:16px;}</style>
+  <rect x="0" y="0" width="1500" height="520" fill="#F3F1EC"/>
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#14171C"/>
+    </marker>
+    <marker id="ahm" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#6B6A63"/>
+    </marker>
+  </defs>
+
+  <text class="display fig-title" x="45" y="46">Where Conditional Access sits in a sign-in</text>
+
+  <!-- A: sign-in attempt -->
+  <rect class="card" x="45" y="175" width="170" height="120" rx="12"/>
+  <text class="lbl" x="130" y="228" text-anchor="middle">Sign-in</text>
+  <text class="lbl" x="130" y="250" text-anchor="middle">attempt</text>
+
+  <line class="flow" x1="215" y1="235" x2="262" y2="235" marker-end="url(#ah)"/>
+
+  <!-- B: credential check -->
+  <rect class="card" x="270" y="175" width="215" height="120" rx="12"/>
+  <text class="lbl" x="377" y="223" text-anchor="middle">Credential check</text>
+  <text class="mono sublbl muted" x="377" y="250" text-anchor="middle">password · passkey · token</text>
+
+  <line class="flow" x1="485" y1="235" x2="532" y2="235" marker-end="url(#ah)"/>
+
+  <!-- C: CA evaluation -->
+  <rect class="sig-box" x="540" y="128" width="430" height="264" rx="14"/>
+  <text class="lbl" x="755" y="158" text-anchor="middle" style="font-size:17px">Conditional Access evaluation</text>
+
+  <rect class="dim" x="562" y="176" width="386" height="90" rx="9"/>
+  <text class="mono kicker muted" x="580" y="202">CONDITIONS</text>
+  <text class="sublbl" x="580" y="228">user · device · location ·</text>
+  <text class="sublbl" x="580" y="248">application · sign-in &amp; user risk</text>
+
+  <rect class="dim" x="562" y="278" width="386" height="96" rx="9"/>
+  <text class="mono kicker muted" x="580" y="304">CONTROLS</text>
+  <text class="sublbl" x="580" y="330">allow · block · require MFA ·</text>
+  <text class="sublbl" x="580" y="350">compliant device · limit session</text>
+
+  <!-- pass path -->
+  <line class="flow" x1="970" y1="235" x2="1017" y2="235" marker-end="url(#ah)"/>
+
+  <!-- block offshoot -->
+  <path class="edge" d="M755,392 L755,430 L648,430" marker-end="url(#ahm)"/>
+  <text class="mono sublbl muted" x="770" y="416">block</text>
+  <rect class="dim" x="470" y="408" width="175" height="44" rx="9"/>
+  <text class="sublbl" x="557" y="435" text-anchor="middle" style="font-weight:600">Access denied</text>
+
+  <!-- D: token -->
+  <rect class="card" x="1025" y="175" width="170" height="120" rx="12"/>
+  <text class="lbl" x="1110" y="228" text-anchor="middle">Token</text>
+  <text class="lbl" x="1110" y="250" text-anchor="middle">issued</text>
+
+  <line class="flow" x1="1197" y1="235" x2="1240" y2="235" marker-end="url(#ah)"/>
+
+  <!-- E: app -->
+  <rect class="card" x="1245" y="175" width="240" height="120" rx="12"/>
+  <text class="lbl" x="1365" y="223" text-anchor="middle">Application</text>
+  <text class="mono muted" x="1365" y="250" text-anchor="middle" style="font-size:12px">Exchange · SharePoint · SaaS</text>
+
+  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:#6B6A63">Conditional Access runs after the credential check and before the token is issued. Nothing reaches the app until it passes.</text>
+</svg>

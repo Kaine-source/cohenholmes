@@ -187,6 +187,12 @@
     margin-bottom:6px;
   }
   .hint{ font-size:12px; color:var(--muted); margin-top:4px; }
+  .id-note{
+    font-size:12px; color:var(--muted); line-height:1.6;
+    margin:6px 0 2px; padding:8px 10px;
+    background:var(--paper-dim); border-left:2px solid var(--signal); border-radius:0 6px 6px 0;
+  }
+  .id-note code{ font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink); }
 
   input[type=text], input[type=number], select{
     width:100%;
@@ -464,7 +470,13 @@
     </p>
     <p class="disclaimer">
       Learning / demo tool. Output mirrors the Graph beta schema shape but is not validated against a
-      tenant. Always review in report-only mode before enforcing. GUIDs are passed through as entered.
+      tenant. Always review in report-only mode before enforcing.
+    </p>
+    <p class="disclaimer">
+      <strong>Your IDs are yours.</strong> Group, app and named-location IDs are specific to your
+      tenant, so this tool emits <code>&lt;PLACEHOLDER&gt;</code> tokens for them &mdash; swap in your
+      own before you run the policy. Well-known IDs (admin role templates, the Azure management app,
+      built-in authentication strengths) are filled in, because they&rsquo;re identical in every tenant.
     </p>
   </header>
 
@@ -545,10 +557,9 @@
               <option value="roles">Select directory roles</option>
             </select>
           </div>
-          <div class="field hidden" id="includeGroupsField">
-            <label class="lbl" for="includeGroups">Include group IDs</label>
-            <input type="text" id="includeGroups" placeholder="comma-separated GUIDs" autocomplete="off">
-          </div>
+          <p class="id-note hidden" id="includeGroupsNote">
+            Emits <code>includeGroups: ["&lt;YOUR-PILOT-GROUP-ID&gt;"]</code> &mdash; replace with your own group's object ID before you run it.
+          </p>
           <div class="field hidden" id="includeRolesField">
             <label class="lbl">Directory roles (admin templates)</label>
             <div class="checks" id="roles">
@@ -566,14 +577,10 @@
             <p class="hint">Well-known role template IDs. Microsoft's "require MFA for admins" template targets these privileged roles.</p>
           </div>
           <div class="field">
-            <label class="lbl" for="excludeGroups">Exclude group IDs</label>
-            <input type="text" id="excludeGroups" placeholder="comma-separated GUIDs" autocomplete="off">
-          </div>
-          <div class="field">
             <div class="checks">
               <label><input type="checkbox" id="excludeBreakglass" checked> Exclude a break-glass / emergency access group</label>
             </div>
-            <p class="hint">Adds a placeholder GUID to <code>excludeGroups</code> — replace with your real emergency access account group.</p>
+            <p class="hint">Adds <code>excludeGroups: ["&lt;YOUR-BREAKGLASS-GROUP-ID&gt;"]</code> — replace with your real emergency access group. Every policy should exclude it.</p>
           </div>
         </fieldset>
 
@@ -584,18 +591,14 @@
             <select id="appInclude">
               <option value="All" selected>All cloud apps</option>
               <option value="Office365">Office 365 (bundle)</option>
-              <option value="apps">Select apps (by ID)</option>
+              <option value="azure">Azure management (well-known app)</option>
+              <option value="apps">Select apps by ID</option>
               <option value="None">None</option>
             </select>
           </div>
-          <div class="field hidden" id="includeAppsField">
-            <label class="lbl" for="includeApps">Include app IDs</label>
-            <input type="text" id="includeApps" placeholder="comma-separated app GUIDs" autocomplete="off">
-          </div>
-          <div class="field">
-            <label class="lbl" for="excludeApps">Exclude app IDs</label>
-            <input type="text" id="excludeApps" placeholder="comma-separated app GUIDs" autocomplete="off">
-          </div>
+          <p class="id-note hidden" id="includeAppsNote">
+            Emits <code>includeApplications: ["&lt;YOUR-APP-ID&gt;"]</code> &mdash; replace with the application (client) IDs (the <code>appId</code> GUID, not the enterprise app's object ID) you want to target.
+          </p>
           <div class="field">
             <label class="lbl" for="authContext">Authentication context IDs</label>
             <input type="text" id="authContext" placeholder="e.g. c1, c2" autocomplete="off">
@@ -647,14 +650,9 @@
               </select>
             </div>
           </div>
-          <div class="field hidden" id="locIncludeIdsField">
-            <label class="lbl" for="locIncludeIds">Include location IDs</label>
-            <input type="text" id="locIncludeIds" placeholder="comma-separated named-location GUIDs" autocomplete="off">
-          </div>
-          <div class="field hidden" id="locExcludeIdsField">
-            <label class="lbl" for="locExcludeIds">Exclude location IDs</label>
-            <input type="text" id="locExcludeIds" placeholder="comma-separated named-location GUIDs" autocomplete="off">
-          </div>
+          <p class="id-note hidden" id="locIdsNote">
+            Each selector set to "Selected locations" emits its own placeholder &mdash; <code>&lt;YOUR-INCLUDED-LOCATION-ID&gt;</code> for include, <code>&lt;YOUR-EXCLUDED-LOCATION-ID&gt;</code> for exclude &mdash; so the two can't collapse to the same ID. Replace with named-location IDs from Entra &rarr; Conditional Access &rarr; Named locations. Setting only an exclude targets <code>includeLocations: ["All"]</code>.
+          </p>
 
           <div class="field">
             <label class="lbl">Device platforms</label>
@@ -985,7 +983,11 @@
 (function(){
   "use strict";
 
-  var BREAKGLASS_PLACEHOLDER = "00000000-0000-0000-0000-000000000000";
+  var BREAKGLASS_PLACEHOLDER = "<YOUR-BREAKGLASS-GROUP-ID>";
+  var GROUP_PLACEHOLDER = "<YOUR-PILOT-GROUP-ID>";
+  var APP_PLACEHOLDER = "<YOUR-APP-ID>";
+  var LOCATION_INCL_PLACEHOLDER = "<YOUR-INCLUDED-LOCATION-ID>";
+  var LOCATION_EXCL_PLACEHOLDER = "<YOUR-EXCLUDED-LOCATION-ID>";
   var AZURE_MGMT_APP = "797f4846-ba00-4fd7-ba43-dac1f8f63013";
   var STRENGTH_MFA   = "00000000-0000-0000-0000-000000000002";
   var STRENGTH_PWLESS = "00000000-0000-0000-0000-000000000003";
@@ -1077,7 +1079,7 @@
       licence: LIC_P1, doc: DOC + "policy-block-legacy-authentication"
     },
     "mfa-azure-mgmt": {
-      displayName: "Require MFA for Azure management", includeApps: [AZURE_MGMT_APP], grant: ["mfa"],
+      displayName: "Require MFA for Azure management", appInclude: "azure", grant: ["mfa"],
       scenario: "The Azure portal, CLI and PowerShell are how the tenant gets reconfigured. Require MFA specifically for that surface even if the broad rollout isn't done.",
       licence: LIC_P1, doc: DOC + "policy-old-require-mfa-azure-mgmt"
     },
@@ -1112,8 +1114,7 @@
     $("state").value = p.state || "enabledForReportingButNotEnforced";
     $("userInclude").value = p.userInclude || "All";
     if (p.roles) setChecks("roles", p.roles);
-    if (p.includeApps){ $("appInclude").value = "apps"; $("includeApps").value = p.includeApps.join(", "); }
-    else if (p.appInclude) $("appInclude").value = p.appInclude;
+    if (p.appInclude) $("appInclude").value = p.appInclude;
     $("authContext").value = (p.authContext || []).join(", ");
     setChecks("clientApps", p.clientApps || []);
     setChecks("platforms", p.platforms || []);
@@ -1133,11 +1134,11 @@
   }
 
   function syncVisibility(){
-    $("includeGroupsField").classList.toggle("hidden", $("userInclude").value !== "groups");
+    $("includeGroupsNote").classList.toggle("hidden", $("userInclude").value !== "groups");
     $("includeRolesField").classList.toggle("hidden", $("userInclude").value !== "roles");
-    $("includeAppsField").classList.toggle("hidden", $("appInclude").value !== "apps");
-    $("locIncludeIdsField").classList.toggle("hidden", $("locInclude").value !== "selected");
-    $("locExcludeIdsField").classList.toggle("hidden", $("locExclude").value !== "selected");
+    $("includeAppsNote").classList.toggle("hidden", $("appInclude").value !== "apps");
+    var locSelected = $("locInclude").value === "selected" || $("locExclude").value === "selected";
+    $("locIdsNote").classList.toggle("hidden", !locSelected);
   }
 
   function buildPolicy(){
@@ -1145,19 +1146,16 @@
 
     var users = { includeUsers: [], excludeUsers: [], includeGroups: [], excludeGroups: [], includeRoles: [] };
     var ui = $("userInclude").value;
-    if (ui === "groups"){ users.includeGroups = splitIds($("includeGroups").value); }
+    if (ui === "groups"){ users.includeGroups = [GROUP_PLACEHOLDER]; }
     else if (ui === "roles"){ users.includeRoles = checkedValues("roles"); }
     else { users.includeUsers = [ui]; }
-    users.excludeGroups = splitIds($("excludeGroups").value);
-    if ($("excludeBreakglass").checked && users.excludeGroups.indexOf(BREAKGLASS_PLACEHOLDER) === -1){
-      users.excludeGroups.push(BREAKGLASS_PLACEHOLDER);
-    }
+    if ($("excludeBreakglass").checked){ users.excludeGroups = [BREAKGLASS_PLACEHOLDER]; }
 
     var apps = { includeApplications: [], excludeApplications: [], includeAuthenticationContextClassReferences: [] };
     var ai = $("appInclude").value;
-    if (ai === "apps"){ apps.includeApplications = splitIds($("includeApps").value); }
+    if (ai === "apps"){ apps.includeApplications = [APP_PLACEHOLDER]; }
+    else if (ai === "azure"){ apps.includeApplications = [AZURE_MGMT_APP]; }
     else { apps.includeApplications = [ai]; }
-    apps.excludeApplications = splitIds($("excludeApps").value);
     apps.includeAuthenticationContextClassReferences = splitIds($("authContext").value);
 
     var conditions = {
@@ -1173,9 +1171,10 @@
     var li = $("locInclude").value, le = $("locExclude").value;
     if (li || le){
       var loc = { includeLocations: [], excludeLocations: [] };
-      if (li === "selected"){ loc.includeLocations = splitIds($("locIncludeIds").value); }
+      if (li === "selected"){ loc.includeLocations = [LOCATION_INCL_PLACEHOLDER]; }
       else if (li){ loc.includeLocations = [li]; }
-      if (le === "selected"){ loc.excludeLocations = splitIds($("locExcludeIds").value); }
+      else if (le){ loc.includeLocations = ["All"]; }
+      if (le === "selected"){ loc.excludeLocations = [LOCATION_EXCL_PLACEHOLDER]; }
       else if (le){ loc.excludeLocations = [le]; }
       conditions.locations = loc;
     }
@@ -1265,10 +1264,9 @@
     if (u.includeUsers && u.includeUsers.indexOf("All") !== -1) who = "all users";
     else if (u.includeUsers && u.includeUsers.indexOf("GuestsOrExternalUsers") !== -1) who = "all guest and external users";
     else if (u.includeRoles && u.includeRoles.length) who = u.includeRoles.length + " selected admin role" + (u.includeRoles.length > 1 ? "s" : "");
-    else if (u.includeGroups && u.includeGroups.length) who = u.includeGroups.length + " selected group" + (u.includeGroups.length > 1 ? "s" : "");
+    else if (u.includeGroups && u.includeGroups.length) who = "a selected group";
     else who = "no one yet";
-    var excl = (u.excludeGroups || []).length;
-    if (excl) who += " <span class=\"muted\">(excluding " + excl + " group" + (excl > 1 ? "s" : "") + ")</span>";
+    if ((u.excludeGroups || []).length) who += " <span class=\"muted\">(excluding your break-glass group)</span>";
 
     var apps = c.applications || {};
     var inc = apps.includeApplications || [];
@@ -1279,7 +1277,7 @@
     else if (inc.indexOf("Office365") !== -1) what = "Office 365";
     else if (inc.indexOf("None") !== -1) what = "no apps";
     else if (inc.indexOf(AZURE_MGMT_APP) !== -1 && inc.length === 1) what = "Azure management";
-    else if (inc.length) what = inc.length + " selected app" + (inc.length > 1 ? "s" : "");
+    else if (inc.length) what = "selected apps";
     else what = "no apps";
 
     parts.push("When <strong>" + who + "</strong> access <strong>" + what + "</strong>");
