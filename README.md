@@ -43,14 +43,17 @@ Writing page work locally.
 
 ## Deploy
 
-Manual, from the repo root:
+Automatic: `.github/workflows/deploy.yml` runs `wrangler pages deploy` on every push to
+`main` (i.e. every merged PR). Needs two repo secrets — `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` — set once under Settings → Secrets and variables → Actions.
+
+Manual deploy still works if needed, from the repo root:
 
 ```bash
 npx wrangler pages deploy
 ```
 
-Uses the `cohenholmes-site` Pages project (output dir `public`). No CI yet — a GitHub
-Action that runs this on push to `main` is a planned follow-up.
+Uses the `cohenholmes-site` Pages project (output dir `public`).
 
 ## Design system
 
