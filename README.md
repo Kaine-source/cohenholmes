@@ -46,6 +46,9 @@ Automatic: `.github/workflows/deploy.yml` runs `wrangler pages deploy` on every 
 `main` (i.e. every merged PR). Needs two repo secrets — `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` — set once under Settings → Secrets and variables → Actions.
 
+`.github/workflows/preview.yml` deploys a per-branch preview for every PR opened from
+this repo (not forks) and comments the `*.cohenholmes-site.pages.dev` URL on the PR.
+
 Manual deploy still works if needed, from the repo root:
 
 ```bash
