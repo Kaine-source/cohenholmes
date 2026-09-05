@@ -30,7 +30,11 @@ jobs:
         run: |
           out="$(npx wrangler@3 pages deploy --branch="$HEAD_REF" 2>&1)"
           echo "$out"
-          url="$(printf '%s\n' "$out" | grep -oE 'https://[a-z0-9-]+\.cohenholmes-site\.pages\.dev' | head -n1)"
+          # prefer the stable branch-alias URL; fall back to the per-deploy URL
+          url="$(printf '%s\n' "$out" | grep -oE 'alias URL: https://[a-z0-9-]+\.cohenholmes-site\.pages\.dev' | grep -oE 'https://\S+' | head -n1)"
+          if [ -z "$url" ]; then
+            url="$(printf '%s\n' "$out" | grep -oE 'https://[a-z0-9-]+\.cohenholmes-site\.pages\.dev' | head -n1)"
+          fi
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Comment preview URL
