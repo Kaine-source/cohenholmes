@@ -4,6 +4,12 @@ on:
   pull_request:
     branches: [main]
 
+# one preview per PR: a newer push cancels an in-flight run so the
+# comment/URL can't be overwritten by a slower older deploy
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   pull-requests: write
