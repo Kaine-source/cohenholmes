@@ -21,9 +21,9 @@ jobs:
     if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: 22
 
@@ -34,7 +34,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          out="$(npx wrangler@3 pages deploy --branch="$HEAD_REF" 2>&1)"
+          out="$(npx wrangler@4 pages deploy --branch="$HEAD_REF" 2>&1)"
           echo "$out"
           # prefer the stable branch-alias URL; fall back to the per-deploy URL
           url="$(printf '%s\n' "$out" | grep -oE 'alias URL: https://[a-z0-9-]+\.cohenholmes-site\.pages\.dev' | grep -oE 'https://\S+' | head -n1)"
