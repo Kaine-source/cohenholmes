@@ -21,14 +21,13 @@ wrangler.toml           Pages project config (pages_build_output_dir = "public")
 
 # not deployed — kept at repo root:
 ca-baseline-model-DRAFT.md      source copy of the CA baseline model (also on the CA Builder page)
-personal-site-design-plan_1.md  homepage refresh plan
-personal-site-draft.html        original copy/voice draft the homepage was built from
-claude-code-prompt.md           original working brief
+ca-docs-alignment-audit.md      notes from aligning the CA content with Microsoft's docs
+blog/                           post drafts + diagram sources (published via Medium)
 backup-*/                       previous homepage versions
 ```
 
-Only `public/` and `functions/` ship. `wrangler.toml`, the `.md` docs and `backup-*/`
-folders sit at the repo root so Pages never publishes them.
+Only `public/` and `functions/` ship. `wrangler.toml`, the `.md` docs, `blog/` and
+`backup-*/` folders sit at the repo root so Pages never publishes them.
 
 ## Local preview
 
@@ -46,6 +45,9 @@ Writing page work locally.
 Automatic: `.github/workflows/deploy.yml` runs `wrangler pages deploy` on every push to
 `main` (i.e. every merged PR). Needs two repo secrets — `CLOUDFLARE_API_TOKEN` and
 `CLOUDFLARE_ACCOUNT_ID` — set once under Settings → Secrets and variables → Actions.
+
+`.github/workflows/preview.yml` deploys a per-branch preview for every PR opened from
+this repo (not forks) and comments the `*.cohenholmes-site.pages.dev` URL on the PR.
 
 Manual deploy still works if needed, from the repo root:
 
