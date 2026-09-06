@@ -20,6 +20,8 @@ No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
 - `/ca-builder` — Conditional Access policy builder, aligned to Microsoft's docs.
 - `/ai-governance-check` — 12-question AI governance readiness check, browser-only,
   hash-locked CSP, no storage or network.
+- `/mail-auth` — SPF/DKIM/DMARC record builder with a staged path to enforcement;
+  DMARCbis-aware (no `pct`, uses `t=y`, includes `np`). Same hardening as the AI check.
 - `/writing` — Medium posts via a server-side RSS Pages Function.
 - Shared mini-nav across all three sub-pages.
 - CI: `deploy.yml` (auto-deploy on push to `main`), `preview.yml` (per-PR Cloudflare
@@ -31,8 +33,7 @@ No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
 
 | Item | Notes |
 |---|---|
-| SPF/DKIM/DMARC builder tool | Next. Same pattern as the CA builder. Build before 16 Sept. |
-| DMARC hardening post | Companion to the tool; write after the 16 Sept DMARC review lands real data. |
+| DMARC hardening post | Companion to the `/mail-auth` tool; write after the 16 Sept DMARC review lands real data. |
 | Blog post 2 — "how AI built me a website" | Unblocked, not started. |
 | Service token -> CI browser tests | Optional. Automates preview review (Playwright + axe/Lighthouse), removes the Access login step. |
 | `_headers` for `Referrer-Policy` | Cosmetic — align the server header with the page meta. |
