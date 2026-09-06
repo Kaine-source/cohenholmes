@@ -36,23 +36,33 @@
 
   .wrap{ max-width:760px; margin:0 auto; padding:0 28px; }
 
-  header{ padding:64px 0 8px; }
-  .mark{
+  header{ padding:20px 0 0; }
+  .pagehead{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px 20px;
+    padding-top:44px;
+  }
+  .pagehead .brand{
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
     letter-spacing:0.08em;
-    color:var(--muted);
     text-transform:uppercase;
+    color:var(--muted);
+    text-decoration:none;
   }
-  .back{
-    display:inline-block;
-    margin-top:14px;
+  .pagehead .brand:hover{ color:var(--signal); }
+  .subnav{ display:flex; flex-wrap:wrap; gap:16px; }
+  .subnav a{
     font-family:'IBM Plex Mono', monospace;
     font-size:13px;
     color:var(--muted);
     text-decoration:none;
   }
-  .back:hover{ color:var(--signal); }
+  .subnav a:hover{ color:var(--signal); }
+  .subnav a[aria-current="page"]{ color:var(--ink); }
 
   h1{
     font-family:'Fraunces', serif;
@@ -169,9 +179,16 @@
 <body>
 
 <div class="wrap">
+  <div class="pagehead">
+    <a class="brand" href="/">Kaine Cohen</a>
+    <nav class="subnav" aria-label="Sections">
+      <a href="/">Home</a>
+      <a href="/ca-builder">CA Builder</a>
+      <a href="/ai-governance-check">AI Check</a>
+      <a href="/writing" aria-current="page">Writing</a>
+    </nav>
+  </div>
   <header>
-    <div class="mark">Kaine Cohen</div>
-    <a class="back" href="/">← Home</a>
     <h1>Writing</h1>
     <p class="lede">Notes on identity, security and the move into AI engineering. Pulled automatically from Medium — nothing here is edited by hand.</p>
   </header>
