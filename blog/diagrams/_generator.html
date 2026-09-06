@@ -144,6 +144,64 @@
 </svg>
 </div>
 
+<!-- ============ DIAGRAM 4 (blog post 2) ============ -->
+<div class="sheet">
+<svg id="svg4" width="1500" height="520" viewBox="0 0 1500 520" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1500" height="520" fill="var(--paper)"/>
+  <defs>
+    <marker id="ah4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+    </marker>
+    <marker id="ahm4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+    </marker>
+  </defs>
+
+  <text class="display fig-title" x="45" y="46">How a change reaches the site</text>
+
+  <!-- 1: local edit -->
+  <rect class="card" x="45" y="175" width="240" height="120" rx="12"/>
+  <text class="lbl" x="165" y="228" text-anchor="middle">Local edit</text>
+  <text class="mono sublbl muted" x="165" y="250" text-anchor="middle">agent, in the repo</text>
+
+  <line class="flow" x1="285" y1="235" x2="330" y2="235" marker-end="url(#ah4)"/>
+
+  <!-- 2: branch + PR -->
+  <rect class="card" x="332" y="175" width="240" height="120" rx="12"/>
+  <text class="lbl" x="452" y="228" text-anchor="middle">Branch + PR</text>
+  <text class="mono sublbl muted" x="452" y="250" text-anchor="middle">validate + preview run</text>
+
+  <line class="flow" x1="572" y1="235" x2="617" y2="235" marker-end="url(#ah4)"/>
+
+  <!-- 3: review (the gate) -->
+  <rect class="sig-box" x="619" y="158" width="240" height="154" rx="14"/>
+  <text class="lbl" x="739" y="222" text-anchor="middle" style="font-size:17px">Review</text>
+  <text class="mono sublbl muted" x="739" y="246" text-anchor="middle">Copilot + me</text>
+  <text class="mono sublbl" x="739" y="286" text-anchor="middle" style="fill:#3B5BFF; font-weight:600">approve</text>
+
+  <line class="flow" x1="859" y1="235" x2="904" y2="235" marker-end="url(#ah4)"/>
+
+  <!-- 4: merge -->
+  <rect class="card" x="906" y="175" width="240" height="120" rx="12"/>
+  <text class="lbl" x="1026" y="228" text-anchor="middle">Merge to main</text>
+  <text class="mono sublbl muted" x="1026" y="250" text-anchor="middle">branch protected</text>
+
+  <line class="flow" x1="1146" y1="235" x2="1191" y2="235" marker-end="url(#ah4)"/>
+
+  <!-- 5: production -->
+  <rect class="card" x="1193" y="175" width="240" height="120" rx="12"/>
+  <text class="lbl" x="1313" y="228" text-anchor="middle">Production</text>
+  <text class="mono sublbl muted" x="1313" y="250" text-anchor="middle">auto-deploys on merge</text>
+
+  <!-- offshoot: failed deploy -->
+  <path class="edge" d="M1313,295 L1313,340 L1313,362" marker-end="url(#ahm4)"/>
+  <rect class="dim" x="1178" y="366" width="270" height="46" rx="9"/>
+  <text class="sublbl" x="1313" y="394" text-anchor="middle" style="font-weight:600">Failed deploy &rarr; I get pinged</text>
+
+  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:var(--muted)">Every change is a pull request. Nothing merges without a green check and the review step; nothing deploys except a merge to main.</text>
+</svg>
+</div>
+
 <script>
 var SVGNS = "http://www.w3.org/2000/svg";
 function el(name, attrs, text){
