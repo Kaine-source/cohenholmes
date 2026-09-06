@@ -20,9 +20,12 @@ same repository. More on that shortly.
 
 Not just a static site. By the end there were:
 
-- Three interactive tools, each a single self-contained HTML file with no backend: a Conditional
-  Access policy builder, an AI governance readiness check, and an SPF/DKIM/DMARC record builder.
-  Plain-English input, live output, nothing submitted anywhere.
+- Three interactive tools, each a single self-contained HTML file with no backend. If you run
+  Microsoft Conditional Access, the policy builder turns plain-English intent into a named, scoped
+  policy. If you're weighing up AI governance, the readiness check scores you across five domains
+  in about two minutes. If you own a domain, the mail-auth builder gives you SPF, DKIM and DMARC
+  records with a staged path to enforcement that won't blackhole your own mail. Plain-English
+  input, live output, nothing submitted anywhere.
 - A writing page that pulls my Medium posts through a small server-side function, so the feed's
   missing CORS headers stop being my problem.
 - A deployment pipeline: every push to `main` deploys itself, every pull request gets its own
