@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-3wjBG9ipjNbuot8TFbzAHV8Ger/PWAU/jXABxovbJ+s='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>SPF, DKIM &amp; DMARC Builder — Kaine Cohen</title>
+<meta name="description" content="Generate correct SPF, DKIM and DMARC DNS records for Microsoft 365 or Google Workspace, with a staged rollout to enforcement and plain-English notes on what each policy does. Runs entirely in your browser.">
+<link rel="canonical" href="https://cohenholmes.co.uk/mail-auth">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SPF, DKIM & DMARC Builder — Kaine Cohen">
+<meta property="og:description" content="Correct SPF / DKIM / DMARC records and a staged path to enforcement. Browser-only, nothing submitted.">
+<meta property="og:url" content="https://cohenholmes.co.uk/mail-auth">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14171C;
+    --paper:#F3F1EC;
+    --card:#F8F4EE;
+    --paper-dim:#E7E4DB;
+    --line:#D8D4C8;
+    --signal:#3B5BFF;
+    --muted:#6B6A63;
+    --panel:#181B21;
+    --good:#237A57;
+    --warn:#A65A1F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  a{ color:inherit; }
+  code, pre, .mono{ font-family:'IBM Plex Mono', monospace; }
+  .hidden{ display:none !important; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:0 28px 90px; }
+
+  header{ padding:20px 0 0; }
+  .pagehead{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:8px 20px;
+    padding-top:44px;
+  }
+  .pagehead .brand{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    text-decoration:none;
+  }
+  .pagehead .brand:hover{ color:var(--signal); }
+  .subnav{ display:flex; flex-wrap:wrap; gap:16px; }
+  .subnav a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px;
+    color:var(--muted);
+    text-decoration:none;
+  }
+  .subnav a:hover{ color:var(--signal); }
+  .subnav a[aria-current="page"]{ color:var(--ink); }
+
+  h1{
+    font-family:'Fraunces', serif;
+    font-weight:480;
+    font-size:clamp(30px, 5vw, 44px);
+    line-height:1.1;
+    letter-spacing:-0.01em;
+    margin:20px 0 12px;
+  }
+  .lede{ font-size:16px; color:var(--muted); max-width:66ch; margin-bottom:14px; }
+  .disclaimer{
+    font-size:13px; color:var(--muted); max-width:70ch;
+    border-left:2px solid var(--line); padding-left:14px; margin-bottom:12px;
+  }
+
+  .layout{ display:grid; grid-template-columns:1fr 1fr; gap:34px; margin-top:34px; align-items:start; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .output{ position:static !important; } }
+
+  fieldset{ border:1px solid var(--line); border-radius:12px; padding:18px 18px 6px; margin-bottom:18px; background:var(--card); }
+  legend{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); padding:0 8px; }
+  .field{ margin-bottom:16px; }
+  .field .lbl{ display:block; font-size:13px; font-weight:500; margin-bottom:6px; }
+  input[type=text], input[type=email], select{
+    width:100%; font:inherit; font-size:14px; padding:9px 11px;
+    border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink);
+  }
+  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; }
+  .checks label{ display:flex; gap:9px; align-items:flex-start; font-size:14px; margin-bottom:8px; }
+  .checks input{ margin-top:3px; }
+  .sub{ margin:6px 0 2px 27px; }
+  .sub input{ max-width:440px; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+  .hint code{ font-size:11.5px; background:var(--paper-dim); padding:1px 4px; border-radius:4px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .row2{ grid-template-columns:1fr; } }
+  .warn-line{ font-size:12.5px; color:var(--warn); margin-top:8px; font-weight:500; }
+  .ok-line{ font-size:12.5px; color:var(--good); margin-top:8px; }
+
+  .output{ position:sticky; top:24px; }
+  .tabs{ display:flex; gap:6px; }
+  .tab{
+    font:inherit; font-size:13px; padding:8px 13px; cursor:pointer;
+    border:1px solid var(--line); border-bottom:none; border-radius:9px 9px 0 0;
+    background:var(--paper-dim); color:var(--muted);
+  }
+  .tab[aria-selected=true]{ background:var(--panel); color:#EAECEF; border-color:var(--panel); }
+  .panel{ border:1px solid var(--panel); border-radius:0 10px 10px 10px; background:var(--panel); padding:16px; }
+  .rec{ margin-bottom:18px; }
+  .rec:last-child{ margin-bottom:0; }
+  .rec h3{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:#8A93A6; margin-bottom:7px; }
+  .rec .meta{ font-size:11.5px; color:#8A93A6; margin-bottom:6px; }
+  pre{ background:#0E1013; color:#E4E7EC; font-size:12.5px; line-height:1.7; padding:12px 13px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; }
+  .copy{
+    font:inherit; font-size:11.5px; margin-top:7px; padding:5px 10px; cursor:pointer;
+    background:transparent; color:#8A93A6; border:1px solid #333A44; border-radius:6px;
+  }
+  .copy:hover{ color:#EAECEF; border-color:#55606E; }
+  .panel .prose{ color:#D2D6DD; font-size:13.5px; line-height:1.7; }
+  .panel .prose p{ margin-bottom:12px; }
+  .panel .prose strong{ color:#fff; }
+  .panel .prose code{ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:12px; }
+  .ladder{ list-style:none; counter-reset:step; }
+  .ladder li{ counter-increment:step; margin-bottom:14px; padding-left:30px; position:relative; color:#D2D6DD; font-size:13px; line-height:1.6; }
+  .ladder li::before{ content:counter(step); position:absolute; left:0; top:0; width:20px; height:20px; border-radius:50%; background:var(--signal); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; }
+  .ladder code{ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:11.5px; }
+
+  section.explain{ margin-top:56px; }
+  section.explain h2{ font-family:'Fraunces', serif; font-weight:480; font-size:clamp(22px,3vw,30px); letter-spacing:-0.01em; margin-bottom:14px; }
+  section.explain h3{ font-size:15px; margin:18px 0 6px; }
+  section.explain p, section.explain li{ font-size:14px; color:var(--ink); max-width:74ch; }
+  section.explain ul{ margin:8px 0 8px 20px; }
+  section.explain li{ margin-bottom:8px; }
+  section.explain .muted{ color:var(--muted); }
+
+  footer{ margin-top:70px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="pagehead">
+    <a class="brand" href="/">Kaine Cohen</a>
+    <nav class="subnav" aria-label="Sections">
+      <a href="/">Home</a>
+      <a href="/ca-builder">CA Builder</a>
+      <a href="/ai-governance-check">AI Check</a>
+      <a href="/mail-auth" aria-current="page">Mail Auth</a>
+      <a href="/writing">Writing</a>
+    </nav>
+  </div>
+
+  <header>
+    <h1>SPF, DKIM &amp; DMARC builder</h1>
+    <p class="lede">
+      Pick your mail provider and the policy you want, and get the three DNS records to publish, a
+      plain-English reading of what they do, and a staged path from monitoring to enforcement that
+      doesn&rsquo;t bounce your own mail on the way.
+    </p>
+    <p class="disclaimer">
+      Runs entirely in your browser &mdash; nothing you type is submitted, stored or logged. The records
+      are correct in shape, but <strong>your keys and selectors are yours</strong>: DKIM values come from
+      your provider&rsquo;s admin portal, so this tool emits <code>&lt;PLACEHOLDER&gt;</code> tokens for them.
+    </p>
+    <p class="disclaimer">
+      Aligned with DMARCbis (RFC&nbsp;9989/9990/9991, May&nbsp;2026): the deprecated <code>pct</code>,
+      <code>rf</code> and <code>ri</code> tags are not emitted; staged rollout uses <code>t=y</code>
+      testing mode, and <code>np</code> (non-existent-subdomain policy) is included.
+    </p>
+  </header>
+
+  <div class="layout">
+    <form id="f" aria-label="Record options">
+      <fieldset>
+        <legend>Domain &amp; provider</legend>
+        <div class="field">
+          <label class="lbl" for="domain">Sending domain</label>
+          <input type="text" id="domain" placeholder="example.com" autocomplete="off" spellcheck="false" inputmode="url">
+          <p class="hint">The domain your mail is <em>From:</em>. Left blank, the output uses <code>&lt;YOUR-DOMAIN&gt;</code>.</p>
+        </div>
+        <div class="field">
+          <label class="lbl" for="provider">Primary mail provider</label>
+          <select id="provider">
+            <option value="m365" selected>Microsoft 365 / Exchange Online</option>
+            <option value="google">Google Workspace</option>
+            <option value="other">Other / self-hosted</option>
+          </select>
+          <p class="hint" id="providerHint"></p>
+        </div>
+        <div class="field hidden" id="otherIncludeField">
+          <label class="lbl" for="otherInclude">Your provider&rsquo;s SPF mechanism</label>
+          <input type="text" id="otherInclude" placeholder="include:spf.yourprovider.example" autocomplete="off" spellcheck="false">
+          <p class="hint">Whatever your provider tells you to add &mdash; an <code>include:</code>, an <code>ip4:</code>/<code>ip6:</code>, or <code>mx</code>.</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Other senders</legend>
+        <p class="hint" style="margin:0 0 12px">Anything else that sends as your domain. Each one adds an SPF term &mdash; watch the 10-lookup limit.</p>
+        <div class="checks">
+          <label><input type="checkbox" id="s_esp"> Marketing / newsletter platform (Mailchimp, Brevo, SendGrid&hellip;)</label>
+          <div class="sub hidden" id="sub_esp"><input type="text" id="v_esp" placeholder="include:servers.mcsv.net" autocomplete="off" spellcheck="false"></div>
+          <label><input type="checkbox" id="s_crm"> CRM / helpdesk / billing (Salesforce, Zendesk, Stripe&hellip;)</label>
+          <div class="sub hidden" id="sub_crm"><input type="text" id="v_crm" placeholder="include:_spf.salesforce.com" autocomplete="off" spellcheck="false"></div>
+          <label><input type="checkbox" id="s_srv"> Your own mail server / app server</label>
+          <div class="sub hidden" id="sub_srv"><input type="text" id="v_srv" placeholder="ip4:198.51.100.25" autocomplete="off" spellcheck="false"></div>
+        </div>
+        <p class="warn-line hidden" id="lookupWarn"></p>
+        <p class="ok-line hidden" id="lookupOk"></p>
+      </fieldset>
+
+      <fieldset>
+        <legend>SPF</legend>
+        <div class="field">
+          <label class="lbl" for="spfAll">Unlisted senders</label>
+          <select id="spfAll">
+            <option value="~" selected>~all &mdash; softfail (mark, don&rsquo;t reject) &mdash; use while rolling out</option>
+            <option value="-">-all &mdash; hardfail &mdash; use once every sender is listed</option>
+          </select>
+          <p class="hint">DMARC treats <code>~all</code> and <code>-all</code> the same for the pass/fail decision, but <code>-all</code> is a clearer signal and helps outside DMARC. Move to it once your reports are clean.</p>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>DMARC</legend>
+        <div class="field">
+          <label class="lbl" for="p">Policy for mail that fails both SPF and DKIM alignment</label>
+          <select id="p">
+            <option value="none" selected>p=none &mdash; monitor only (start here)</option>
+            <option value="quarantine">p=quarantine &mdash; send to spam</option>
+            <option value="reject">p=reject &mdash; refuse at the door</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="checks" style="display:flex;gap:9px;align-items:flex-start;font-size:14px;margin:0">
+            <input type="checkbox" id="testing" style="margin-top:3px"> <span>Testing mode (<code>t=y</code>) &mdash; publish this policy but ask receivers to apply the <em>next-lower</em> one. The ramp step before going live.</span>
+          </label>
+        </div>
+        <div class="field">
+          <label class="lbl" for="rua">Aggregate report address (<code>rua</code>)</label>
+          <input type="text" id="rua" placeholder="dmarc-reports@example.com" autocomplete="off" spellcheck="false">
+          <p class="hint">Where daily XML rollups go. Blank &rarr; <code>dmarc@&lt;domain&gt;</code>. Point it at an inbox or a report analyser.</p>
+        </div>
+        <div class="field">
+          <label class="lbl" for="ruf">Failure report address (<code>ruf</code>) &mdash; optional</label>
+          <input type="text" id="ruf" placeholder="leave blank" autocomplete="off" spellcheck="false">
+          <p class="hint">Per-message forensic samples. Few receivers send them, they can carry recipient data, and volume can spike. Usually leave off.</p>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="lbl" for="sp">Subdomain policy (<code>sp</code>)</label>
+            <select id="sp">
+              <option value="" selected>inherit from p</option>
+              <option value="none">none</option>
+              <option value="quarantine">quarantine</option>
+              <option value="reject">reject</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl" for="np">Non-existent subdomains (<code>np</code>)</label>
+            <select id="np">
+              <option value="reject" selected>reject (recommended)</option>
+              <option value="quarantine">quarantine</option>
+              <option value="none">none</option>
+            </select>
+          </div>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label class="lbl" for="adkim">DKIM alignment (<code>adkim</code>)</label>
+            <select id="adkim">
+              <option value="r" selected>relaxed &mdash; subdomain of From is fine</option>
+              <option value="s">strict &mdash; exact domain match</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="lbl" for="aspf">SPF alignment (<code>aspf</code>)</label>
+            <select id="aspf">
+              <option value="r" selected>relaxed</option>
+              <option value="s">strict</option>
+            </select>
+          </div>
+        </div>
+        <p class="hint">Relaxed alignment is right for almost everyone &mdash; strict breaks common setups where a provider signs with a subdomain. Only tighten if you know you need it.</p>
+      </fieldset>
+    </form>
+
+    <div class="output">
+      <div class="tabs" role="tablist" aria-label="Output">
+        <button class="tab" role="tab" id="tab-rec" aria-selected="true" aria-controls="view-rec">Records</button>
+        <button class="tab" role="tab" id="tab-plain" aria-selected="false" aria-controls="view-plain">Plain English</button>
+        <button class="tab" role="tab" id="tab-roll" aria-selected="false" aria-controls="view-roll">Rollout</button>
+      </div>
+      <div class="panel">
+        <div id="view-rec" role="tabpanel" aria-labelledby="tab-rec"></div>
+        <div id="view-plain" role="tabpanel" aria-labelledby="tab-plain" hidden></div>
+        <div id="view-roll" role="tabpanel" aria-labelledby="tab-roll" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="explain">
+    <h2>How the three records work together</h2>
+    <p><strong>SPF</strong> is a published list of who is allowed to send for your domain. A receiver checks the sending server&rsquo;s IP against it.</p>
+    <p><strong>DKIM</strong> puts a cryptographic signature on each message. The receiver fetches your public key from DNS and verifies the mail wasn&rsquo;t forged or altered in transit.</p>
+    <p><strong>DMARC</strong> ties both back to the domain a human sees in the <em>From:</em> field (&ldquo;alignment&rdquo;), tells receivers what to do when neither check passes in alignment, and &mdash; the part people underuse &mdash; asks them to send you daily reports on who is sending as you.</p>
+    <p class="muted">A message passes DMARC if SPF <em>or</em> DKIM passes <em>and</em> that passing check is aligned with the From domain. One aligned pass is enough.</p>
+
+    <h2>The staged rollout</h2>
+    <p>The failure mode of DMARC is blocking your own legitimate mail &mdash; a forgotten newsletter platform, an app server nobody documented. So you move in steps, and you only take the next one when the aggregate reports show every real sender passing, in alignment, for a week or two.</p>
+    <ul>
+      <li><code>p=none</code> &mdash; nothing is enforced; you are only collecting reports. Stay here until you recognise every source.</li>
+      <li><code>p=quarantine; t=y</code> &mdash; you&rsquo;ve declared quarantine, but <code>t=y</code> tells receivers to still act as <code>none</code>. A dress rehearsal.</li>
+      <li><code>p=quarantine</code> &mdash; drop <code>t=y</code>. Failing mail now goes to spam. Watch for a week.</li>
+      <li><code>p=reject; t=y</code> &mdash; declared reject, receivers act as quarantine. Last checkpoint.</li>
+      <li><code>p=reject</code> &mdash; failing mail is refused outright. The destination.</li>
+    </ul>
+
+    <h2>Watch-outs</h2>
+    <ul>
+      <li><strong>The 10-lookup SPF limit.</strong> Every <code>include</code>, <code>a</code>, <code>mx</code>, <code>ptr</code>, <code>exists</code> and <code>redirect</code> costs a DNS lookup, and their includes count too. Over ten and SPF returns <code>permerror</code> &mdash; treated as a fail. Consolidate or use a provider that flattens.</li>
+      <li><strong>Don&rsquo;t jump to <code>p=reject</code>.</strong> Every skipped step is mail you might be silently dropping. The reports are the whole point &mdash; read them.</li>
+      <li><strong>Third-party senders need alignment, not just an SPF pass.</strong> A platform that sends from <code>bounces.theirdomain.com</code> passes SPF for <em>their</em> domain, which doesn&rsquo;t align with yours. Either have them DKIM-sign as your domain, or set a custom return-path so SPF aligns.</li>
+      <li><strong>DKIM keys.</strong> Use 2048-bit where the provider allows it, and rotate on a schedule &mdash; that&rsquo;s why Microsoft and Google give you two selectors.</li>
+      <li><strong>Migrating an old record?</strong> Strip <code>pct</code>, <code>rf</code> and <code>ri</code> &mdash; DMARCbis removed them. <code>pct</code> in particular no longer does what you think; use <code>t=y</code> for a staged step.</li>
+      <li><strong>This isn&rsquo;t a deliverability guarantee.</strong> DMARC stops spoofing of your domain. It does nothing about content filters, bl&nbsp;lists, or bad sending reputation.</li>
+    </ul>
+  </section>
+
+  <footer>
+    A learning / demo tool from <a href="/">Kaine Cohen</a>. Verify every record with your provider&rsquo;s
+    guidance and a DNS lookup before you publish, and watch the DMARC reports at each step.
+  </footer>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var f = $("f");
+
+  var PROVIDERS = {
+    m365: {
+      spf: "include:spf.protection.outlook.com",
+      hint: "SPF include is `spf.protection.outlook.com`. DKIM is two CNAMEs whose targets you copy from the Defender portal: Email & collaboration -> Policies & rules -> Threat policies -> Email authentication -> DKIM.",
+      dkim: [
+        { host: "selector1._domainkey.{d}", type: "CNAME", value: "<COPY selector1 TARGET FROM DEFENDER PORTAL>" },
+        { host: "selector2._domainkey.{d}", type: "CNAME", value: "<COPY selector2 TARGET FROM DEFENDER PORTAL>" }
+      ]
+    },
+    google: {
+      spf: "include:_spf.google.com",
+      hint: "SPF include is `_spf.google.com`. DKIM is one TXT record - generate the key in Admin console: Apps -> Google Workspace -> Gmail -> Authenticate email, then publish it.",
+      dkim: [
+        { host: "google._domainkey.{d}", type: "TXT", value: "v=DKIM1; k=rsa; p=<PASTE PUBLIC KEY FROM GOOGLE ADMIN CONSOLE>" }
+      ]
+    },
+    other: {
+      spf: "",
+      hint: "Add whatever SPF mechanism your provider specifies below. For DKIM, publish the selector and public key they give you (usually `<selector>._domainkey.<domain>`).",
+      dkim: [
+        { host: "<SELECTOR>._domainkey.{d}", type: "TXT", value: "v=DKIM1; k=rsa; p=<PASTE PUBLIC KEY FROM YOUR PROVIDER>" }
+      ]
+    }
+  };
+
+  function dom(){ var v = $("domain").value.trim().toLowerCase().replace(/^https?:\/\//,"").replace(/\/.*$/,""); return v || "<YOUR-DOMAIN>"; }
+
+  function spfTerms(){
+    var terms = [];
+    var p = $("provider").value;
+    if (p === "other"){
+      var o = $("otherInclude").value.trim();
+      terms.push(o || "include:<YOUR-PROVIDER-SPF>");
+    } else {
+      terms.push(PROVIDERS[p].spf);
+    }
+    [["s_esp","v_esp","include:<MARKETING-PLATFORM-SPF>"],
+     ["s_crm","v_crm","include:<CRM-OR-HELPDESK-SPF>"],
+     ["s_srv","v_srv","ip4:<YOUR-SERVER-IP>"]].forEach(function(row){
+      if ($(row[0]).checked){
+        var val = $(row[1]).value.trim();
+        terms.push(val || row[2]);
+      }
+    });
+    return terms;
+  }
+
+  function lookupCount(terms){
+    var n = 1; // the SPF record itself
+    terms.forEach(function(t){
+      if (/^(include:|a$|a:|mx$|mx:|ptr|exists:|redirect=)/.test(t)) n++;
+    });
+    return n;
+  }
+
+  function buildSPF(){
+    var terms = spfTerms();
+    return { host: dom(), type: "TXT", value: "v=spf1 " + terms.join(" ") + " " + $("spfAll").value + "all", terms: terms };
+  }
+
+  function buildDKIM(){
+    var p = $("provider").value;
+    var d = dom();
+    return PROVIDERS[p].dkim.map(function(r){
+      return { host: r.host.replace("{d}", d), type: r.type, value: r.value };
+    });
+  }
+
+  function dmarcTags(policy, testing){
+    var d = dom();
+    var tags = ["v=DMARC1", "p=" + policy];
+    if (testing) tags.push("t=y");
+    var rua = $("rua").value.trim() || ("dmarc@" + d);
+    tags.push("rua=mailto:" + rua);
+    var ruf = $("ruf").value.trim();
+    if (ruf) tags.push("ruf=mailto:" + ruf);
+    if ($("sp").value) tags.push("sp=" + $("sp").value);
+    tags.push("np=" + $("np").value);
+    if ($("adkim").value === "s") tags.push("adkim=s");
+    if ($("aspf").value === "s") tags.push("aspf=s");
+    return tags;
+  }
+
+  function buildDMARC(){
+    return { host: "_dmarc." + dom(), type: "TXT", value: dmarcTags($("p").value, $("testing").checked).join("; ") };
+  }
+
+  function recBlock(title, meta, rec, id){
+    var wrap = document.createElement("div");
+    wrap.className = "rec";
+    var h = document.createElement("h3"); h.textContent = title; wrap.appendChild(h);
+    var m = document.createElement("div"); m.className = "meta";
+    m.textContent = "Host  " + rec.host + "      Type  " + rec.type; wrap.appendChild(m);
+    if (meta){ var mm = document.createElement("div"); mm.className = "meta"; mm.textContent = meta; wrap.appendChild(mm); }
+    var pre = document.createElement("pre"); pre.id = id; pre.textContent = rec.value; wrap.appendChild(pre);
+    var b = document.createElement("button"); b.type = "button"; b.className = "copy"; b.textContent = "Copy value";
+    b.addEventListener("click", function(){
+      var t = pre.textContent;
+      navigator.clipboard && navigator.clipboard.writeText(t).then(function(){
+        b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy value"; }, 1400);
+      }, function(){ b.textContent = "Copy failed"; });
+    });
+    wrap.appendChild(b);
+    return wrap;
+  }
+
+  function renderRecords(){
+    var v = $("view-rec");
+    v.replaceChildren();
+    var spf = buildSPF();
+    v.appendChild(recBlock("SPF", "One TXT record at the domain apex. Replace any existing v=spf1 record — you can only have one.", spf, "spfOut"));
+    var dkim = buildDKIM();
+    dkim.forEach(function(r, i){
+      v.appendChild(recBlock("DKIM" + (dkim.length > 1 ? " (" + (i+1) + " of " + dkim.length + ")" : ""), i === 0 ? "Placeholder — the real target/key comes from your provider's admin portal." : null, r, "dkimOut" + i));
+    });
+    v.appendChild(recBlock("DMARC", "One TXT record at _dmarc.<domain>.", buildDMARC(), "dmarcOut"));
+  }
+
+  // mini-markup -> DOM via createElement/textContent only: **bold** and `code`, rest is text
+  function frag(str){
+    var out = document.createDocumentFragment();
+    str.split(/(\*\*[^*]+\*\*|`[^`]+`)/).forEach(function(chunk){
+      if (!chunk) return;
+      if (/^\*\*[\s\S]+\*\*$/.test(chunk)){ var s = document.createElement("strong"); s.textContent = chunk.slice(2, -2); out.appendChild(s); }
+      else if (/^`[\s\S]+`$/.test(chunk)){ var c = document.createElement("code"); c.textContent = chunk.slice(1, -1); out.appendChild(c); }
+      else { out.appendChild(document.createTextNode(chunk)); }
+    });
+    return out;
+  }
+  function para(parent, str){ var p = document.createElement("p"); p.appendChild(frag(str)); parent.appendChild(p); }
+  function setProse(el, str){ el.replaceChildren(frag(str)); }
+
+  function renderPlain(){
+    var v = $("view-plain");
+    v.replaceChildren();
+    var prose = document.createElement("div"); prose.className = "prose";
+    var d = dom();
+    var terms = spfTerms();
+    para(prose, "**SPF.** Receivers will accept mail for `" + d + "` from " +
+      (terms.length === 1 ? "one source: " : (terms.length + " sources: ")) +
+      terms.map(function(t){ return "`" + t + "`"; }).join(", ") + ". " +
+      ($("spfAll").value === "-" ? "Anything else **hardfails**." : "Anything else **softfails** — flagged, not refused."));
+    para(prose, "**DKIM.** " + ($("provider").value === "m365"
+      ? "Exchange Online signs outbound mail once both selector CNAMEs resolve. Two selectors so a key can be rotated without downtime."
+      : $("provider").value === "google"
+        ? "Gmail signs outbound mail once the TXT key is published and signing is switched on in the Admin console."
+        : "Your provider signs outbound mail once its selector and public key are in DNS."));
+    var p = $("p").value, testing = $("testing").checked;
+    var effective = testing ? (p === "reject" ? "quarantine" : "none") : p;
+    para(prose, "**DMARC.** You are publishing `p=" + p + "`" +
+      (testing ? " with `t=y`, so receivers currently act as `p=" + effective + "`" : "") + ". " +
+      (effective === "none"
+        ? "Nothing is enforced yet — you are collecting reports at `" + ($("rua").value.trim() || ("dmarc@" + d)) + "`."
+        : effective === "quarantine"
+          ? "Mail from `" + d + "` that fails both checks in alignment is sent to spam."
+          : "Mail from `" + d + "` that fails both checks in alignment is refused at the receiving server."));
+    para(prose, "Subdomains: " + ($("sp").value ? "`" + $("sp").value + "` (explicit `sp`)" : "inherit the policy above") +
+      ". Non-existent subdomains: `" + $("np").value + "`. " +
+      "Alignment is " + ($("adkim").value === "s" || $("aspf").value === "s"
+        ? "**strict** on " + [ $("adkim").value === "s" ? "DKIM" : null, $("aspf").value === "s" ? "SPF" : null ].filter(Boolean).join(" and ") + " — exact domain match required."
+        : "relaxed on both — a subdomain match is fine."));
+    v.appendChild(prose);
+  }
+
+  function renderRollout(){
+    var v = $("view-roll");
+    v.replaceChildren();
+    var intro = document.createElement("div"); intro.className = "prose";
+    para(intro, "Each step keeps the same SPF and DKIM. Only the `_dmarc." + dom() + "` TXT value changes. Move on only when the reports show every real sender passing in alignment.");
+    v.appendChild(intro);
+    var steps = [
+      ["none", false, "Monitor. Recognise every sending source in the reports before moving."],
+      ["quarantine", true, "Declared quarantine, receivers still act as none. Dress rehearsal — confirm nothing new appears."],
+      ["quarantine", false, "Live quarantine. Failing mail goes to spam. Hold a week, watch for false positives."],
+      ["reject", true, "Declared reject, receivers act as quarantine. Final checkpoint."],
+      ["reject", false, "Live reject. Spoofed mail is refused. Done."]
+    ];
+    var ol = document.createElement("ol"); ol.className = "ladder";
+    steps.forEach(function(s){
+      var li = document.createElement("li");
+      var code = document.createElement("code");
+      code.textContent = dmarcTags(s[0], s[1]).join("; ");
+      li.appendChild(code);
+      li.appendChild(document.createTextNode(" — " + s[2]));
+      ol.appendChild(li);
+    });
+    v.appendChild(ol);
+  }
+
+  function syncVisibility(){
+    var p = $("provider").value;
+    $("otherIncludeField").classList.toggle("hidden", p !== "other");
+    [["s_esp","sub_esp"],["s_crm","sub_crm"],["s_srv","sub_srv"]].forEach(function(r){
+      $(r[1]).classList.toggle("hidden", !$(r[0]).checked);
+    });
+    setProse($("providerHint"), PROVIDERS[p].hint);
+    var n = lookupCount(spfTerms());
+    var warn = $("lookupWarn"), ok = $("lookupOk");
+    if (n > 10){
+      warn.textContent = "SPF term count is " + n + " of 10 — over the limit, SPF will permerror. Consolidate senders or use a flattening provider.";
+      warn.classList.remove("hidden"); ok.classList.add("hidden");
+    } else if (n >= 8){
+      warn.textContent = "SPF term count is " + n + " of 10 — close to the limit. Each extra include still has its own nested lookups.";
+      warn.classList.remove("hidden"); ok.classList.add("hidden");
+    } else {
+      warn.classList.add("hidden"); ok.classList.add("hidden");
+    }
+  }
+
+  function render(){
+    syncVisibility();
+    renderRecords();
+    renderPlain();
+    renderRollout();
+  }
+
+  f.addEventListener("input", render);
+  f.addEventListener("change", render);
+
+  var tabs = [["tab-rec","view-rec"],["tab-plain","view-plain"],["tab-roll","view-roll"]];
+  tabs.forEach(function(t){
+    $(t[0]).addEventListener("click", function(){
+      tabs.forEach(function(x){
+        var on = x[0] === t[0];
+        $(x[0]).setAttribute("aria-selected", on ? "true" : "false");
+        $(x[1]).hidden = !on;
+      });
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
