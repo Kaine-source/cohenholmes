@@ -46,30 +46,35 @@
   a{color:inherit;}
   button,input{font:inherit;}
   button{cursor:pointer;}
-  .wrap{max-width:900px;margin:0 auto;padding:42px 24px 80px;}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px 80px;}
 
-  .topbar{
+  .pagehead{
     display:flex;
+    flex-wrap:wrap;
+    align-items:baseline;
     justify-content:space-between;
-    align-items:center;
-    gap:18px;
+    gap:8px 20px;
+    padding-top:44px;
     margin-bottom:54px;
   }
-  .brand{
+  .pagehead .brand{
     font-family:var(--font-mono);
-    font-size:.8rem;
-    letter-spacing:.12em;
+    font-size:13px;
+    letter-spacing:.08em;
     text-transform:uppercase;
     color:var(--muted);
     text-decoration:none;
   }
-  .back{
+  .pagehead .brand:hover{color:var(--signal);}
+  .subnav{display:flex;flex-wrap:wrap;gap:16px;}
+  .subnav a{
     font-family:var(--font-mono);
-    font-size:.78rem;
+    font-size:13px;
     color:var(--muted);
     text-decoration:none;
   }
-  .back:hover{color:var(--signal);}
+  .subnav a:hover{color:var(--signal);}
+  .subnav a[aria-current="page"]{color:var(--ink);}
 
   .eyebrow{
     margin-bottom:16px;
@@ -226,7 +231,7 @@
   }
 
   @media(max-width:640px){
-    .topbar{align-items:flex-start;flex-direction:column;}
+    .pagehead{align-items:flex-start;flex-direction:column;}
     .choices{grid-template-columns:1fr;}
     .choice label{text-align:left;}
     .result-grid{grid-template-columns:1fr;}
@@ -238,7 +243,7 @@
   }
   @media print{
     body{background:#fff;color:#000;}
-    .topbar,.assessment,.form-actions,.result-actions{display:none!important;}
+    .pagehead,.assessment,.form-actions,.result-actions{display:none!important;}
     .wrap{max-width:none;padding:0;}
     .results{display:block!important;margin-top:0;}
     .result-card{background:#fff;color:#000;border:2px solid #000;}
@@ -250,10 +255,15 @@
 </head>
 <body>
 <div class="wrap">
-  <header class="topbar">
+  <div class="pagehead">
     <a class="brand" href="/">Kaine Cohen</a>
-    <a class="back" href="/">← Back home</a>
-  </header>
+    <nav class="subnav" aria-label="Sections">
+      <a href="/">Home</a>
+      <a href="/ca-builder">CA Builder</a>
+      <a href="/ai-governance-check" aria-current="page">AI Check</a>
+      <a href="/writing">Writing</a>
+    </nav>
+  </div>
 
   <main>
     <section aria-labelledby="page-title">
