@@ -35,6 +35,13 @@ Not just a static site. By the end there were:
 
 All of it on free tiers. Cloudflare Pages, GitHub Actions' free minutes, no paid services.
 
+![A left-to-right pipeline of five stages: Local edit (agent, in the repo); Branch and PR
+(validate and preview run); Review (Copilot and me), drawn as the highlighted box with the word
+"approve"; Merge to main (branch protected); Production (auto-deploys on merge). An offshoot
+from Production reads "failed deploy, I get pinged". Caption: every change is a pull request;
+nothing merges without a green check and the review step; nothing deploys except a merge to
+main.](diagrams/blog2-pipeline.png)
+
 That list is longer than what I set out to build. The scope crept, in a good way. Once the
 deploy pipeline existed, adding previews was cheap. Once previews existed, the second tool was
 mostly "do that again, for this." Agents are very good at "do that again, for this."
