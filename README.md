@@ -23,6 +23,7 @@ wrangler.toml           Pages project config (pages_build_output_dir = "public")
 ca-baseline-model-DRAFT.md      source copy of the CA baseline model (also on the CA Builder page)
 ca-docs-alignment-audit.md      notes from aligning the CA content with Microsoft's docs
 blog/                           post drafts + diagram sources (published via Medium)
+docs/                           delivery-log.md — how work runs + what's in flight
 backup-*/                       previous homepage versions
 ```
 
