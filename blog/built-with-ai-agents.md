@@ -28,9 +28,9 @@ Not just a static site. By the end there were:
   input, live output, nothing submitted anywhere.
 - A writing page that pulls my Medium posts through a small server-side function, so the feed's
   missing CORS headers stop being my problem.
-- A deployment pipeline: every push to `main` deploys itself, every pull request gets its own
-  Cloudflare preview URL posted as a comment, and a validation job checks routing, the
-  content-security-policy hashes and every scoring boundary in the governance tool before
+- A deployment pipeline: every push to `main` deploys itself, every branch pull request I open
+  gets its own Cloudflare preview URL posted as a comment, and a validation job checks routing,
+  the governance tool's content-security-policy hash and all its scoring boundaries before
   anything merges.
 - Branch protection so nothing reaches production without a pull request, plus scheduled agents
   that re-check the site's DNS health, remind me to rotate an API token before it expires, and
