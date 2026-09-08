@@ -1,0 +1,30 @@
+{
+  "site": "https://cohenholmes.co.uk",
+  "routes": [
+    { "path": "/", "contains": "Kaine Cohen" },
+    { "path": "/ca-builder", "contains": "Conditional Access Policy Builder" },
+    { "path": "/ai-governance-check", "contains": "AI Governance Readiness Check" },
+    { "path": "/mail-auth", "contains": "DMARC builder" },
+    { "path": "/writing", "contains": "Writing" },
+    { "path": "/api/medium-feed", "json": "posts" },
+    { "path": "/this-route-should-not-exist", "status": 404 }
+  ],
+  "dns": {
+    "TXT": {
+      "cohenholmes.co.uk": [
+        "v=spf1 include:spf.protection.outlook.com -all",
+        "MS=ms64540345"
+      ],
+      "_dmarc.cohenholmes.co.uk": [
+        "v=DMARC1; p=none; rua=mailto:kaine.cohen@cohenholmes.co.uk"
+      ]
+    },
+    "MX": {
+      "cohenholmes.co.uk": ["cohenholmes-co-uk.mail.protection.outlook.com"]
+    },
+    "CNAME": {
+      "selector1._domainkey.cohenholmes.co.uk": "selector1-cohenholmes-co-uk._domainkey.kcprod1.k-v1.dkim.mail.microsoft",
+      "selector2._domainkey.cohenholmes.co.uk": "selector2-cohenholmes-co-uk._domainkey.kcprod1.k-v1.dkim.mail.microsoft"
+    }
+  }
+}
