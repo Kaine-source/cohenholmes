@@ -28,12 +28,18 @@ No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
   preview + URL comment), `validate.yml` (route / CSP / privacy / scoring checks).
 - Actions pinned to commit SHAs; Dependabot watching them.
 - Repo is public; branch protection as above.
+- `uptime.yml` — synthetic monitor every 15 min: route health + DNS drift against
+  [`ops/monitor.json`](../ops/monitor.json); opens/closes a `monitoring` issue.
+- [`docs/runbook.md`](runbook.md) — recovery playbooks and where everything lives.
+  [`docs/dns-expected.md`](dns-expected.md) — the DNS the monitor enforces.
 
 ## In flight / queued
 
 | Item | Status | Notes |
 |---|---|---|
+| Ops layer — account tasks | Kaine to do | Click-ops only, no code: (D) enable Cloudflare Web Analytics + a one-line privacy note; (E) verify the domain in Google Search Console + Bing Webmaster Tools, submit the sitemap; (F) confirm GitHub Secret Scanning + Push Protection are on. Runbook has **TODO** lines only Kaine can fill (registrar, recovery-code locations, 2FA methods). |
 | Site copy + polish pass | Active | Full wording review done 8 Sep 2026. Queued: 5 wording fixes (missing space on `/ai-governance-check`, "bl lists" on `/mail-auth`, raw `riskRemediation` label on `/ca-builder`, bare `&` in a `/mail-auth` og:title, "Posts there" on the homepage) plus a cosmetic set (per-page footers differ, no canonical/og tags on `/ca-builder`, H1 casing, `/404` still on the old nav). Aim: the site reads like a working toolkit, not a template. |
+| Ops layer — CI quality gates | Queued | Lighthouse CI + axe against a locally-served build in PRs (budgets for perf / a11y / SEO); scheduled `lychee` link check. Folds into the `validate` pattern. |
 | New tool candidates | On hold | Paused deliberately — building up the ops / supporting layer before adding more features. Shortlist kept for later: `/mail-auth` **checker** (live DNS lookup via a Pages Function), CA policy-set reviewer (paste a Graph export, get an audit), email-header analyzer (paste headers, parse locally). |
 | Blog post 2 — "I rebuilt my website with AI agents" | On hold | Draft written and merged to the repo (`blog/built-with-ai-agents.md`, PR #12). Not being re-typed into Medium yet — holding until the site polish and any new tool land, so the post points people at something finished. |
 | DMARC hardening post | Queued | Companion to `/mail-auth`; write after the 16 Sept DMARC review lands real data. |
