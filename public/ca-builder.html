@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Conditional Access Policy Builder — Kaine Cohen</title>
 <meta name="description" content="An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON, the licence tier each policy needs, and how CA connects to Purview, Defender for Cloud Apps and Entra Suite.">
+<link rel="canonical" href="https://cohenholmes.co.uk/ca-builder">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Conditional Access Policy Builder — Kaine Cohen">
+<meta property="og:description" content="Plain-English input, live Microsoft Graph conditionalAccessPolicy JSON, the licence tier it needs, and how Conditional Access connects to the rest. A learning tool — nothing is submitted.">
+<meta property="og:url" content="https://cohenholmes.co.uk/ca-builder">
+<meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -86,6 +92,7 @@
     max-width:64ch;
     margin-bottom:28px;
   }
+  .disclaimer a{ color:var(--signal); }
 
   main{ padding-bottom:80px; }
 
@@ -487,8 +494,12 @@
       and Entra Suite.
     </p>
     <p class="disclaimer">
-      Learning / demo tool. Output mirrors the Graph beta schema shape but is not validated against a
-      tenant. Always review in report-only mode before enforcing.
+      <strong>This is a learning tool.</strong> It builds the JSON so you can see the shape and copy
+      it into your own tenant &mdash; it never connects to anything or changes a setting. Treat the
+      output as a starting point: review it in report-only mode first, and check the current
+      <a href="https://learn.microsoft.com/entra/identity/conditional-access/" target="_blank" rel="noopener">Microsoft
+      Conditional Access documentation</a> before you enforce anything, because the schema and the
+      licensing move over time.
     </p>
     <p class="disclaimer">
       <strong>Your IDs are yours.</strong> Group, app and named-location IDs are specific to your
@@ -1018,7 +1029,7 @@
   </main>
 
   <footer>
-    <span>© 2026 Kaine Cohen</span>
+    <span>Kaine Cohen — Microsoft 365 consultant</span>
     <span>cohenholmes.co.uk</span>
   </footer>
 </div>
@@ -1397,7 +1408,8 @@
   function labelGrant(v){
     return { mfa:"multifactor authentication", compliantDevice:"a compliant device",
       domainJoinedDevice:"a Hybrid AD joined device", approvedApplication:"an approved client app",
-      compliantApplication:"an app protection policy", passwordChange:"a password change" }[v] || v;
+      compliantApplication:"an app protection policy", passwordChange:"a password change",
+      riskRemediation:"risk remediation" }[v] || v;
   }
 
   function highlight(json){

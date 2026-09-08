@@ -9,7 +9,7 @@
 <meta name="description" content="Generate correct SPF, DKIM and DMARC DNS records for Microsoft 365 or Google Workspace, with a staged rollout to enforcement and plain-English notes on what each policy does. Runs entirely in your browser.">
 <link rel="canonical" href="https://cohenholmes.co.uk/mail-auth">
 <meta property="og:type" content="website">
-<meta property="og:title" content="SPF, DKIM & DMARC Builder — Kaine Cohen">
+<meta property="og:title" content="SPF, DKIM &amp; DMARC Builder — Kaine Cohen">
 <meta property="og:description" content="Correct SPF / DKIM / DMARC records and a staged path to enforcement. Browser-only, nothing submitted.">
 <meta property="og:url" content="https://cohenholmes.co.uk/mail-auth">
 <meta name="twitter:card" content="summary">
@@ -147,7 +147,7 @@
   section.explain li{ margin-bottom:8px; }
   section.explain .muted{ color:var(--muted); }
 
-  footer{ margin-top:70px; padding-top:20px; border-top:1px solid var(--line); font-size:13px; color:var(--muted); }
+  footer{ margin-top:70px; padding-top:20px; border-top:1px solid var(--line); font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
 </style>
 </head>
 <body>
@@ -171,9 +171,13 @@
       doesn&rsquo;t bounce your own mail on the way.
     </p>
     <p class="disclaimer">
-      Runs entirely in your browser &mdash; nothing you type is submitted, stored or logged. The records
-      are correct in shape, but <strong>your keys and selectors are yours</strong>: DKIM values come from
-      your provider&rsquo;s admin portal, so this tool emits <code>&lt;PLACEHOLDER&gt;</code> tokens for them.
+      <strong>This is a learning tool.</strong> It runs entirely in your browser &mdash; nothing you type
+      is submitted, stored or logged, and it never touches your DNS. It builds the records so you can
+      understand them and publish them yourself. Always check them against your provider&rsquo;s own
+      guidance (Microsoft&nbsp;365, Google Workspace) and a live DNS lookup before publishing, and watch
+      the DMARC reports at each step &mdash; email-auth guidance shifts as standards like DMARCbis land.
+      DKIM values come from your provider&rsquo;s admin portal, so this tool emits
+      <code>&lt;PLACEHOLDER&gt;</code> tokens for them.
     </p>
     <p class="disclaimer">
       Aligned with DMARCbis (RFC&nbsp;9989/9990/9991, May&nbsp;2026): the deprecated <code>pct</code>,
@@ -336,13 +340,13 @@
       <li><strong>Third-party senders need alignment, not just an SPF pass.</strong> A platform that sends from <code>bounces.theirdomain.com</code> passes SPF for <em>their</em> domain, which doesn&rsquo;t align with yours. Either have them DKIM-sign as your domain, or set a custom return-path so SPF aligns.</li>
       <li><strong>DKIM keys.</strong> Use 2048-bit where the provider allows it, and rotate on a schedule &mdash; that&rsquo;s why Microsoft and Google give you two selectors.</li>
       <li><strong>Migrating an old record?</strong> Strip <code>pct</code>, <code>rf</code> and <code>ri</code> &mdash; DMARCbis removed them. <code>pct</code> in particular no longer does what you think; use <code>t=y</code> for a staged step.</li>
-      <li><strong>This isn&rsquo;t a deliverability guarantee.</strong> DMARC stops spoofing of your domain. It does nothing about content filters, bl&nbsp;lists, or bad sending reputation.</li>
+      <li><strong>This isn&rsquo;t a deliverability guarantee.</strong> DMARC stops spoofing of your domain. It does nothing about content filters, blocklists, or bad sending reputation.</li>
     </ul>
   </section>
 
   <footer>
-    A learning / demo tool from <a href="/">Kaine Cohen</a>. Verify every record with your provider&rsquo;s
-    guidance and a DNS lookup before you publish, and watch the DMARC reports at each step.
+    <span>Kaine Cohen — Microsoft 365 consultant</span>
+    <span>cohenholmes.co.uk</span>
   </footer>
 </div>
 
