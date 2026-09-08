@@ -13,8 +13,8 @@ The obvious upcoming one: moving DMARC from `p=none` to `p=quarantine` after the
 ## Nameservers / DNS host
 
 Cloudflare DNS — `mona.ns.cloudflare.com`, `jaime.ns.cloudflare.com`. All records
-below are managed in the Cloudflare dashboard (DNS → Records). The registrar is
-recorded in [`runbook.md`](runbook.md).
+below are managed in the Cloudflare dashboard (DNS → Records). Registrar and
+recovery details are kept in the private ops notes, not in this repo.
 
 ## Web
 
