@@ -7,8 +7,8 @@ human actually do, and where did it go wrong. So here is mine, with those bits l
 
 I already had a personal site. A flat one-page thing on Cloudflare Pages, the kind you put up
 in an afternoon and never touch again. What I wanted this time was different: somewhere that
-showed the work rather than describing it. Tools a peer or a recruiter could click through, not
-screenshots of tools.
+showed the work rather than describing it. Tools someone could click through, not screenshots of
+tools.
 
 The build ran from 1 to 6 September 2026. Six days, mostly evenings, 41 commits across nine pull
 requests. The thing doing most of the typing was Claude Code, a terminal agent that reads the
