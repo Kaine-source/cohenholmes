@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-6TkwoR0zMNA5Pz/NtgnkSCb9LPpfxO4H7JqGr/3YbMc='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Conditional Access Policy Builder — Kaine Cohen</title>
 <meta name="description" content="An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON, the licence tier each policy needs, and how CA connects to Purview, Defender for Cloud Apps and Entra Suite.">
 <link rel="canonical" href="https://cohenholmes.co.uk/ca-builder">
@@ -1327,7 +1329,7 @@
     var inc = apps.includeApplications || [];
     var ctx = apps.includeAuthenticationContextClassReferences || [];
     var what;
-    if (ctx.length) what = "a sensitive action (auth context " + ctx.join(", ") + ")";
+    if (ctx.length) what = "a sensitive action (auth context " + esc(ctx.join(", ")) + ")";
     else if (inc.indexOf("All") !== -1) what = "all cloud apps";
     else if (inc.indexOf("Office365") !== -1) what = "Office 365";
     else if (inc.indexOf("None") !== -1) what = "no apps";
@@ -1339,7 +1341,7 @@
 
     var conds = [];
     if (c.clientAppTypes && c.clientAppTypes.length && c.clientAppTypes[0] !== "all"){
-      conds.push("from " + c.clientAppTypes.map(labelClient).join(" or "));
+      conds.push("from " + c.clientAppTypes.map(function(x){ return esc(labelClient(x)); }).join(" or "));
     }
     if (c.locations){
       var l = c.locations;
@@ -1352,16 +1354,16 @@
       }
     }
     if (c.platforms && c.platforms.includePlatforms.length){
-      conds.push("on " + c.platforms.includePlatforms.join(", "));
+      conds.push("on " + esc(c.platforms.includePlatforms.join(", ")));
     }
     if (c.signInRiskLevels && c.signInRiskLevels.length){
-      conds.push("when sign-in risk is " + c.signInRiskLevels.join(", "));
+      conds.push("when sign-in risk is " + esc(c.signInRiskLevels.join(", ")));
     }
     if (c.userRiskLevels && c.userRiskLevels.length){
-      conds.push("when user risk is " + c.userRiskLevels.join(", "));
+      conds.push("when user risk is " + esc(c.userRiskLevels.join(", ")));
     }
     if (c.insiderRiskLevels){
-      conds.push("when insider risk is " + c.insiderRiskLevels + " or above");
+      conds.push("when insider risk is " + esc(c.insiderRiskLevels) + " or above");
     }
     if (conds.length) parts.push(conds.join(", "));
 
@@ -1370,8 +1372,8 @@
     if (g && g.builtInControls && g.builtInControls.indexOf("block") !== -1){
       parts.push("&rarr; <strong>access is blocked</strong>");
     } else if (g){
-      var reqs = (g.builtInControls || []).map(labelGrant);
-      if (strengthId) reqs.push("<strong>" + (STRENGTH_NAMES[strengthId] || "an authentication strength") + "</strong>");
+      var reqs = (g.builtInControls || []).map(function(x){ return esc(labelGrant(x)); });
+      if (strengthId) reqs.push("<strong>" + esc(STRENGTH_NAMES[strengthId] || "an authentication strength") + "</strong>");
       var joiner = g.operator === "AND" ? " and " : " or ";
       parts.push("&rarr; require " + reqs.map(function(r){ return r.indexOf("<strong>") === 0 ? r : "<strong>" + r + "</strong>"; }).join(joiner));
     } else {
@@ -1384,10 +1386,10 @@
       if (s.signInFrequency){
         bits.push(s.signInFrequency.frequencyInterval === "everyTime"
           ? "reauthenticate every time"
-          : "sign-in frequency every " + s.signInFrequency.value + " " + s.signInFrequency.type);
+          : "sign-in frequency every " + esc(s.signInFrequency.value) + " " + esc(s.signInFrequency.type));
       }
-      if (s.persistentBrowser){ bits.push("browser session " + s.persistentBrowser.mode + " persistent"); }
-      if (s.cloudAppSecurity){ bits.push("session via Defender for Cloud Apps (" + s.cloudAppSecurity.cloudAppSecurityType + ")"); }
+      if (s.persistentBrowser){ bits.push("browser session " + esc(s.persistentBrowser.mode) + " persistent"); }
+      if (s.cloudAppSecurity){ bits.push("session via Defender for Cloud Apps (" + esc(s.cloudAppSecurity.cloudAppSecurityType) + ")"); }
       if (s.disableResilienceDefaults){ bits.push("resilience defaults off"); }
       if (bits.length) parts.push("<span class=\"muted\">Session: " + bits.join("; ") + ".</span>");
     }
@@ -1399,6 +1401,12 @@
     }[p.state];
 
     return parts.join(" ") + ". <br><span class=\"muted\">" + stateLine + "</span>";
+  }
+
+  function esc(s){
+    return String(s).replace(/[&<>"]/g, function(ch){
+      return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch];
+    });
   }
 
   function labelClient(v){
