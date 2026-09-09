@@ -5,14 +5,17 @@ How work on this repo runs, and what's in flight. Updated as things move.
 ## Who does what
 
 - **Build & drive** — Claude Code: implementation, infrastructure, content, opens PRs.
-- **Review** — GitHub Copilot code review (automatic on pull requests).
+- **Review** — GitHub Copilot (auto, ruleset on `main`) + the ChatGPT Codex
+  connector (auto). Both advisory. Codex is a *reviewer* only now — it no longer
+  pushes branches or orchestrates, which is what made two orchestrators a tax
+  earlier in this project.
 - **Approve & merge** — Kaine.
 
 Everything reaches `main` through a pull request. Branch protection on `main`: PR
 required, the `validate` check must pass, review threads must be resolved, no
 force-push or deletion, not enforced for admins (emergency escape hatch).
 
-No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
+No Airtable, no Outlook. Tracking and review live in GitHub.
 
 ## Shipped
 
@@ -47,7 +50,7 @@ No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
 
 | Item | Status | Notes |
 |---|---|---|
-| Ops layer — account tasks | Kaine to do | Click-ops only, no code: (D) enable Cloudflare Web Analytics + a one-line privacy note; (E) verify the domain in Google Search Console + Bing Webmaster Tools, submit the sitemap; (F) confirm GitHub Secret Scanning + Push Protection are on. Runbook has **TODO** lines only Kaine can fill (registrar, recovery-code locations, 2FA methods). |
+| Ops layer — account tasks | Kaine to do | Click-ops only. (D) Cloudflare Web Analytics: a site exists (added ~5 months ago) but the beacon was never installed — 0 data. Switch it to automatic setup; the hash-locked CSP means it only reports on `/`, `/writing`, `/404` (the tool pages stay dark, by design). Then Claude adds the one-line privacy note. (E) verify the domain in Google Search Console + Bing (import from GSC), submit the sitemap; give Claude the GSC TXT string to add to DNS + `ops/monitor.json`. (F) confirm GitHub Secret Scanning + Push Protection are on. Runbook **TODO**s: registrar + renewal, recovery-code locations, 2FA methods. |
 | Site copy + polish pass | Done (PR in review) | Hero/contact rewrite (M365-consultant positioning, certs + dyslexia line, "Say hello"), per-tool "learning tool" intros, consistent footers, `/404` on the shared nav, `/ca-builder` canonical + og tags, and the 5 wording-bug fixes. Analytics privacy note deferred until Web Analytics is actually enabled. |
 | Ops layer — CI quality gates | Queued | Lighthouse CI + axe against a locally-served build in PRs (budgets for perf / a11y / SEO); scheduled `lychee` link check. Folds into the `validate` pattern. |
 | New tool candidates | On hold | Paused deliberately — building up the ops / supporting layer before adding more features. Shortlist kept for later: `/mail-auth` **checker** (live DNS lookup via a Pages Function), CA policy-set reviewer (paste a Graph export, get an audit), email-header analyzer (paste headers, parse locally). |
