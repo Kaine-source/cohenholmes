@@ -21,7 +21,7 @@ recovery details are kept in the private ops notes, not in this repo.
 | Name | Type | Value | Notes |
 |---|---|---|---|
 | `cohenholmes.co.uk` | CNAME (flattened) | `cohenholmes-site.pages.dev` | Proxied — resolves publicly as Cloudflare anycast `A` records, which change. The monitor checks the **site responds with the right content**, not the IPs. |
-| `www.cohenholmes.co.uk` | CNAME → apex (proxied) | resolves as Cloudflare anycast `A` records; a Cloudflare Redirect Rule 301s `www` → the root, path and query preserved. |
+| `www.cohenholmes.co.uk` | CNAME → apex (proxied) | resolves as Cloudflare anycast `A` records; a Cloudflare Redirect Rule 301s `www` → the root, path and query preserved. The monitor asserts this redirect (`redirects` in `ops/monitor.json`). |
 
 ## Email — Microsoft 365
 

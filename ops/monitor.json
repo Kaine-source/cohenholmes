@@ -9,6 +9,10 @@
     { "path": "/api/medium-feed", "json": "posts" },
     { "path": "/this-route-should-not-exist", "status": 404 }
   ],
+  "redirects": [
+    { "from": "https://www.cohenholmes.co.uk/", "to": "https://cohenholmes.co.uk/" },
+    { "from": "https://www.cohenholmes.co.uk/ca-builder?x=1", "to": "https://cohenholmes.co.uk/ca-builder?x=1" }
+  ],
   "dns": {
     "TXT": {
       "cohenholmes.co.uk": [
