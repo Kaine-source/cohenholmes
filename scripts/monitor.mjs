@@ -167,9 +167,40 @@ async function checkCname(name, expectedTarget) {
   else failures.push(`CNAME ${name} → ${got.join(", ") || "no record"}, expected ${expectedTarget}`);
 }
 
+// ---- redirect checks --------------------------------------------------
+
+async function checkRedirect(from, expectedTo) {
+  let res;
+  try {
+    res = await withRetry(`GET ${from}`, () => fetchWithTimeout(from, { redirect: "manual" }));
+  } catch (err) {
+    warnings.push(err.message);
+    return;
+  }
+  if (res.status < 300 || res.status >= 400) {
+    failures.push(`${from} → ${res.status}, expected a 3xx redirect to ${expectedTo}`);
+    return;
+  }
+  const location = res.headers.get("location") || "";
+  // resolve relative Location values against the request URL
+  const resolved = (() => {
+    try {
+      return new URL(location, from).href;
+    } catch {
+      return location;
+    }
+  })();
+  if (resolved === expectedTo || resolved === expectedTo + "/") {
+    passes.push(`${from} → ${res.status} ${expectedTo}`);
+  } else {
+    failures.push(`${from} → ${res.status} ${resolved || "(no Location)"}, expected ${expectedTo}`);
+  }
+}
+
 // ---- run -----------------------------------------------------------------
 
 for (const route of cfg.routes) await checkRoute(route);
+for (const r of cfg.redirects || []) await checkRedirect(r.from, r.to);
 
 for (const [name, list] of Object.entries(cfg.dns.TXT || {})) await checkTxt(name, list);
 for (const [name, hosts] of Object.entries(cfg.dns.MX || {})) await checkMx(name, hosts);
