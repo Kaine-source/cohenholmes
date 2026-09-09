@@ -22,6 +22,11 @@ No ChatGPT Work / Codex, no Airtable, no Outlook — this repo is GitHub-only.
   hash-locked CSP, no storage or network.
 - `/mail-auth` — SPF/DKIM/DMARC record builder with a staged path to enforcement;
   DMARCbis-aware (no `pct`, uses `t=y`, includes `np`). Same hardening as the AI check.
+- All three tools carry a hash-locked CSP with `connect-src 'none'` — a browser-
+  enforced guarantee that nothing typed can be sent anywhere. Verified with an
+  injected exfil payload: blocked, CSP violation logged, no outbound request.
+  `no-referrer` on every page. (Follow-up: swap `/ca-builder`'s two `innerHTML`
+  writes for `createElement`/`textContent` — inert markup still renders as DOM.)
 - `/writing` — Medium posts via a server-side RSS Pages Function.
 - Shared mini-nav across all four sub-pages (and `/404`).
 - Site copy positions Kaine as a Microsoft 365 consultant (identity / security /
