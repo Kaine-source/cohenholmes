@@ -6,8 +6,9 @@ How work on this repo runs, and what's in flight. Updated as things move.
 
 - **Build & drive** — Claude Code: implementation, infrastructure, content, opens PRs.
 - **Review** — GitHub Copilot (auto, ruleset on `main`) + the ChatGPT Codex
-  connector (auto). Both advisory. Codex is a *reviewer* only — it does not push
-  branches or orchestrate; that's what made it a tax before, and doesn't now.
+  connector (auto). Both advisory. Codex is a *reviewer* only now — it no longer
+  pushes branches or orchestrates, which is what made two orchestrators a tax
+  earlier in this project.
 - **Approve & merge** — Kaine.
 
 Everything reaches `main` through a pull request. Branch protection on `main`: PR
