@@ -2,8 +2,13 @@ name: Monitor site
 
 on:
   schedule:
-    - cron: "*/15 * * * *"   # every 15 minutes (UTC); GitHub may batch under load
-  workflow_dispatch:          # run on demand from the Actions tab
+    - cron: "*/15 * * * *"   # every 15 min (UTC); GitHub throttles this to every few hours on quiet repos
+  workflow_dispatch:
+    inputs:
+      force_fail:
+        description: "Force the check to fail (to test the alert path)"
+        type: boolean
+        default: false
 
 # only one monitor run at a time; a new run supersedes a queued one
 concurrency:
@@ -26,17 +31,22 @@ jobs:
 
       - name: Run checks
         id: run
-        run: node scripts/monitor.mjs
+        run: |
+          if [ "${{ inputs.force_fail }}" = "true" ]; then
+            echo "forced failure (alert-path test)"; exit 1
+          fi
+          node scripts/monitor.mjs
 
       - name: Open or update the tracking issue
-        if: steps.run.outcome == 'failure'
+        # !cancelled() disables the implicit success() guard so this runs after a failed check
+        if: ${{ !cancelled() && steps.run.outcome == 'failure' }}
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           gh label create monitoring --color B60205 --description "Automated site monitoring" --force
           existing="$(gh issue list --label monitoring --state open --json number --jq '.[0].number // empty')"
-          body="A site monitoring run failed. Details and the exact failing checks are in the run summary:
+          body="A site monitoring run failed. The exact failing checks are in the run summary:
           $RUN_URL
 
           This issue will close itself automatically once a later run passes."
@@ -47,7 +57,7 @@ jobs:
           fi
 
       - name: Close the tracking issue on recovery
-        if: steps.run.outcome == 'success'
+        if: ${{ !cancelled() && steps.run.outcome == 'success' }}
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
