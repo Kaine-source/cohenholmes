@@ -39,9 +39,12 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   preview + URL comment), `validate.yml` (route / CSP / privacy / scoring checks).
 - Actions pinned to commit SHAs; Dependabot watching them.
 - Repo is public; branch protection as above.
-- `uptime.yml` — synthetic monitor every 15 min: route health, `www` redirect,
-  and DNS drift against [`ops/monitor.json`](../ops/monitor.json); opens/closes a
-  `monitoring` issue.
+- `uptime.yml` — synthetic monitor (cron; GitHub throttles it to every few hours
+  on a quiet repo): route health, `www` redirect, DNS drift against
+  [`ops/monitor.json`](../ops/monitor.json); opens/closes a `monitoring` issue on
+  failure/recovery. `transient` routes (the Medium-feed proxy) retry harder and a
+  persistent bad status is a warning, not a page. `workflow_dispatch` has a
+  `force_fail` input to exercise the alert path.
 - [`docs/dns-expected.md`](dns-expected.md) — the DNS the monitor enforces.
 - Runbook (recovery playbooks, account/secret inventory) is kept in the private
   ops notes, out of this public repo. A personal recovery email that was briefly

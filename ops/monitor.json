@@ -6,7 +6,7 @@
     { "path": "/ai-governance-check", "contains": "AI Governance Readiness Check" },
     { "path": "/mail-auth", "contains": "DMARC builder" },
     { "path": "/writing", "contains": "Writing" },
-    { "path": "/api/medium-feed", "json": "posts" },
+    { "path": "/api/medium-feed", "json": "posts", "transient": true },
     { "path": "/this-route-should-not-exist", "status": 404 }
   ],
   "redirects": [
