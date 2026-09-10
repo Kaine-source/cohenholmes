@@ -66,17 +66,30 @@ async function fetchWithTimeout(url, opts = {}) {
 async function checkRoute(route) {
   const url = cfg.site + route.path;
   const wantStatus = route.status || 200;
-  let res;
-  try {
-    res = await withRetry(`GET ${route.path}`, () => fetchWithTimeout(url, { redirect: "follow" }));
-  } catch (err) {
-    warnings.push(err.message);
-    return;
-  }
+  // `transient: true` routes (e.g. the Medium-feed proxy) depend on a third party;
+  // give them more retries and downgrade a persistent bad status to a warning.
+  const attempts = route.transient ? 4 : RETRIES;
 
-  if (res.status !== wantStatus) {
-    failures.push(`GET ${route.path} → ${res.status}, expected ${wantStatus}`);
-    return;
+  let res;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      res = await fetchWithTimeout(url, { redirect: "follow" });
+    } catch (err) {
+      if (i === attempts) {
+        warnings.push(`GET ${route.path}: unreachable (${err.message})`);
+        return;
+      }
+      await sleep(RETRY_DELAY_MS * i);
+      continue;
+    }
+    if (res.status === wantStatus) break;
+    if (i === attempts) {
+      const msg = `GET ${route.path} → ${res.status}, expected ${wantStatus}`;
+      if (route.transient) warnings.push(`${msg} — transient dependency, not failing the run`);
+      else failures.push(msg);
+      return;
+    }
+    await sleep(RETRY_DELAY_MS * i);
   }
 
   if (wantStatus === 200) {
