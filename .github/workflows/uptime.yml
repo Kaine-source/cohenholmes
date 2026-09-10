@@ -33,6 +33,11 @@ jobs:
         id: run
         run: |
           if [ "${{ inputs.force_fail }}" = "true" ]; then
+            {
+              echo "### Monitor — ❌ forced failure (alert-path test)"
+              echo ""
+              echo "Dispatched with \`force_fail=true\` to verify alerting. No real check failed."
+            } >> "$GITHUB_STEP_SUMMARY"
             echo "forced failure (alert-path test)"; exit 1
           fi
           node scripts/monitor.mjs
