@@ -66,16 +66,38 @@ async function fetchWithTimeout(url, opts = {}) {
 async function checkRoute(route) {
   const url = cfg.site + route.path;
   const wantStatus = route.status || 200;
-  let res;
-  try {
-    res = await withRetry(`GET ${route.path}`, () => fetchWithTimeout(url, { redirect: "follow" }));
-  } catch (err) {
-    warnings.push(err.message);
-    return;
+  // `transient: true` routes (e.g. the Medium-feed proxy) depend on a third party.
+  // Only they re-poll a bad status; a persistent bad status there is a warning, not
+  // a page. Non-transient routes keep the strict one-shot check (withRetry still
+  // covers pure connection failures, which stay a warning — may be monitor-side).
+  const statusAttempts = route.transient ? 4 : 1;
+
+  let res = null;
+  let lastStatus = null; // last resolved HTTP status; null if every attempt threw
+  let lastErr = null;
+
+  for (let i = 1; i <= statusAttempts; i++) {
+    try {
+      const r = await withRetry(`GET ${route.path}`, () => fetchWithTimeout(url, { redirect: "follow" }));
+      lastStatus = r.status;
+      if (r.status === wantStatus) { res = r; break; }
+    } catch (err) {
+      lastErr = err; // withRetry already retried the connection failure
+      break;
+    }
+    if (i < statusAttempts) await sleep(RETRY_DELAY_MS * i);
   }
 
-  if (res.status !== wantStatus) {
-    failures.push(`GET ${route.path} → ${res.status}, expected ${wantStatus}`);
+  if (!res) {
+    if (lastStatus !== null) {
+      // the server answered, with the wrong status
+      const msg = `GET ${route.path} → ${lastStatus}, expected ${wantStatus}`;
+      if (route.transient) warnings.push(`${msg} — transient dependency, not failing the run`);
+      else failures.push(msg);
+    } else {
+      // never reached the server on any attempt
+      warnings.push(lastErr ? lastErr.message : `GET ${route.path}: unreachable`);
+    }
     return;
   }
 
