@@ -15,15 +15,12 @@ const { Content } = await render(post);
 const slug = post.data.slug ?? post.id;
 ---
 <BaseLayout
-  title={`${post.data.title} — Kaine Cohen`}
+  title={`${post.data.title} — CohenHolmes`}
   description={post.data.description}
   canonicalPath={`/blog/${slug}`}
 >
   <article>
-    <span class="post-date">
-      {post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-      &middot; {post.data.author}
-    </span>
+    <span class="post-date">{post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} &middot; Blog by {post.data.author}</span>
     <h1>{post.data.title}</h1>
     {post.data.heroImage && <img class="hero" src={post.data.heroImage} alt="" />}
     <div class="prose">
