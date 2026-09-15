@@ -52,8 +52,8 @@ npm install
 npm run dev       # dev server at localhost:4321
 ```
 
-or, to preview the exact production build (needed to see the 3 tool pages and `functions/`-style
-routing behave as Cloudflare Pages would):
+or, to preview the exact production build (needed to see the 3 tool pages served exactly as
+Cloudflare Pages would):
 
 ```bash
 npm run build
