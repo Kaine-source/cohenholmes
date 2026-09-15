@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 const pagePath = 'public/ai-governance-check.html';
 const legacyPath = 'public/ai-governance-readiness-check.html';
-const indexPath = 'public/index.html';
+const indexPath = 'dist/index.html';
 const sitemapPath = 'public/sitemap.xml';
 
 const assert = (condition, message) => {
@@ -12,6 +12,7 @@ const assert = (condition, message) => {
 
 assert(existsSync(pagePath), `${pagePath} is missing`);
 assert(!existsSync(legacyPath), `${legacyPath} must not exist`);
+assert(existsSync(indexPath), `${indexPath} is missing — run "npm run build" first`);
 
 const page = readFileSync(pagePath, 'utf8');
 const index = readFileSync(indexPath, 'utf8');

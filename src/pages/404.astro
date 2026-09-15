@@ -1,0 +1,42 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Not found — Kaine Cohen"
+  description="That page isn't here."
+  canonicalPath="/404"
+  noindex={true}
+>
+  <main class="notfound">
+    <h1>That page <em>isn't here</em>.</h1>
+    <p>The link may be old, or the address slightly off. Nothing's broken — the page just doesn't exist.</p>
+    <a class="home" href="/">← Back home</a>
+  </main>
+</BaseLayout>
+
+<style>
+  .notfound{
+    min-height:52vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    max-width:46ch;
+    padding:40px 0 80px;
+  }
+  h1 em{ font-style:italic; font-weight:500; color:var(--accent); }
+  p{ color:#4A4A5A; font-size:1rem; margin-bottom:24px; }
+  a.home{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 18px;
+    border:1px solid #E3DFD3;
+    border-radius:100px;
+    color:var(--navy);
+    text-decoration:none;
+    font-size:0.95rem;
+    font-weight:500;
+    transition:border-color 0.2s ease, background 0.2s ease;
+  }
+  a.home:hover{ border-color:var(--accent); background:#F1E2D6; }
+</style>
