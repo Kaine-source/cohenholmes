@@ -9,7 +9,7 @@ slug: "homelab-soc-raspberry-pi"
 
 I spend my working days advising enterprise clients on Microsoft 365 security — Entra ID, Conditional Access, Purview, the lot. Most of what I build lives in tenants I don't own, on infrastructure I can't fully see. So when I wanted to build something I controlled end-to-end, something I could break and fix and learn from at 11pm without a change-approval board, I bought a Raspberry Pi.
 
-What started as a simple Tailscale monitor turned into a proper homelab SOC: real-time device visibility, Microsoft Graph integration, push alerts, and a live web dashboard — all running on a £70 bit of kit on my desk in Northumberland.
+What started as a simple Tailscale monitor turned into a proper homelab SOC: real-time device visibility, Microsoft Graph integration, push alerts, and a live web dashboard — all running on a £70 bit of kit on my desk.
 
 Here's how it works.
 
