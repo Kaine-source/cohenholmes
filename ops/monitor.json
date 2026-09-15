@@ -5,8 +5,8 @@
     { "path": "/ca-builder", "contains": "Conditional Access Policy Builder" },
     { "path": "/ai-governance-check", "contains": "AI Governance Readiness Check" },
     { "path": "/mail-auth", "contains": "DMARC builder" },
-    { "path": "/writing", "contains": "Writing" },
-    { "path": "/api/medium-feed", "json": "posts", "transient": true },
+    { "path": "/blog", "contains": "Notes on identity, security and the move into AI engineering." },
+    { "path": "/writing", "contains": "url=/blog" },
     { "path": "/this-route-should-not-exist", "status": 404 }
   ],
   "redirects": [
