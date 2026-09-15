@@ -5,24 +5,27 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 export async function getStaticPaths() {
   const posts = await getCollection('blog', ({ data }) => !data.draft);
   return posts.map(post => ({
-    params: { slug: post.id },
+    params: { slug: post.data.slug ?? post.id },
     props: { post },
   }));
 }
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const slug = post.data.slug ?? post.id;
 ---
 <BaseLayout
   title={`${post.data.title} — Kaine Cohen`}
   description={post.data.description}
-  canonicalPath={`/blog/${post.id}`}
+  canonicalPath={`/blog/${slug}`}
 >
   <article>
     <span class="post-date">
       {post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+      &middot; {post.data.author}
     </span>
     <h1>{post.data.title}</h1>
+    {post.data.heroImage && <img class="hero" src={post.data.heroImage} alt="" />}
     <div class="prose">
       <Content />
     </div>
@@ -37,6 +40,13 @@ const { Content } = await render(post);
     color:#8A8794;
     text-transform:uppercase;
     letter-spacing:0.04em;
+  }
+  .hero{
+    display:block;
+    width:100%;
+    height:auto;
+    border-radius:10px;
+    margin:8px 0 28px;
   }
   .prose{
     font-size:16px;
@@ -59,5 +69,21 @@ const { Content } = await render(post);
     padding:0.1em 0.35em;
     border-radius:4px;
     font-size:0.9em;
+  }
+  .prose :global(pre){
+    background:#1A1A2E;
+    color:#E8E6F0;
+    padding:16px 18px;
+    border-radius:10px;
+    overflow-x:auto;
+    margin:0 0 20px;
+    font-size:0.85em;
+    line-height:1.5;
+  }
+  .prose :global(pre code){
+    background:none;
+    padding:0;
+    color:inherit;
+    font-size:inherit;
   }
 </style>

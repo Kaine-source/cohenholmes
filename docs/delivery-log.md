@@ -11,6 +11,10 @@ How work on this repo runs, and what's in flight. Updated as things move.
   earlier in this project.
 - **Approve & merge** — Kaine.
 
+Every blog post gets a sensitivity pass before it's added — real IPs, tokens, secrets,
+internal hostnames — regardless of who drafted it. Caught once already: a real Tailscale
+address in a supplied draft, redacted before it landed (see Shipped).
+
 Everything reaches `main` through a pull request. Branch protection on `main`: PR
 required, the `validate` check must pass, review threads must be resolved, no
 force-push or deletion, not enforced for admins (emergency escape hatch).
@@ -38,10 +42,14 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   `/writing` — the Medium dependency (`functions/api/medium-feed.js`) is removed entirely.
   `/writing` is now a redirect page to `/blog` (a static meta-refresh, since the site has no
   SSR adapter — not a true HTTP 3xx, so `ops/monitor.json` checks it as a route, not a
-  redirect). Two posts shipped as native launch content: "I rebuilt my website with AI
-  agents..." and "Conditional Access policies: what exactly are they...", both migrated
+  redirect). Three posts shipped as native launch content: "I rebuilt my website with AI
+  agents..." and "Conditional Access policies: what exactly are they..." (both migrated
   from their `blog/*.md` repo drafts with frontmatter added and diagrams copied into
-  `public/blog/diagrams/`.
+  `public/blog/diagrams/`), plus "Building a Homelab SOC on a Raspberry Pi..." (supplied
+  as ready Markdown; a specific Tailscale IP in the draft was redacted before publishing —
+  see "Who does what" below on the sensitivity pass this repo now runs on every post).
+  The collection schema also gained `author` (defaults to Kaine Cohen), and optional
+  `slug` (overrides the filename-derived route) and `heroImage` fields.
 - New C&H brand (Cormorant Garamond / DM Sans, navy `#0F1E33`/`#1A1A2E`, burnt orange
   `#C8622A`, cream `#F7F4EF`) applied via `src/layouts/BaseLayout.astro` to the homepage,
   `/404` and the blog. The 3 tool pages deliberately keep the original paper-and-ink system
@@ -74,13 +82,12 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
 
 | Item | Status | Notes |
 |---|---|---|
-| Ops — analytics decision (D) | Kaine to decide | A Web Analytics site exists (Pages-created) but no beacon was ever installed — 0 data. It's toggled from **Workers & Pages → `cohenholmes-site` → Settings → Web Analytics**, not the standalone UI. The tool claims are scoped to *what you type*, so counting an anonymous visit doesn't break them. **Option A:** enable it — reports on `/`, `/writing`, `/404` only (the tool pages' `connect-src 'none'` blocks the beacon); Claude then adds a one-line "visits counted anonymously; the tools send nothing you enter" note and softens ca-builder's "never connects" wording. **Option B:** leave it off — no beacon anywhere, lean on Search Console for discovery data (Claude's lean). |
+| Ops — analytics decision (D) | Kaine to decide | A Web Analytics site exists (Pages-created) but no beacon was ever installed — 0 data. It's toggled from **Workers & Pages → `cohenholmes-site` → Settings → Web Analytics**, not the standalone UI. The tool claims are scoped to *what you type*, so counting an anonymous visit doesn't break them. **Option A:** enable it — reports on `/`, `/blog`, `/404` only (the tool pages' `connect-src 'none'` blocks the beacon); Claude then adds a one-line "visits counted anonymously; the tools send nothing you enter" note and softens ca-builder's "never connects" wording. **Option B:** leave it off — no beacon anywhere, lean on Search Console for discovery data (Claude's lean). |
 | Ops — Search Console + Bing (E) | Kaine to do | GSC: any Google account (a personal Gmail is fine — no @cohenholmes.co.uk needed), add a **Domain** property for `cohenholmes.co.uk`, send Claude the `google-site-verification` TXT string → Claude adds it to Cloudflare DNS + `ops/monitor.json`, then verify + submit `sitemap.xml`. Bing: "import from Google Search Console" after GSC verifies. |
 | Ops — GitHub security (F) | **Done** | Claude enabled secret scanning, push protection and Dependabot alerts via the API (all were off). Not touched: Dependabot *security updates* (opens PRs — Kaine's call) and `secret_scanning_validity_checks` (toggle didn't take; retry later). |
 | Runbook TODOs | Kaine to do | Fill `C:\Projects\cohenholmes-notes\runbook.md`: registrar + renewal + auto-renew (the important one), recovery-code locations, 2FA method per account, which Google account owns the GSC property. |
 | Ops layer — CI quality gates | Queued | Lighthouse CI + axe against a locally-served build in PRs (budgets for perf / a11y / SEO); scheduled `lychee` link check. Folds into the `validate` pattern. |
 | New tool candidates | On hold | Paused deliberately — building up the ops / supporting layer before adding more features. Shortlist kept for later: `/mail-auth` **checker** (live DNS lookup via a Pages Function), CA policy-set reviewer (paste a Graph export, get an audit), email-header analyzer (paste headers, parse locally). |
-| Next blog post — "Building a Homelab SOC on a Raspberry Pi with MCP + Microsoft Graph" | Kaine to supply | Content exists as an HTML artifact from a separate session; Markdown version to follow, then it drops straight into `src/content/blog/` — no Medium step any more. |
 | DMARC hardening post | Queued | Companion to `/mail-auth`; write after the 16 Sept DMARC review lands real data. |
 | Service token → CI browser tests | Optional | Automates preview review (Playwright + axe/Lighthouse), removes the Access login step. |
 | `_headers` for `Referrer-Policy` | Cosmetic | Align the server header with the page meta. |
