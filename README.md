@@ -1,7 +1,9 @@
 # cohenholmes.co.uk
 
-Personal site for Kaine Cohen — security / identity consultant moving into AI engineering.
-[Astro](https://astro.build), hosted on **Cloudflare Pages**.
+The CohenHolmes site — Kaine Cohen's Microsoft 365 consultancy, covering security,
+identity and the move into AI engineering. Blog posts are bylined "Blog by Kaine Cohen";
+the site itself is branded CohenHolmes throughout (nav, footer, page titles, structured
+data). [Astro](https://astro.build), hosted on **Cloudflare Pages**.
 
 Live: <https://cohenholmes.co.uk>
 

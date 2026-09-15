@@ -34,10 +34,9 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   every page. `/ca-builder` also escapes every user value in its summary output
   (`esc()`), so injected markup — `<img onerror>`, `<meta refresh>`, `<iframe>` —
   renders as inert text. Verified: no navigation, no outbound request.
-- Site rebuilt on Astro. The 3 tool pages are unchanged, byte-for-byte, carried through as a
-  passthrough `public/` directory — everything else (homepage, `/404`, the blog) is a real
-  Astro page. `pages_build_output_dir` is now `dist`; all 3 CI workflows build before
-  deploying/validating.
+- Site rebuilt on Astro. The 3 tool pages are carried through as a passthrough `public/`
+  directory — everything else (homepage, `/404`, the blog) is a real Astro page.
+  `pages_build_output_dir` is now `dist`; all 3 CI workflows build before deploying/validating.
 - Native blog at `/blog` (content collection, `src/content/blog/`) replaces the Medium-synced
   `/writing` — the Medium dependency (`functions/api/medium-feed.js`) is removed entirely.
   `/writing` is now a redirect page to `/blog` (a static meta-refresh, since the site has no
@@ -56,7 +55,24 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   (Fraunces/IBM Plex Mono/Inter, signal blue) — they're frozen, so the site carries two
   visual identities during the transition rather than something to paper over.
 - Shared mini-nav across all pages using the new brand (Home / CA Builder / AI Check /
-  Mail Auth / Blog); the 3 tool pages keep their own original nav markup unchanged.
+  Mail Auth / Blog); the 3 tool pages keep their own original nav markup and paper-and-ink
+  styling, just with the brand text updated (see rebrand bullet below).
+- **Rebrand: site identity is now "CohenHolmes", not "Kaine Cohen".** Nav brand, footer,
+  page titles/`og:title`, and the homepage's JSON-LD (now `Organization` "CohenHolmes"
+  with Kaine as `founder`, was `Person` "Kaine Cohen") all updated — including in the 3
+  frozen tool pages, where only the brand text (title, `og:title`, nav link, footer span)
+  was touched, never the inline `<script>`; the CSP sha256 hash was verified byte-for-byte
+  unchanged before and after on all three. Blog posts keep individual authorship via a
+  "Blog by Kaine Cohen" byline instead of the site-wide identity.
+- **Location/sensitivity sweep across the whole repo**, prompted by a specific-town
+  reference (the United Kingdom) found in old, non-deployed `backup-*/` homepage
+  snapshots — more precise than anything on the live site, but still tracked in the public
+  repo. Redacted from the current files in all three backups plus the general-region
+  mention that was in the new blog post. **Not done: those old commits still contain the
+  original text in git history** (this repo has scrubbed history before — see the recovery
+  email note below — but that's a deliberate, disruptive call: force-push, and every
+  existing clone/fork keeps the old history regardless. Needs Kaine's explicit go-ahead,
+  same as last time).
 - Site copy positions Kaine as a Microsoft 365 consultant (identity / security /
   compliance / AI adoption); each tool page opens with a "learning tool — changes
   nothing, yours to take, check current official docs" note; footers consistent.

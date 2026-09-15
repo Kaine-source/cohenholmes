@@ -2,18 +2,22 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
-  title="Kaine Cohen — Security, Identity &amp; AI"
-  description="Kaine Cohen — Microsoft 365 consultant working across identity, security and compliance, and the practical side of AI adoption. Notes and tools on Conditional Access, AI governance, and email authentication."
+  title="CohenHolmes — Security, Identity &amp; AI"
+  description="CohenHolmes — Kaine Cohen's Microsoft 365 consultancy working across identity, security and compliance, and the practical side of AI adoption. Notes and tools on Conditional Access, AI governance, and email authentication."
   canonicalPath="/"
   ogDescription="Security, identity, and the practical realities of AI adoption."
 >
   <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Person",
-    "name": "Kaine Cohen",
+    "@type": "Organization",
+    "name": "CohenHolmes",
     "url": "https://cohenholmes.co.uk/",
     "sameAs": ["https://linkedin.com/in/kainecohen"],
-    "jobTitle": "Microsoft 365 Consultant",
+    "founder": {
+      "@type": "Person",
+      "name": "Kaine Cohen",
+      "jobTitle": "Microsoft 365 Consultant"
+    },
     "knowsAbout": [
       "Microsoft 365 security",
       "Identity and access management",
