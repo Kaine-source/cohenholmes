@@ -202,6 +202,56 @@
 </svg>
 </div>
 
+<!-- ============ DIAGRAM 5 (Medium blog pipeline) ============ -->
+<div class="sheet">
+<svg id="svg5" width="1500" height="520" viewBox="0 0 1500 520" xmlns="http://www.w3.org/2000/svg">
+  <rect x="0" y="0" width="1500" height="520" fill="var(--paper)"/>
+  <defs>
+    <marker id="ah5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--ink)"/>
+    </marker>
+  </defs>
+
+  <text class="display fig-title" x="45" y="46">How the Medium blog reaches the site</text>
+
+  <!-- 1: Medium -->
+  <rect class="card" x="45" y="175" width="210" height="120" rx="12"/>
+  <text class="lbl" x="150" y="228" text-anchor="middle">Medium</text>
+  <text class="mono sublbl muted" x="150" y="250" text-anchor="middle">@kaine.cohen</text>
+
+  <line class="flow" x1="255" y1="235" x2="298" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 2: RSS feed -->
+  <rect class="card" x="302" y="175" width="210" height="120" rx="12"/>
+  <text class="lbl" x="407" y="228" text-anchor="middle">RSS feed</text>
+  <text class="mono sublbl muted" x="407" y="250" text-anchor="middle">/feed — no CORS</text>
+
+  <line class="flow" x1="512" y1="235" x2="555" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 3: Pages Function -->
+  <rect class="sig-box" x="559" y="158" width="280" height="154" rx="14"/>
+  <text class="lbl" x="699" y="222" text-anchor="middle" style="font-size:17px">Pages Function</text>
+  <text class="mono sublbl muted" x="699" y="246" text-anchor="middle">functions/api/medium-feed.js</text>
+  <text class="mono sublbl" x="699" y="286" text-anchor="middle" style="fill:#3B5BFF; font-weight:600">fetch &#8594; parse &#8594; cache 6h</text>
+
+  <line class="flow" x1="839" y1="235" x2="882" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 4: API endpoint -->
+  <rect class="card" x="886" y="175" width="230" height="120" rx="12"/>
+  <text class="lbl" x="1001" y="228" text-anchor="middle">API endpoint</text>
+  <text class="mono sublbl muted" x="1001" y="250" text-anchor="middle">/api/medium-feed</text>
+
+  <line class="flow" x1="1116" y1="235" x2="1159" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 5: Writing page -->
+  <rect class="card" x="1163" y="175" width="230" height="120" rx="12"/>
+  <text class="lbl" x="1278" y="228" text-anchor="middle">Writing page</text>
+  <text class="mono sublbl muted" x="1278" y="250" text-anchor="middle">public/writing.html</text>
+
+  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:var(--muted)">Medium stays the source of truth. The site stores nothing — it fetches, caches for six hours, and renders whatever's live.</text>
+</svg>
+</div>
+
 <script>
 var SVGNS = "http://www.w3.org/2000/svg";
 function el(name, attrs, text){

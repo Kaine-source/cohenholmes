@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="svg5" width="1500" height="520" viewBox="0 0 1500 520" xmlns="http://www.w3.org/2000/svg"><style>text{font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;fill:#14171C;}.display{font-family:Fraunces,Georgia,serif;}.mono{font-family:"IBM Plex Mono",Consolas,monospace;}.muted{fill:#6B6A63;}.card{fill:#F8F4EE;stroke:#D8D4C8;stroke-width:1.5;}.dim{fill:#E7E4DB;stroke:#D8D4C8;stroke-width:1.5;}.edge{stroke:#6B6A63;stroke-width:1.6;fill:none;}.flow{stroke:#14171C;stroke-width:1.8;fill:none;}.sig-box{fill:#F8F4EE;stroke:#3B5BFF;stroke-width:2.4;}.lbl{font-size:15px;font-weight:600;}.sublbl{font-size:13px;}.kicker{font-size:11px;font-weight:600;letter-spacing:1.5px;}.fig-title{font-size:30px;font-weight:600;}.fig-sub{font-size:16px;}</style>
+  <rect x="0" y="0" width="1500" height="520" fill="#F3F1EC"/>
+  <defs>
+    <marker id="ah5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#14171C"/>
+    </marker>
+  </defs>
+
+  <text class="display fig-title" x="45" y="46">How the Medium blog reaches the site</text>
+
+  <!-- 1: Medium -->
+  <rect class="card" x="45" y="175" width="210" height="120" rx="12"/>
+  <text class="lbl" x="150" y="228" text-anchor="middle">Medium</text>
+  <text class="mono sublbl muted" x="150" y="250" text-anchor="middle">@kaine.cohen</text>
+
+  <line class="flow" x1="255" y1="235" x2="298" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 2: RSS feed -->
+  <rect class="card" x="302" y="175" width="210" height="120" rx="12"/>
+  <text class="lbl" x="407" y="228" text-anchor="middle">RSS feed</text>
+  <text class="mono sublbl muted" x="407" y="250" text-anchor="middle">/feed — no CORS</text>
+
+  <line class="flow" x1="512" y1="235" x2="555" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 3: Pages Function -->
+  <rect class="sig-box" x="559" y="158" width="280" height="154" rx="14"/>
+  <text class="lbl" x="699" y="222" text-anchor="middle" style="font-size:17px">Pages Function</text>
+  <text class="mono sublbl muted" x="699" y="246" text-anchor="middle">functions/api/medium-feed.js</text>
+  <text class="mono sublbl" x="699" y="286" text-anchor="middle" style="fill:#3B5BFF; font-weight:600">fetch &#8594; parse &#8594; cache 6h</text>
+
+  <line class="flow" x1="839" y1="235" x2="882" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 4: API endpoint -->
+  <rect class="card" x="886" y="175" width="230" height="120" rx="12"/>
+  <text class="lbl" x="1001" y="228" text-anchor="middle">API endpoint</text>
+  <text class="mono sublbl muted" x="1001" y="250" text-anchor="middle">/api/medium-feed</text>
+
+  <line class="flow" x1="1116" y1="235" x2="1159" y2="235" marker-end="url(#ah5)"/>
+
+  <!-- 5: Writing page -->
+  <rect class="card" x="1163" y="175" width="230" height="120" rx="12"/>
+  <text class="lbl" x="1278" y="228" text-anchor="middle">Writing page</text>
+  <text class="mono sublbl muted" x="1278" y="250" text-anchor="middle">public/writing.html</text>
+
+  <text class="display" x="45" y="497" style="font-size:17px; font-style:italic; fill:#6B6A63">Medium stays the source of truth. The site stores nothing — it fetches, caches for six hours, and renders whatever's live.</text>
+</svg>
