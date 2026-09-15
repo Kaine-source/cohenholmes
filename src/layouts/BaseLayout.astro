@@ -54,6 +54,11 @@ const navLinks = [
     --navy:#0F1E33;
     --navy-deep:#1A1A2E;
     --accent:#C8622A;
+    /* Darker than --accent: #C8622A on --cream is ~3.7:1, below the 4.5:1 AA
+       threshold for normal-sized text. Use this for body-sized text (links,
+       small labels); --accent is fine for large text (headings) and non-text
+       uses (borders, backgrounds). */
+    --accent-text:#A8501C;
     --cream:#F7F4EF;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
@@ -126,7 +131,7 @@ const navLinks = [
     color:var(--navy);
   }
   p{ margin:0 0 16px; }
-  a{ color:var(--accent); }
+  a{ color:var(--accent-text); }
 
   footer.site{
     background:var(--navy-deep);
