@@ -19,7 +19,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     <ul class="posts">
       {posts.map(post => (
         <li class="post">
-          <a class="title-link" href={`/blog/${post.id}/`}>
+          <a class="title-link" href={`/blog/${post.data.slug ?? post.id}/`}>
             <span class="post-date">
               {post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
             </span>
