@@ -7,8 +7,12 @@ const blog = defineCollection({
     title: z.string(),
     description: z.string(),
     pubDate: z.coerce.date(),
+    author: z.string().default('Kaine Cohen'),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    // Overrides the filename-derived id for routing/links when present.
+    slug: z.string().optional(),
+    heroImage: z.string().optional(),
   }),
 });
 
