@@ -1,0 +1,265 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="Kaine Cohen — Security, Identity &amp; AI"
+  description="Kaine Cohen — Microsoft 365 consultant working across identity, security and compliance, and the practical side of AI adoption. Notes and tools on Conditional Access, AI governance, and email authentication."
+  canonicalPath="/"
+  ogDescription="Security, identity, and the practical realities of AI adoption."
+>
+  <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Kaine Cohen",
+    "url": "https://cohenholmes.co.uk/",
+    "sameAs": ["https://linkedin.com/in/kainecohen"],
+    "jobTitle": "Microsoft 365 Consultant",
+    "knowsAbout": [
+      "Microsoft 365 security",
+      "Identity and access management",
+      "Conditional Access",
+      "Information protection and compliance",
+      "AI adoption and governance"
+    ]
+  })} />
+
+  <section class="hero" id="about">
+    <p class="eyebrow">Security, identity, AI</p>
+    <h1>I write about <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
+
+    <p class="intro">
+      I'm a Microsoft 365 consultant — identity, security and compliance, and the
+      practical side of rolling out Copilot and other AI tools. This is where I think
+      out loud about it.
+    </p>
+
+    <p class="note">
+      Most of what's here started as something I had to work out properly myself: a
+      policy with no clean explanation anywhere, a rollout that could have gone wrong, a
+      check I wanted to run and couldn't. The write-ups and the tools are the result.
+    </p>
+
+    <p class="note">
+      I hold Microsoft certifications in information protection and compliance (SC-400)
+      and Microsoft 365 administration (MS-102), with applied skills in securing AI in
+      the cloud. I'm also dyslexic — a lot of how I explain this comes from needing to
+      make it make sense to myself first.
+    </p>
+
+    <div class="actions">
+      <a class="button primary" href="/blog">Read my writing</a>
+      <a class="button" href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </section>
+
+  <section class="section" id="focus">
+    <div class="section-head">
+      <h2>What I'm thinking about</h2>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="kicker">Identity</div>
+        <p>Turning on MFA is the easy part. Getting Conditional Access right — without locking yourself out — is the actual work.</p>
+      </article>
+
+      <article class="card">
+        <div class="kicker">Security</div>
+        <p>Most incidents aren't clever. They're a legacy protocol nobody turned off, or a service account with a password from 2019.</p>
+      </article>
+
+      <article class="card">
+        <div class="kicker">AI</div>
+        <p>The interesting question isn't whether Copilot can draft the email. It's what happens to everything it read to do it.</p>
+      </article>
+
+      <a class="card" href="/ca-builder">
+        <div class="kicker">Tooling</div>
+        <p>An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON out.</p>
+        <span class="more">Open the builder →</span>
+      </a>
+
+      <a class="card" href="/ai-governance-check">
+        <div class="kicker">AI Governance</div>
+        <p>A private, browser-only readiness check across data, identity, governance, agents and human oversight.</p>
+        <span class="more">Check your readiness →</span>
+      </a>
+
+      <a class="card" href="/mail-auth">
+        <div class="kicker">Email authentication</div>
+        <p>Build correct SPF, DKIM and DMARC records and a staged path from monitoring to enforcement.</p>
+        <span class="more">Open the builder →</span>
+      </a>
+    </div>
+
+    <p class="story">
+      <strong>The tools are the same instinct, made clickable</strong> — the thing I wanted
+      to exist while I was working it out.
+    </p>
+  </section>
+
+  <section class="section" id="writing">
+    <div class="section-head">
+      <h2>Writing</h2>
+    </div>
+
+    <p class="story">
+      I write about identity, security, and where AI fits in — usually working something out
+      in public rather than reporting back once it's tidy.
+    </p>
+    <p class="story">
+      Longer writing lives at the blog, hosted here rather than anywhere else.
+    </p>
+
+    <div class="links">
+      <a href="/blog">Read the blog →</a>
+    </div>
+  </section>
+
+  <section class="section" id="contact">
+    <div class="section-head">
+      <h2>Say hello</h2>
+    </div>
+
+    <p class="story">
+      I'm on LinkedIn — happy to talk identity, security, compliance, or where AI fits
+      into any of them.
+    </p>
+
+    <div class="links">
+      <a href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero{ padding-top:8px; }
+  .eyebrow{
+    margin:0 0 18px;
+    font-family:var(--font-body);
+    font-weight:500;
+    font-size:0.78rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+  }
+  h1{
+    max-width:16ch;
+  }
+  h1 em{ font-style:italic; font-weight:500; color:var(--accent); }
+
+  .intro{
+    max-width:52ch;
+    margin-top:24px;
+    font-size:clamp(1.1rem, 2vw, 1.4rem);
+    color:#4A4A5A;
+  }
+  .note{
+    max-width:60ch;
+    margin-top:18px;
+    font-size:1rem;
+    color:#2C2C3A;
+  }
+
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:28px;
+  }
+  .button{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 18px;
+    text-decoration:none;
+    border-radius:100px;
+    font-size:0.95rem;
+    font-weight:500;
+    border:1px solid #E3DFD3;
+    background:var(--cream);
+    color:var(--navy);
+    transition:transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  }
+  .button:hover{ transform:translateY(-1px); border-color:var(--accent); background:#F1E2D6; }
+  .button.primary{
+    background:var(--navy);
+    color:var(--cream);
+    border-color:var(--navy);
+  }
+  .button.primary:hover{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .button:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .section{ margin-top:84px; }
+  .section-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:16px;
+    padding-bottom:14px;
+    border-bottom:1px solid #E3DFD3;
+    margin-bottom:28px;
+  }
+  .section-head h2{ margin:0; }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:18px;
+  }
+  .card{
+    background:#FCFAF6;
+    border:1px solid #E3DFD3;
+    border-radius:16px;
+    padding:22px 20px;
+    box-shadow:0 8px 18px rgba(15,30,51,0.06);
+  }
+  a.card{
+    text-decoration:none;
+    transition:transform 0.2s ease, border-color 0.2s ease;
+  }
+  a.card:hover{ transform:translateY(-2px); border-color:var(--accent); }
+  a.card:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .card .kicker{
+    font-family:var(--font-body);
+    color:var(--accent);
+    font-weight:500;
+    font-size:0.72rem;
+    letter-spacing:0.11em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+  }
+  .card p{ margin:0; color:#4A4A5A; font-size:0.95rem; }
+  .card .more{
+    display:inline-block;
+    margin-top:12px;
+    font-size:0.85rem;
+    color:var(--navy);
+  }
+
+  .story{
+    max-width:68ch;
+    margin-top:18px;
+    font-size:1.02rem;
+    color:#4A4A5A;
+  }
+  .story strong{ color:var(--navy); }
+
+  .links{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:18px;
+  }
+  .links a{
+    text-decoration:none;
+    color:var(--navy);
+    border:1px solid #E3DFD3;
+    border-radius:100px;
+    padding:10px 14px;
+    font-size:0.92rem;
+    background:var(--cream);
+    transition:border-color 0.2s ease;
+  }
+  .links a:hover{ border-color:var(--accent); }
+</style>

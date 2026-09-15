@@ -2,6 +2,10 @@
 .wrangler/
 node_modules/
 
+# Astro build output / generated types
+dist/
+.astro/
+
 # OS / editor
 .DS_Store
 Thumbs.db

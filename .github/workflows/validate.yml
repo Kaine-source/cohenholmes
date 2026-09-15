@@ -17,5 +17,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
       - name: Validate routes, privacy, CSP and scoring
         run: node tests/validate-site.mjs

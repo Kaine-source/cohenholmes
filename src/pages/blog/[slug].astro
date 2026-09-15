@@ -1,0 +1,63 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map(post => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+---
+<BaseLayout
+  title={`${post.data.title} — Kaine Cohen`}
+  description={post.data.description}
+  canonicalPath={`/blog/${post.id}`}
+>
+  <article>
+    <span class="post-date">
+      {post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+    </span>
+    <h1>{post.data.title}</h1>
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  .post-date{
+    font-family:var(--font-body);
+    font-size:12px;
+    font-weight:500;
+    color:#8A8794;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .prose{
+    font-size:16px;
+    color:#26263A;
+    max-width:68ch;
+  }
+  .prose :global(img){
+    max-width:100%;
+    height:auto;
+    border-radius:8px;
+    margin:20px 0;
+  }
+  .prose :global(ul), .prose :global(ol){
+    margin:0 0 16px;
+    padding-left:24px;
+  }
+  .prose :global(code){
+    font-family:'DM Mono', monospace;
+    background:#EDE8DD;
+    padding:0.1em 0.35em;
+    border-radius:4px;
+    font-size:0.9em;
+  }
+</style>
