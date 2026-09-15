@@ -30,8 +30,25 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   every page. `/ca-builder` also escapes every user value in its summary output
   (`esc()`), so injected markup — `<img onerror>`, `<meta refresh>`, `<iframe>` —
   renders as inert text. Verified: no navigation, no outbound request.
-- `/writing` — Medium posts via a server-side RSS Pages Function.
-- Shared mini-nav across all four sub-pages (and `/404`).
+- Site rebuilt on Astro. The 3 tool pages are unchanged, byte-for-byte, carried through as a
+  passthrough `public/` directory — everything else (homepage, `/404`, the blog) is a real
+  Astro page. `pages_build_output_dir` is now `dist`; all 3 CI workflows build before
+  deploying/validating.
+- Native blog at `/blog` (content collection, `src/content/blog/`) replaces the Medium-synced
+  `/writing` — the Medium dependency (`functions/api/medium-feed.js`) is removed entirely.
+  `/writing` is now a redirect page to `/blog` (a static meta-refresh, since the site has no
+  SSR adapter — not a true HTTP 3xx, so `ops/monitor.json` checks it as a route, not a
+  redirect). Two posts shipped as native launch content: "I rebuilt my website with AI
+  agents..." and "Conditional Access policies: what exactly are they...", both migrated
+  from their `blog/*.md` repo drafts with frontmatter added and diagrams copied into
+  `public/blog/diagrams/`.
+- New C&H brand (Cormorant Garamond / DM Sans, navy `#0F1E33`/`#1A1A2E`, burnt orange
+  `#C8622A`, cream `#F7F4EF`) applied via `src/layouts/BaseLayout.astro` to the homepage,
+  `/404` and the blog. The 3 tool pages deliberately keep the original paper-and-ink system
+  (Fraunces/IBM Plex Mono/Inter, signal blue) — they're frozen, so the site carries two
+  visual identities during the transition rather than something to paper over.
+- Shared mini-nav across all pages using the new brand (Home / CA Builder / AI Check /
+  Mail Auth / Blog); the 3 tool pages keep their own original nav markup unchanged.
 - Site copy positions Kaine as a Microsoft 365 consultant (identity / security /
   compliance / AI adoption); each tool page opens with a "learning tool — changes
   nothing, yours to take, check current official docs" note; footers consistent.
@@ -42,7 +59,8 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
 - `uptime.yml` — synthetic monitor (cron; GitHub throttles it to every few hours
   on a quiet repo): route health, `www` redirect, DNS drift against
   [`ops/monitor.json`](../ops/monitor.json); opens/closes a `monitoring` issue on
-  failure/recovery. `transient` routes (the Medium-feed proxy) retry harder and a
+  failure/recovery. `transient` routes (reserved for checks with a third-party dependency —
+  none currently configured, now that the Medium-feed proxy is gone) retry harder and a
   persistent bad status is a warning, not a page. `workflow_dispatch` has a
   `force_fail` input to exercise the alert path.
 - [`docs/dns-expected.md`](dns-expected.md) — the DNS the monitor enforces.
@@ -62,7 +80,7 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
 | Runbook TODOs | Kaine to do | Fill `C:\Projects\cohenholmes-notes\runbook.md`: registrar + renewal + auto-renew (the important one), recovery-code locations, 2FA method per account, which Google account owns the GSC property. |
 | Ops layer — CI quality gates | Queued | Lighthouse CI + axe against a locally-served build in PRs (budgets for perf / a11y / SEO); scheduled `lychee` link check. Folds into the `validate` pattern. |
 | New tool candidates | On hold | Paused deliberately — building up the ops / supporting layer before adding more features. Shortlist kept for later: `/mail-auth` **checker** (live DNS lookup via a Pages Function), CA policy-set reviewer (paste a Graph export, get an audit), email-header analyzer (paste headers, parse locally). |
-| Blog post 2 — "I rebuilt my website with AI agents" | On hold | Draft merged to the repo (`blog/built-with-ai-agents.md`, PR #12). Site polish is done; now just waiting on Kaine to want it live. Publish flow: Claude re-types the approved text into a Medium draft, Kaine formats + publishes. |
+| Next blog post — "Building a Homelab SOC on a Raspberry Pi with MCP + Microsoft Graph" | Kaine to supply | Content exists as an HTML artifact from a separate session; Markdown version to follow, then it drops straight into `src/content/blog/` — no Medium step any more. |
 | DMARC hardening post | Queued | Companion to `/mail-auth`; write after the 16 Sept DMARC review lands real data. |
 | Service token → CI browser tests | Optional | Automates preview review (Playwright + axe/Lighthouse), removes the Access login step. |
 | `_headers` for `Referrer-Policy` | Cosmetic | Align the server header with the page meta. |
