@@ -64,15 +64,18 @@ No Airtable, no Outlook. Tracking and review live in GitHub.
   was touched, never the inline `<script>`; the CSP sha256 hash was verified byte-for-byte
   unchanged before and after on all three. Blog posts keep individual authorship via a
   "Blog by Kaine Cohen" byline instead of the site-wide identity.
-- **Location/sensitivity sweep across the whole repo**, prompted by a specific-town
-  reference (the United Kingdom) found in old, non-deployed `backup-*/` homepage
-  snapshots — more precise than anything on the live site, but still tracked in the public
-  repo. Redacted from the current files in all three backups plus the general-region
-  mention that was in the new blog post. **Not done: those old commits still contain the
-  original text in git history** (this repo has scrubbed history before — see the recovery
-  email note below — but that's a deliberate, disruptive call: force-push, and every
-  existing clone/fork keeps the old history regardless. Needs Kaine's explicit go-ahead,
-  same as last time).
+- **Location/sensitivity sweep across the whole repo**, prompted by a specific town-and-
+  county reference found in old, non-deployed `backup-*/` homepage snapshots — more precise
+  than anything on the live site, but still tracked in the public repo. Redacted from the
+  current files in all three backups plus the general-region mention that was in the new
+  blog post, and — with Kaine's explicit go-ahead — scrubbed from git history via
+  `git filter-repo`, the same approach already used once before in this repo for a leaked
+  recovery email. History rewrites don't reach clones/forks made before the rewrite; those
+  keep the old commits regardless.
+- **Sensitivity-check-first practice, formalised as a skill**: content that might carry
+  real personal/infrastructure detail (an address, a real IP, a token) now gets flagged and
+  discussed before it's used or committed, not cleaned up after landing. This incident is
+  exactly the gap that closes — the reference above was caught on request, after the fact.
 - Site copy positions Kaine as a Microsoft 365 consultant (identity / security /
   compliance / AI adoption); each tool page opens with a "learning tool — changes
   nothing, yours to take, check current official docs" note; footers consistent.
