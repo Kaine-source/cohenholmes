@@ -156,9 +156,14 @@ const navLinks = [
     <div class="pagehead">
       <a class="brand" href="/">CohenHolmes</a>
       <nav class="subnav" aria-label="Sections">
-        {navLinks.map(link => (
-          <a href={link.href} aria-current={canonicalPath === link.href ? 'page' : undefined}>{link.label}</a>
-        ))}
+        {navLinks.map(link => {
+          const isCurrent = link.href === '/'
+            ? canonicalPath === '/'
+            : canonicalPath === link.href || canonicalPath.startsWith(`${link.href}/`);
+          return (
+            <a href={link.href} aria-current={isCurrent ? 'page' : undefined}>{link.label}</a>
+          );
+        })}
       </nav>
     </div>
   </div>
