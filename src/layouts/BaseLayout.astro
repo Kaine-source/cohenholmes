@@ -62,7 +62,7 @@ const navLinks = [
     --accent-text:#A8501C;
     --cream:#F7F4EF;
   }
-  *{box-sizing:border-box; margin:0; padding:0;}
+  :global(*){box-sizing:border-box; margin:0; padding:0;}
   html{ background:var(--cream); }
   body{
     background:var(--cream);
@@ -75,7 +75,7 @@ const navLinks = [
     flex-direction:column;
   }
   @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+    :global(*){animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
   }
 
   .wrap{ max-width:820px; margin:0 auto; padding:0 28px; width:100%; }
@@ -114,7 +114,7 @@ const navLinks = [
 
   main{ flex:1; padding-bottom:80px; }
 
-  h1{
+  :global(h1){
     font-family:var(--font-display);
     font-weight:600;
     font-size:clamp(34px, 5vw, 48px);
@@ -123,7 +123,7 @@ const navLinks = [
     margin:34px 0 12px;
     color:var(--navy);
   }
-  h2{
+  :global(h2){
     font-family:var(--font-display);
     font-weight:600;
     font-size:clamp(24px, 3.2vw, 30px);
@@ -131,8 +131,8 @@ const navLinks = [
     margin:40px 0 14px;
     color:var(--navy);
   }
-  p{ margin:0 0 16px; }
-  a{ color:var(--accent-text); }
+  :global(p){ margin:0 0 16px; }
+  :global(a){ color:var(--accent-text); }
 
   footer.site{
     background:var(--navy-deep);
