@@ -10,3 +10,6 @@ dist/
 .DS_Store
 Thumbs.db
 *.log
+
+# Personal Claude Code settings overrides
+.claude/settings.local.json
