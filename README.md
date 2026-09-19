@@ -15,6 +15,9 @@ src/
   pages/
     index.astro              homepage
     404.astro                custom not-found page
+    ca-builder.astro         interactive Conditional Access Policy Builder
+    ai-governance-check.astro  AI governance readiness check
+    mail-auth.astro          SPF/DKIM/DMARC builder
     blog/
       index.astro            blog listing
       [slug].astro           individual post
@@ -22,9 +25,6 @@ src/
     blog/                    post source (markdown, one file per post)
   content.config.ts          blog collection schema
 public/                      passthrough — copied into dist/ byte-for-byte, unprocessed
-  ca-builder.html            interactive Conditional Access Policy Builder (self-contained)
-  ai-governance-check.html   AI governance readiness check (self-contained)
-  mail-auth.html             SPF/DKIM/DMARC builder (self-contained)
   blog/diagrams/             diagram images referenced by blog posts
   sitemap.xml, robots.txt
 astro.config.mjs             Astro config — also owns the /writing → /blog redirect
@@ -38,10 +38,12 @@ docs/                           delivery-log.md — how work runs + what's in fl
 backup-*/                       previous homepage versions
 ```
 
-The three tool pages (`ca-builder.html`, `ai-governance-check.html`, `mail-auth.html`) are
-frozen, self-contained HTML files carrying a hash-locked CSP — they live in `public/`
-untouched by the Astro build and must never be reformatted, or their inline `<script>`'s
-CSP hash breaks.
+The three tool pages (`ca-builder`, `ai-governance-check`, `mail-auth`) are ordinary Astro
+pages using `BaseLayout`, same as the rest of the site — but each carries a hash-locked
+CSP (`script-src 'sha256-...'`) tied to its own inline `<script is:inline>` block. That
+script's exact text must never change (not even whitespace) without recomputing and
+updating the matching hash in the page's own CSP `<meta>` tag, or the policy breaks.
+`node tests/validate-site.mjs` checks this self-consistency on every build.
 
 Blog posts used to sync from Medium via a Pages Function; that dependency has been dropped.
 The blog is now native: content lives in `src/content/blog/` and renders at `/blog`.
@@ -83,17 +85,14 @@ Uses the `cohenholmes-site` Pages project (output dir `dist`).
 
 ## Design system
 
-Two systems currently coexist on the live site, deliberately — a visible artefact of an
-in-progress rebrand, not a bug:
-
-- **The 3 tool pages** (`ca-builder`, `ai-governance-check`, `mail-auth`) keep the original
-  paper-and-ink system — Fraunces (display) / IBM Plex Mono / Inter (body), `--ink:#14171C`,
-  `--paper:#F3F1EC`, `--line:#D8D4C8`, `--muted:#6B6A63`, accent `--signal:#3B5BFF`. They're
-  frozen and won't be re-skinned incidentally.
-- **Everything else** (homepage, 404, blog) uses the new C&H brand via
-  `src/layouts/BaseLayout.astro` — Cormorant Garamond (display) / DM Sans (body), navy
-  `--navy:#0F1E33` / `--navy-deep:#1A1A2E`, burnt orange `--accent:#C8622A`, cream
-  `--cream:#F7F4EF`.
+One system across the whole site, via `src/layouts/BaseLayout.astro` — Cormorant Garamond
+(display) / DM Sans (body) / DM Mono (code, tool labels), navy `--navy:#0F1E33` /
+`--navy-deep:#1A1A2E`, burnt orange `--accent:#C8622A` (`--accent-text:#A8501C` for
+body-sized text/links, `--accent-on-dark:#D97A42` for small text on the dark header/
+footer — plain `--accent` fails AA contrast in both of those contexts), cream
+`--cream:#F7F4EF`. The header/footer chrome is always the standard measure; a page can
+opt into a wider content column (`<BaseLayout wide>`) for data-dense layouts like the 3
+tool pages' builders and grids, without widening the nav/footer bar itself.
 
 ## Infrastructure notes
 
@@ -107,8 +106,9 @@ in-progress rebrand, not a bug:
 
 ## The CA Builder
 
-`public/ca-builder.html` is a single self-contained file (HTML + CSS + vanilla JS, no
-dependencies). It turns form input into Microsoft Graph `conditionalAccessPolicy` JSON
+`src/pages/ca-builder.astro` is a self-contained Conditional Access builder (vanilla JS,
+no dependencies, hash-locked CSP — see above). It turns form input into Microsoft Graph
+`conditionalAccessPolicy` JSON
 plus a plain-English summary and the Entra ID licence tier the policy needs, with
 Microsoft baseline presets and a layered "baseline model" section. It's a learning /
 demo tool — output is not validated against a tenant.

@@ -6,6 +6,7 @@ interface Props {
   noindex?: boolean;
   ogTitle?: string;
   ogDescription?: string;
+  wide?: boolean;
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   noindex = false,
   ogTitle = title,
   ogDescription = description,
+  wide = false,
 } = Astro.props;
 
 const canonicalUrl = new URL(canonicalPath, 'https://cohenholmes.co.uk').href;
@@ -84,6 +86,11 @@ const navLinks = [
   }
 
   .wrap{ max-width:820px; margin:0 auto; padding:0 28px; width:100%; }
+  /* Chrome (header/footer) always stays at the standard measure above; only
+     a page's main content column can opt into more room via the `wide` prop
+     — for data-dense tools (a 2-column policy builder, a stat grid) that
+     need more horizontal space than prose does. */
+  main .wrap.wrap-wide{ max-width:1100px; }
 
   header.site{
     background:var(--navy-deep);
@@ -175,7 +182,7 @@ const navLinks = [
 </header>
 
 <main>
-  <div class="wrap">
+  <div class:list={['wrap', wide && 'wrap-wide']}>
     <slot />
   </div>
 </main>
