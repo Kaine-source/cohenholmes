@@ -46,7 +46,7 @@ const navLinks = [
 <meta property="og:site_name" content="CohenHolmes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <slot name="head" />
 <style>
   :root{
@@ -60,6 +60,11 @@ const navLinks = [
        small labels); --accent is fine for large text (headings) and non-text
        uses (borders, backgrounds). */
     --accent-text:#A8501C;
+    /* Lighter than --accent: #C8622A on --navy-deep is ~4.25:1, below the 4.5:1
+       AA threshold for normal-sized text. Use this for small text on the dark
+       header/footer (nav hover); --accent is fine there for large text (the
+       brand link) since 3:1 covers it. */
+    --accent-on-dark:#D97A42;
     --cream:#F7F4EF;
   }
   :global(*){box-sizing:border-box; margin:0; padding:0;}
@@ -109,7 +114,7 @@ const navLinks = [
     color:#C9C7D6;
     text-decoration:none;
   }
-  .subnav a:hover{ color:var(--accent); }
+  .subnav a:hover{ color:var(--accent-on-dark); }
   .subnav a[aria-current="page"]{ color:var(--cream); }
 
   main{ flex:1; padding-bottom:80px; }

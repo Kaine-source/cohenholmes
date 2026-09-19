@@ -1,7 +1,7 @@
 {
   "site": "https://cohenholmes.co.uk",
   "routes": [
-    { "path": "/", "contains": "Kaine Cohen" },
+    { "path": "/", "contains": "CohenHolmes" },
     { "path": "/ca-builder", "contains": "Conditional Access Policy Builder" },
     { "path": "/ai-governance-check", "contains": "AI Governance Readiness Check" },
     { "path": "/mail-auth", "contains": "DMARC builder" },
