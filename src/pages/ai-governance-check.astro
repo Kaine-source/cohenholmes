@@ -11,7 +11,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 >
   <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-Bxiuow0EgCtSifOrfe7d5/IlSlMOeTa+5+HTCEPj98w='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
-  <main>
     <section aria-labelledby="page-title">
       <p class="eyebrow">Practical assessment · 5 minutes</p>
       <h1 id="page-title">How ready are you to govern <em>AI?</em></h1>
@@ -69,7 +68,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         </div>
       </div>
     </section>
-  </main>
 
   <script is:inline>
   const questions = [
@@ -390,13 +388,13 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .progress-track{height:6px;margin:14px 0 34px;background:var(--paper-dim);border-radius:999px;overflow:hidden;}
   .progress-value{height:100%;width:0;background:var(--accent);transition:width .25s ease;}
 
-  fieldset{
+  :global(fieldset){
     border:0;
     padding:0 0 30px;
     margin:0 0 30px;
     border-bottom:1px solid var(--line);
   }
-  legend{width:100%;}
+  :global(legend){width:100%;}
   :global(.domain){
     display:inline-block;
     margin-bottom:8px;
