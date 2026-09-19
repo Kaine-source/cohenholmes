@@ -4,7 +4,16 @@
     <loc>https://cohenholmes.co.uk/</loc>
   </url>
   <url>
-    <loc>https://cohenholmes.co.uk/writing</loc>
+    <loc>https://cohenholmes.co.uk/blog</loc>
+  </url>
+  <url>
+    <loc>https://cohenholmes.co.uk/blog/built-with-ai-agents</loc>
+  </url>
+  <url>
+    <loc>https://cohenholmes.co.uk/blog/ca-where-to-start</loc>
+  </url>
+  <url>
+    <loc>https://cohenholmes.co.uk/blog/homelab-soc-raspberry-pi</loc>
   </url>
   <url>
     <loc>https://cohenholmes.co.uk/ca-builder</loc>

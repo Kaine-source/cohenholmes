@@ -1,21 +1,34 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 
-const pagePath = 'public/ai-governance-check.html';
-const legacyPath = 'public/ai-governance-readiness-check.html';
-const indexPath = 'public/index.html';
-const sitemapPath = 'public/sitemap.xml';
+// Read the tool page and sitemap from dist/ (the deployed output) rather than public/
+// (the source) — this also exercises Astro's public/ passthrough itself, so a build
+// misconfiguration that fails to copy one of these files is caught here instead of
+// silently shipping. Byte-identity against the public/ source is asserted separately
+// below, since that's the invariant the CSP hash actually depends on.
+const pagePath = 'dist/ai-governance-check.html';
+const pageSourcePath = 'public/ai-governance-check.html';
+const legacyPath = 'dist/ai-governance-readiness-check.html';
+const indexPath = 'dist/index.html';
+const sitemapPath = 'dist/sitemap.xml';
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
 };
 
-assert(existsSync(pagePath), `${pagePath} is missing`);
+assert(existsSync(pagePath), `${pagePath} is missing — run "npm run build" first`);
+assert(existsSync(indexPath), `${indexPath} is missing — run "npm run build" first`);
+assert(existsSync(sitemapPath), `${sitemapPath} is missing — run "npm run build" first`);
 assert(!existsSync(legacyPath), `${legacyPath} must not exist`);
 
 const page = readFileSync(pagePath, 'utf8');
 const index = readFileSync(indexPath, 'utf8');
 const sitemap = readFileSync(sitemapPath, 'utf8');
+
+assert(
+  page === readFileSync(pageSourcePath, 'utf8'),
+  `${pagePath} differs from ${pageSourcePath} — the build must not reformat this file, or its CSP script hash breaks`
+);
 
 assert(page.includes('https://cohenholmes.co.uk/ai-governance-check'), 'Canonical route is incorrect');
 assert(index.includes('href="/ai-governance-check"'), 'Homepage route is missing');

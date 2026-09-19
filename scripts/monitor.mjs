@@ -66,7 +66,7 @@ async function fetchWithTimeout(url, opts = {}) {
 async function checkRoute(route) {
   const url = cfg.site + route.path;
   const wantStatus = route.status || 200;
-  // `transient: true` routes (e.g. the Medium-feed proxy) depend on a third party.
+  // `transient: true` routes depend on a third party (none currently configured).
   // Only they re-poll a bad status; a persistent bad status there is a warning, not
   // a page. Non-transient routes keep the strict one-shot check (withRetry still
   // covers pure connection failures, which stay a warning — may be monitor-side).

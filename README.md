@@ -1,70 +1,99 @@
 # cohenholmes.co.uk
 
-Personal site for Kaine Cohen — security / identity consultant moving into AI engineering.
-Static HTML, no build step, hosted on **Cloudflare Pages**.
+The CohenHolmes site — Kaine Cohen's Microsoft 365 consultancy, covering security,
+identity and the move into AI engineering. Blog posts are bylined "Blog by Kaine Cohen";
+the site itself is branded CohenHolmes throughout (nav, footer, page titles, structured
+data). [Astro](https://astro.build), hosted on **Cloudflare Pages**.
 
 Live: <https://cohenholmes.co.uk>
 
 ## Repo layout
 
 ```
-public/                 ← everything here is deployed to Cloudflare Pages
-  index.html            homepage
-  writing.html          Medium posts, rendered client-side from the feed function
-  ca-builder.html       interactive Conditional Access Policy Builder (self-contained)
-  404.html              custom not-found page
-  sitemap.xml
-functions/
-  api/medium-feed.js    Pages Function — fetches @kaine.cohen's Medium RSS server-side,
-                        returns clean JSON to writing.html (Medium's feed has no CORS)
-wrangler.toml           Pages project config (pages_build_output_dir = "public")
+src/
+  layouts/BaseLayout.astro   shared nav/footer + the C&H brand tokens
+  pages/
+    index.astro              homepage
+    404.astro                custom not-found page
+    blog/
+      index.astro            blog listing
+      [slug].astro           individual post
+  content/
+    blog/                    post source (markdown, one file per post)
+  content.config.ts          blog collection schema
+public/                      passthrough — copied into dist/ byte-for-byte, unprocessed
+  ca-builder.html            interactive Conditional Access Policy Builder (self-contained)
+  ai-governance-check.html   AI governance readiness check (self-contained)
+  mail-auth.html             SPF/DKIM/DMARC builder (self-contained)
+  blog/diagrams/             diagram images referenced by blog posts
+  sitemap.xml, robots.txt
+astro.config.mjs             Astro config — also owns the /writing → /blog redirect
+wrangler.toml                Pages project config (pages_build_output_dir = "dist")
 
 # not deployed — kept at repo root:
 ca-baseline-model-DRAFT.md      source copy of the CA baseline model (also on the CA Builder page)
 ca-docs-alignment-audit.md      notes from aligning the CA content with Microsoft's docs
-blog/                           post drafts + diagram sources (published via Medium)
+blog/                           original post drafts + diagram sources (now published natively — see below)
 docs/                           delivery-log.md — how work runs + what's in flight
 backup-*/                       previous homepage versions
 ```
 
-Only `public/` and `functions/` ship. `wrangler.toml`, the `.md` docs, `blog/` and
-`backup-*/` folders sit at the repo root so Pages never publishes them.
+The three tool pages (`ca-builder.html`, `ai-governance-check.html`, `mail-auth.html`) are
+frozen, self-contained HTML files carrying a hash-locked CSP — they live in `public/`
+untouched by the Astro build and must never be reformatted, or their inline `<script>`'s
+CSP hash breaks.
+
+Blog posts used to sync from Medium via a Pages Function; that dependency has been dropped.
+The blog is now native: content lives in `src/content/blog/` and renders at `/blog`.
+`/writing` still exists as a redirect page to `/blog` for old links.
 
 ## Local preview
 
-Any static server works, e.g.:
-
 ```bash
-npx wrangler pages dev public
+npm install
+npm run dev       # dev server at localhost:4321
 ```
 
-`wrangler pages dev` also runs the `functions/` code, so `/api/medium-feed` and the
-Writing page work locally.
+or, to preview the exact production build (needed to see the 3 tool pages served exactly as
+Cloudflare Pages would):
+
+```bash
+npm run build
+npm run preview
+```
 
 ## Deploy
 
-Automatic: `.github/workflows/deploy.yml` runs `wrangler pages deploy` on every push to
-`main` (i.e. every merged PR). Needs two repo secrets — `CLOUDFLARE_API_TOKEN` and
-`CLOUDFLARE_ACCOUNT_ID` — set once under Settings → Secrets and variables → Actions.
+Automatic: `.github/workflows/deploy.yml` runs `npm ci && npm run build` then
+`wrangler pages deploy` on every push to `main` (i.e. every merged PR). Needs two repo
+secrets — `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` — set once under Settings →
+Secrets and variables → Actions.
 
-`.github/workflows/preview.yml` deploys a per-branch preview for every PR opened from
-this repo (not forks) and comments the `*.cohenholmes-site.pages.dev` URL on the PR.
+`.github/workflows/preview.yml` builds and deploys a per-branch preview for every PR opened
+from this repo (not forks) and comments the `*.cohenholmes-site.pages.dev` URL on the PR.
 
 Manual deploy still works if needed, from the repo root:
 
 ```bash
+npm run build
 npx wrangler pages deploy
 ```
 
-Uses the `cohenholmes-site` Pages project (output dir `public`).
+Uses the `cohenholmes-site` Pages project (output dir `dist`).
 
 ## Design system
 
-- **Type:** Fraunces (display) / IBM Plex Mono / Inter (body)
-- **Colour:** paper-and-ink — `--ink:#14171C`, `--paper:#F3F1EC`, `--line:#D8D4C8`,
-  `--muted:#6B6A63`, one accent `--signal:#3B5BFF`
-- Flat, static, deliberately lightweight. CSS is inline per page (extract to a shared
-  sheet only if the page count grows).
+Two systems currently coexist on the live site, deliberately — a visible artefact of an
+in-progress rebrand, not a bug:
+
+- **The 3 tool pages** (`ca-builder`, `ai-governance-check`, `mail-auth`) keep the original
+  paper-and-ink system — Fraunces (display) / IBM Plex Mono / Inter (body), `--ink:#14171C`,
+  `--paper:#F3F1EC`, `--line:#D8D4C8`, `--muted:#6B6A63`, accent `--signal:#3B5BFF`. They're
+  frozen and won't be re-skinned incidentally.
+- **Everything else** (homepage, 404, blog) uses the new C&H brand via
+  `src/layouts/BaseLayout.astro` — Cormorant Garamond (display) / DM Sans (body), navy
+  `--navy:#0F1E33` / `--navy-deep:#1A1A2E`, burnt orange `--accent:#C8622A`, cream
+  `--cream:#F7F4EF`.
 
 ## Infrastructure notes
 
@@ -73,7 +102,7 @@ Uses the `cohenholmes-site` Pages project (output dir `public`).
 - **TLS:** Full (Strict), Always Use HTTPS on, minimum TLS 1.2.
 - **Mail:** Microsoft 365. SPF (`-all`) + DKIM (`selector1`/`selector2`) + DMARC
   (`p=none`, monitoring — tighten to `quarantine`/`reject` once aggregate reports are clean).
-- **`.html` → extensionless** is automatic on Pages; internal links use `/writing`,
+- **`.html` → extensionless** is automatic on Pages; internal links use `/blog`,
   `/ca-builder`.
 
 ## The CA Builder
