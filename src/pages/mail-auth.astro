@@ -1,167 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-3wjBG9ipjNbuot8TFbzAHV8Ger/PWAU/jXABxovbJ+s='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>SPF, DKIM &amp; DMARC Builder — CohenHolmes</title>
-<meta name="description" content="Generate correct SPF, DKIM and DMARC DNS records for Microsoft 365 or Google Workspace, with a staged rollout to enforcement and plain-English notes on what each policy does. Runs entirely in your browser.">
-<link rel="canonical" href="https://cohenholmes.co.uk/mail-auth">
-<meta property="og:type" content="website">
-<meta property="og:title" content="SPF, DKIM &amp; DMARC Builder — CohenHolmes">
-<meta property="og:description" content="Correct SPF / DKIM / DMARC records and a staged path to enforcement. Browser-only, nothing submitted.">
-<meta property="og:url" content="https://cohenholmes.co.uk/mail-auth">
-<meta name="twitter:card" content="summary">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&amp;family=IBM+Plex+Mono:wght@400;500&amp;family=Inter:wght@400;500&amp;display=swap" rel="stylesheet">
-<style>
-  :root{
-    --ink:#14171C;
-    --paper:#F3F1EC;
-    --card:#F8F4EE;
-    --paper-dim:#E7E4DB;
-    --line:#D8D4C8;
-    --signal:#3B5BFF;
-    --muted:#6B6A63;
-    --panel:#181B21;
-    --good:#237A57;
-    --warn:#A65A1F;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
-  body{
-    background:var(--paper);
-    color:var(--ink);
-    font-family:'Inter', sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
-  }
-  @media (prefers-reduced-motion: reduce){
-    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
-  }
-  a{ color:inherit; }
-  code, pre, .mono{ font-family:'IBM Plex Mono', monospace; }
-  .hidden{ display:none !important; }
-  .wrap{ max-width:1100px; margin:0 auto; padding:0 28px 90px; }
-
-  header{ padding:20px 0 0; }
-  .pagehead{
-    display:flex;
-    flex-wrap:wrap;
-    align-items:baseline;
-    justify-content:space-between;
-    gap:8px 20px;
-    padding-top:44px;
-  }
-  .pagehead .brand{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:13px;
-    letter-spacing:0.08em;
-    text-transform:uppercase;
-    color:var(--muted);
-    text-decoration:none;
-  }
-  .pagehead .brand:hover{ color:var(--signal); }
-  .subnav{ display:flex; flex-wrap:wrap; gap:16px; }
-  .subnav a{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:13px;
-    color:var(--muted);
-    text-decoration:none;
-  }
-  .subnav a:hover{ color:var(--signal); }
-  .subnav a[aria-current="page"]{ color:var(--ink); }
-
-  h1{
-    font-family:'Fraunces', serif;
-    font-weight:480;
-    font-size:clamp(30px, 5vw, 44px);
-    line-height:1.1;
-    letter-spacing:-0.01em;
-    margin:20px 0 12px;
-  }
-  .lede{ font-size:16px; color:var(--muted); max-width:66ch; margin-bottom:14px; }
-  .disclaimer{
-    font-size:13px; color:var(--muted); max-width:70ch;
-    border-left:2px solid var(--line); padding-left:14px; margin-bottom:12px;
-  }
-
-  .layout{ display:grid; grid-template-columns:1fr 1fr; gap:34px; margin-top:34px; align-items:start; }
-  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .output{ position:static !important; } }
-
-  fieldset{ border:1px solid var(--line); border-radius:12px; padding:18px 18px 6px; margin-bottom:18px; background:var(--card); }
-  legend{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); padding:0 8px; }
-  .field{ margin-bottom:16px; }
-  .field .lbl{ display:block; font-size:13px; font-weight:500; margin-bottom:6px; }
-  input[type=text], input[type=email], select{
-    width:100%; font:inherit; font-size:14px; padding:9px 11px;
-    border:1px solid var(--line); border-radius:8px; background:var(--paper); color:var(--ink);
-  }
-  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible{ outline:2px solid var(--signal); outline-offset:2px; }
-  .checks label{ display:flex; gap:9px; align-items:flex-start; font-size:14px; margin-bottom:8px; }
-  .checks input{ margin-top:3px; }
-  .sub{ margin:6px 0 2px 27px; }
-  .sub input{ max-width:440px; }
-  .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
-  .hint code{ font-size:11.5px; background:var(--paper-dim); padding:1px 4px; border-radius:4px; }
-  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-  @media (max-width:520px){ .row2{ grid-template-columns:1fr; } }
-  .warn-line{ font-size:12.5px; color:var(--warn); margin-top:8px; font-weight:500; }
-  .ok-line{ font-size:12.5px; color:var(--good); margin-top:8px; }
-
-  .output{ position:sticky; top:24px; }
-  .tabs{ display:flex; gap:6px; }
-  .tab{
-    font:inherit; font-size:13px; padding:8px 13px; cursor:pointer;
-    border:1px solid var(--line); border-bottom:none; border-radius:9px 9px 0 0;
-    background:var(--paper-dim); color:var(--muted);
-  }
-  .tab[aria-selected=true]{ background:var(--panel); color:#EAECEF; border-color:var(--panel); }
-  .panel{ border:1px solid var(--panel); border-radius:0 10px 10px 10px; background:var(--panel); padding:16px; }
-  .rec{ margin-bottom:18px; }
-  .rec:last-child{ margin-bottom:0; }
-  .rec h3{ font-family:'IBM Plex Mono', monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:#8A93A6; margin-bottom:7px; }
-  .rec .meta{ font-size:11.5px; color:#8A93A6; margin-bottom:6px; }
-  pre{ background:#0E1013; color:#E4E7EC; font-size:12.5px; line-height:1.7; padding:12px 13px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; }
-  .copy{
-    font:inherit; font-size:11.5px; margin-top:7px; padding:5px 10px; cursor:pointer;
-    background:transparent; color:#8A93A6; border:1px solid #333A44; border-radius:6px;
-  }
-  .copy:hover{ color:#EAECEF; border-color:#55606E; }
-  .panel .prose{ color:#D2D6DD; font-size:13.5px; line-height:1.7; }
-  .panel .prose p{ margin-bottom:12px; }
-  .panel .prose strong{ color:#fff; }
-  .panel .prose code{ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:12px; }
-  .ladder{ list-style:none; counter-reset:step; }
-  .ladder li{ counter-increment:step; margin-bottom:14px; padding-left:30px; position:relative; color:#D2D6DD; font-size:13px; line-height:1.6; }
-  .ladder li::before{ content:counter(step); position:absolute; left:0; top:0; width:20px; height:20px; border-radius:50%; background:var(--signal); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; font-family:'IBM Plex Mono',monospace; }
-  .ladder code{ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:11.5px; }
-
-  section.explain{ margin-top:56px; }
-  section.explain h2{ font-family:'Fraunces', serif; font-weight:480; font-size:clamp(22px,3vw,30px); letter-spacing:-0.01em; margin-bottom:14px; }
-  section.explain h3{ font-size:15px; margin:18px 0 6px; }
-  section.explain p, section.explain li{ font-size:14px; color:var(--ink); max-width:74ch; }
-  section.explain ul{ margin:8px 0 8px 20px; }
-  section.explain li{ margin-bottom:8px; }
-  section.explain .muted{ color:var(--muted); }
-
-  footer{ margin-top:70px; padding-top:20px; border-top:1px solid var(--line); font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--muted); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
-</style>
-</head>
-<body>
-<div class="wrap">
-  <div class="pagehead">
-    <a class="brand" href="/">CohenHolmes</a>
-    <nav class="subnav" aria-label="Sections">
-      <a href="/">Home</a>
-      <a href="/ca-builder">CA Builder</a>
-      <a href="/ai-governance-check">AI Check</a>
-      <a href="/mail-auth" aria-current="page">Mail Auth</a>
-      <a href="/writing">Writing</a>
-    </nav>
-  </div>
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout
+  title="SPF, DKIM &amp; DMARC Builder — CohenHolmes"
+  description="Generate correct SPF, DKIM and DMARC DNS records for Microsoft 365 or Google Workspace, with a staged rollout to enforcement and plain-English notes on what each policy does. Runs entirely in your browser."
+  canonicalPath="/mail-auth"
+  ogTitle="SPF, DKIM &amp; DMARC Builder — CohenHolmes"
+  ogDescription="Correct SPF / DKIM / DMARC records and a staged path to enforcement. Browser-only, nothing submitted."
+  wide
+>
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-3wjBG9ipjNbuot8TFbzAHV8Ger/PWAU/jXABxovbJ+s='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
   <header>
     <h1>SPF, DKIM &amp; DMARC builder</h1>
@@ -344,13 +192,7 @@
     </ul>
   </section>
 
-  <footer>
-    <span>CohenHolmes — Microsoft 365 consultancy</span>
-    <span>cohenholmes.co.uk</span>
-  </footer>
-</div>
-
-<script>
+  <script is:inline>
 (function(){
   var $ = function(id){ return document.getElementById(id); };
   var f = $("f");
@@ -588,5 +430,106 @@
   render();
 })();
 </script>
-</body>
-</html>
+</BaseLayout>
+
+<style>
+  :root{
+    --card:#FCFAF6;
+    --paper-dim:#EDE8DD;
+    --line:#E3DFD3;
+    --muted:#4A4A5A;
+    --panel:var(--navy-deep);
+    --good:#237A57;
+    --warn:#A65A1F;
+    --font-mono:'DM Mono', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+  a{ color:inherit; }
+  code, pre, .mono{ font-family:var(--font-mono); }
+  .hidden{ display:none !important; }
+  header{ padding:20px 0 0; }
+  h1{
+    font-family:var(--font-display);
+    font-weight:480;
+    font-size:clamp(30px, 5vw, 44px);
+    line-height:1.1;
+    letter-spacing:-0.01em;
+    margin:20px 0 12px;
+  }
+  .lede{ font-size:16px; color:var(--muted); max-width:66ch; margin-bottom:14px; }
+  .disclaimer{
+    font-size:13px; color:var(--muted); max-width:70ch;
+    border-left:2px solid var(--line); padding-left:14px; margin-bottom:12px;
+  }
+
+  .layout{ display:grid; grid-template-columns:1fr 1fr; gap:34px; margin-top:34px; align-items:start; }
+  /* A grid item's `1fr` track won't shrink below its content's intrinsic
+     min-width by default — normally invisible, but the new brand font
+     renders some <select> option text wider than the old one did, wide
+     enough to force this column past the viewport on mobile. min-width:0
+     is the standard fix: let the column actually shrink to fit. */
+  .layout > *{ min-width:0; }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .output{ position:static !important; } }
+
+  fieldset{ border:1px solid var(--line); border-radius:12px; padding:18px 18px 6px; margin-bottom:18px; background:var(--card); }
+  legend{ font-family:var(--font-mono); font-size:12px; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); padding:0 8px; }
+  .field{ margin-bottom:16px; }
+  .field .lbl{ display:block; font-size:13px; font-weight:500; margin-bottom:6px; }
+  input[type=text], input[type=email], select{
+    width:100%; font:inherit; font-size:14px; padding:9px 11px;
+    border:1px solid var(--line); border-radius:8px; background:var(--cream); color:var(--navy);
+  }
+  input:focus-visible, select:focus-visible, button:focus-visible, a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .checks label{ display:flex; gap:9px; align-items:flex-start; font-size:14px; margin-bottom:8px; }
+  .checks input{ margin-top:3px; }
+  .sub{ margin:6px 0 2px 27px; }
+  .sub input{ max-width:440px; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:8px; }
+  .hint code{ font-size:11.5px; background:var(--paper-dim); padding:1px 4px; border-radius:4px; }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:520px){ .row2{ grid-template-columns:1fr; } }
+  .warn-line{ font-size:12.5px; color:var(--warn); margin-top:8px; font-weight:500; }
+  .ok-line{ font-size:12.5px; color:var(--good); margin-top:8px; }
+
+  .output{ position:sticky; top:24px; }
+  .tabs{ display:flex; gap:6px; }
+  .tab{
+    font:inherit; font-size:13px; padding:8px 13px; cursor:pointer;
+    border:1px solid var(--line); border-bottom:none; border-radius:9px 9px 0 0;
+    background:var(--paper-dim); color:var(--muted);
+  }
+  .tab[aria-selected=true]{ background:var(--panel); color:#EAECEF; border-color:var(--panel); }
+  .panel{ border:1px solid var(--panel); border-radius:0 10px 10px 10px; background:var(--panel); padding:16px; }
+  :global(.rec){ margin-bottom:18px; }
+  :global(.rec:last-child){ margin-bottom:0; }
+  :global(.rec h3){ font-family:var(--font-mono); font-size:12px; letter-spacing:0.05em; text-transform:uppercase; color:#8A93A6; margin-bottom:7px; }
+  :global(.rec .meta){ font-size:11.5px; color:#8A93A6; margin-bottom:6px; }
+  :global(pre){ background:#0E1013; color:#E4E7EC; font-size:12.5px; line-height:1.7; padding:12px 13px; border-radius:8px; overflow-x:auto; white-space:pre-wrap; word-break:break-all; }
+  :global(.copy){
+    font:inherit; font-size:11.5px; margin-top:7px; padding:5px 10px; cursor:pointer;
+    background:transparent; color:#8A93A6; border:1px solid #333A44; border-radius:6px;
+  }
+  :global(.copy:hover){ color:#EAECEF; border-color:#55606E; }
+  .panel :global(.prose){ color:#D2D6DD; font-size:13.5px; line-height:1.7; }
+  .panel :global(.prose p){ margin-bottom:12px; }
+  .panel :global(.prose strong){ color:#fff; }
+  .panel :global(.prose code){ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:12px; }
+  :global(.ladder){ list-style:none; counter-reset:step; }
+  :global(.ladder li){ counter-increment:step; margin-bottom:14px; padding-left:30px; position:relative; color:#D2D6DD; font-size:13px; line-height:1.6; }
+  :global(.ladder li::before){ content:counter(step); position:absolute; left:0; top:0; width:20px; height:20px; border-radius:50%; background:var(--accent-text); color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); }
+  :global(.ladder code){ background:#0E1013; color:#EAECEF; padding:1px 5px; border-radius:4px; font-size:11.5px; }
+
+  section.explain{ margin-top:56px; }
+  section.explain h2{ font-family:var(--font-display); font-weight:480; font-size:clamp(22px,3vw,30px); letter-spacing:-0.01em; margin-bottom:14px; }
+  section.explain h3{ font-size:15px; margin:18px 0 6px; }
+  section.explain p, section.explain li{ font-size:14px; color:var(--navy); max-width:74ch; }
+  section.explain ul{ margin:8px 0 8px 20px; }
+  section.explain li{ margin-bottom:8px; }
+  section.explain .muted{ color:var(--muted); }
+
+
+</style>
