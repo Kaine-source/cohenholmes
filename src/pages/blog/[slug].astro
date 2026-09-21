@@ -1,18 +1,20 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection, render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('blog', ({ data }) => !data.draft);
-  return posts.map(post => ({
+  const posts = (await getCollection('blog', ({ data }) => !data.draft))
+    .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+  return posts.map((post, i) => ({
     params: { slug: post.data.slug ?? post.id },
-    props: { post },
+    props: { post, prevPost: posts[i + 1] ?? null, nextPost: posts[i - 1] ?? null },
   }));
 }
 
-const { post } = Astro.props;
+const { post, prevPost, nextPost } = Astro.props;
 const { Content } = await render(post);
 const slug = post.data.slug ?? post.id;
+const postHref = (p: CollectionEntry<'blog'>) => `/blog/${p.data.slug ?? p.id}/`;
 ---
 <BaseLayout
   title={`${post.data.title} — CohenHolmes`}
@@ -27,6 +29,14 @@ const slug = post.data.slug ?? post.id;
       <Content />
     </div>
   </article>
+
+  <nav class="post-nav" aria-label="More writing">
+    <a class="back" href="/blog">← Back to all writing</a>
+    <div class="adjacent">
+      {prevPost && <a class="adjacent-link prev" href={postHref(prevPost)}><span class="adjacent-label">Older</span>{prevPost.data.title}</a>}
+      {nextPost && <a class="adjacent-link next" href={postHref(nextPost)}><span class="adjacent-label">Newer</span>{nextPost.data.title}</a>}
+    </div>
+  </nav>
 </BaseLayout>
 
 <style>
@@ -82,5 +92,62 @@ const slug = post.data.slug ?? post.id;
     padding:0;
     color:inherit;
     font-size:inherit;
+  }
+  .prose :global(blockquote){
+    margin:0 0 20px;
+    padding:14px 18px;
+    background:#FCFAF6;
+    border:1px solid #E3DFD3;
+    border-left:3px solid var(--accent-text);
+    border-radius:8px;
+    color:#3A3A48;
+  }
+  .prose :global(blockquote p:last-child){ margin-bottom:0; }
+
+  .post-nav{
+    max-width:68ch;
+    margin-top:48px;
+    padding-top:24px;
+    border-top:1px solid #E3DFD3;
+  }
+  .post-nav .back{
+    display:inline-block;
+    font-size:14px;
+    color:var(--navy);
+    text-decoration:none;
+    margin-bottom:18px;
+  }
+  .post-nav .back:hover{ color:var(--accent-text); }
+  .post-nav .adjacent{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+  }
+  .adjacent-link{
+    display:block;
+    padding:14px 16px;
+    border:1px solid #E3DFD3;
+    border-radius:10px;
+    text-decoration:none;
+    color:var(--navy);
+    font-size:14px;
+    line-height:1.4;
+    transition:border-color 0.2s ease;
+  }
+  .adjacent-link:hover{ border-color:var(--accent); }
+  .adjacent-link.next{ text-align:right; grid-column:2; }
+  .adjacent-link.prev{ grid-column:1; }
+  .adjacent-label{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    color:#4A4A5A;
+    margin-bottom:4px;
+  }
+  @media (max-width:520px){
+    .post-nav .adjacent{ grid-template-columns:1fr; }
+    .adjacent-link.next{ grid-column:1; text-align:left; }
   }
 </style>

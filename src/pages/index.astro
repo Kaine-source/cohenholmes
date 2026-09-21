@@ -1,9 +1,13 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout
   title="CohenHolmes — Security, Identity &amp; AI"
-  description="CohenHolmes — Kaine Cohen's Microsoft 365 consultancy working across identity, security and compliance, and the practical side of AI adoption. Notes and tools on Conditional Access, AI governance, and email authentication."
+  description="CohenHolmes — Kaine Cohen's notes and tools on identity, security and AI governance across Microsoft 365. Conditional Access, AI governance, and email authentication."
   canonicalPath="/"
   ogDescription="Security, identity, and the practical realities of AI adoption."
 >
@@ -16,7 +20,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     "founder": {
       "@type": "Person",
       "name": "Kaine Cohen",
-      "jobTitle": "Microsoft 365 Consultant"
+      "jobTitle": "Security and AI Governance Consultant"
     },
     "knowsAbout": [
       "Microsoft 365 security",
@@ -32,9 +36,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h1>I write about <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
 
     <p class="intro">
-      I'm a Microsoft 365 consultant — identity, security and compliance, and the
-      practical side of rolling out Copilot and other AI tools. This is where I think
-      out loud about it.
+      I work across identity, security and compliance in Microsoft 365 — and increasingly,
+      how organisations observe, govern and secure the AI agents now running inside it.
+      This is where I think out loud about both.
     </p>
 
     <p class="note">
@@ -45,9 +49,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <p class="note">
       I hold Microsoft certifications in information protection and compliance (SC-400)
-      and Microsoft 365 administration (MS-102), with applied skills in securing AI in
-      the cloud. I'm also dyslexic — a lot of how I explain this comes from needing to
-      make it make sense to myself first.
+      and Microsoft 365 administration (MS-102) — the grounding underneath the identity,
+      security and AI-governance work above. I'm also dyslexic: a lot of how I explain
+      things comes from needing to make them make sense to myself first.
     </p>
 
     <div class="actions">
@@ -80,18 +84,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <a class="card" href="/ca-builder">
         <div class="kicker">Tooling</div>
         <p>An interactive Conditional Access Policy Builder — plain-English input, live Microsoft Graph-style JSON out.</p>
+        <span class="trust">Free · nothing submitted</span>
         <span class="more">Open the builder →</span>
       </a>
 
       <a class="card" href="/ai-governance-check">
         <div class="kicker">AI Governance</div>
         <p>A private, browser-only readiness check across data, identity, governance, agents and human oversight.</p>
+        <span class="trust">Free · nothing submitted</span>
         <span class="more">Check your readiness →</span>
       </a>
 
       <a class="card" href="/mail-auth">
         <div class="kicker">Email authentication</div>
         <p>Build correct SPF, DKIM and DMARC records and a staged path from monitoring to enforcement.</p>
+        <span class="trust">Free · nothing submitted</span>
         <span class="more">Open the builder →</span>
       </a>
     </div>
@@ -117,6 +124,11 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
     <div class="links">
       <a href="/blog">Read the blog →</a>
+      {latestPost && (
+        <a href={`/blog/${latestPost.data.slug ?? latestPost.id}/`}>
+          Latest: {latestPost.data.title} →
+        </a>
+      )}
     </div>
   </section>
 
@@ -234,9 +246,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-bottom:10px;
   }
   .card p{ margin:0; color:#4A4A5A; font-size:0.95rem; }
+  .card .trust{
+    display:block;
+    margin-top:10px;
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    letter-spacing:0.03em;
+    color:var(--muted);
+  }
   .card .more{
     display:inline-block;
-    margin-top:12px;
+    margin-top:8px;
     font-size:0.85rem;
     color:var(--navy);
   }
