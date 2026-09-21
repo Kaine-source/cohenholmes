@@ -15,6 +15,12 @@ This is the order I'd build a Conditional Access baseline in, with the reasoning
 traps attached. It assumes a normal commercial tenant: a few hundred people, Microsoft
 365, some devices in Intune, an admin who has other things to do.
 
+> **In short:** block legacy authentication first, lock phishing-resistant MFA onto
+> admin accounts, secure the MFA-registration surface itself, then push MFA to everyone,
+> require compliant devices, contain the unmanaged ones, layer in risk-based policies if
+> you have Entra ID P2, cover guests, and restrict device code flow. Every layer goes in
+> report-only, then a pilot group, then everyone — never straight to on.
+
 ## What Conditional Access actually is
 
 When someone signs in, two things happen. First the identity platform checks the first
