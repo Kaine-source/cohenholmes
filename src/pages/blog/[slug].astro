@@ -30,6 +30,24 @@ const postHref = (p: CollectionEntry<'blog'>) => `/blog/${p.data.slug ?? p.id}/`
     </div>
   </article>
 
+  <section class="comments" aria-label="Comments">
+    <script src="https://giscus.app/client.js"
+      data-repo="Kaine-source/cohenholmes"
+      data-repo-id="R_kgDOULQUuw"
+      data-category="Blog Comments"
+      data-category-id="DIC_kwDOULQUu84DGGwv"
+      data-mapping="pathname"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="bottom"
+      data-theme="preferred_color_scheme"
+      data-lang="en"
+      crossorigin="anonymous"
+      is:inline
+      async></script>
+  </section>
+
   <nav class="post-nav" aria-label="More writing">
     <a class="back" href="/blog">← Back to all writing</a>
     <div class="adjacent">
@@ -103,6 +121,13 @@ const postHref = (p: CollectionEntry<'blog'>) => `/blog/${p.data.slug ?? p.id}/`
     color:#3A3A48;
   }
   .prose :global(blockquote p:last-child){ margin-bottom:0; }
+
+  .comments{
+    max-width:68ch;
+    margin-top:48px;
+    padding-top:24px;
+    border-top:1px solid #E3DFD3;
+  }
 
   .post-nav{
     max-width:68ch;
