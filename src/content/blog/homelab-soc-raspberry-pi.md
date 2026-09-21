@@ -25,8 +25,8 @@ The stack has three layers.
 
 ```
 MacBook Pro (Claude Desktop)
-  └── npx mcp-remote → Pi:8080  (tailscale-monitor)
-  └── npx mcp-remote → Pi:8090  (graph-monitor)
+  └── npx mcp-remote → Pi:8080  (mcp-tailscale)
+  └── npx mcp-remote → Pi:8090  (mcp-graph)
 
 Raspberry Pi 4 (on the tailnet)
   └── mcp-tailscale  :8080  — Tailscale API + shell
@@ -111,4 +111,4 @@ The Pi will probably stay as the control plane even as the scope grows. It's che
 
 If you're an M365 security practitioner who hasn't built something like this — start. The Graph API is one of the most capable security data sources in the Microsoft stack, and it's completely accessible with a free Entra app registration and a few hours on a weekend afternoon.
 
-The full source code is available on GitHub. Questions and PRs welcome.
+I'll be open-sourcing this once it's in a state other people can actually pick up and run. Questions welcome in the meantime.
