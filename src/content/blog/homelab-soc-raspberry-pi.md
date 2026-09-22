@@ -111,4 +111,4 @@ The Pi will probably stay as the control plane even as the scope grows. It's che
 
 If you're an M365 security practitioner who hasn't built something like this — start. The Graph API is one of the most capable security data sources in the Microsoft stack, and it's completely accessible with a free Entra app registration and a few hours on a weekend afternoon.
 
-I'll be open-sourcing this once it's in a state other people can actually pick up and run. Questions welcome in the meantime.
+The [repo's up on GitHub](https://github.com/Kaine-source/homelab-soc) — the source itself is still being cleaned up before it lands there, but the README has the full architecture and roadmap. Questions welcome in the meantime.
