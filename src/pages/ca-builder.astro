@@ -22,8 +22,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <p class="disclaimer">
       <strong>This is a learning tool.</strong> It builds the JSON so you can see the shape and copy
       it into your own tenant &mdash; it never connects to anything or changes a setting. This page&rsquo;s
-      Content Security Policy blocks every outbound request, including the anonymous visit-counter
-      used elsewhere on the site. Treat the
+      Content Security Policy blocks it from ever sending anything you type anywhere, including the
+      anonymous visit-counter used elsewhere on the site (the only outbound requests this page makes
+      are for its own font files). Treat the
       output as a starting point: review it in report-only mode first, and check the current
       <a href="https://learn.microsoft.com/entra/identity/conditional-access/" target="_blank" rel="noopener">Microsoft
       Conditional Access documentation</a> before you enforce anything, because the schema and the
