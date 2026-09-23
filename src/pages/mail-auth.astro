@@ -20,7 +20,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </p>
     <p class="disclaimer">
       <strong>This is a learning tool.</strong> It runs entirely in your browser &mdash; nothing you type
-      is submitted, stored or logged, and it never touches your DNS. It builds the records so you can
+      is submitted, stored or logged, and it never touches your DNS. This page&rsquo;s Content Security
+      Policy blocks it from ever sending anything you type anywhere, including the anonymous
+      visit-counter used elsewhere on the site (the only outbound requests this page makes are for
+      its own font files). It builds the records so you can
       understand them and publish them yourself. Always check them against your provider&rsquo;s own
       guidance (Microsoft&nbsp;365, Google Workspace) and a live DNS lookup before publishing, and watch
       the DMARC reports at each step &mdash; email-auth guidance shifts as standards like DMARCbis land.
