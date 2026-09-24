@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   ogDescription="Twelve practical questions. A private, browser-only result. No data submitted or stored."
   wide
 >
-  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-Bxiuow0EgCtSifOrfe7d5/IlSlMOeTa+5+HTCEPj98w='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-Bxiuow0EgCtSifOrfe7d5/IlSlMOeTa+5+HTCEPj98w='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
     <section aria-labelledby="page-title">
       <p class="eyebrow">Practical assessment · 5 minutes</p>
@@ -17,7 +17,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <p class="lede">Twelve questions across data, identity, governance, agents and human oversight. The result is a starting point for a better conversation — not a compliance certificate. You get a score, a breakdown by area, and three next actions to take away and act on yourself. For anything that matters, check it against a real framework — NIST AI RMF, ISO/IEC 42001, the EU AI Act — and get proper advice; this doesn't replace that.</p>
       <div class="privacy">
         <span aria-hidden="true">✓</span>
-        <div><strong>Your answers stay in this browser.</strong> No account, analytics, answer submission or browser storage is used by this assessment — this page&rsquo;s Content Security Policy blocks your answers from ever being sent anywhere, including to the anonymous visit-counter used elsewhere on the site (the only outbound requests this page makes are for its own font files).</div>
+        <div><strong>Your answers stay in this browser.</strong> No account, analytics, answer submission or browser storage is used by this assessment — this page&rsquo;s Content Security Policy blocks every request to anywhere outside cohenholmes.co.uk, including the anonymous visit-counter used elsewhere on the site &mdash; even its fonts are served from this site, not Google.</div>
       </div>
     </section>
 

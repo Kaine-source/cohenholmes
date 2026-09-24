@@ -46,14 +46,52 @@ const navLinks = [
 <meta property="og:url" content={canonicalUrl}>
 <meta name="twitter:card" content="summary">
 <meta property="og:site_name" content="CohenHolmes">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <slot name="head" />
 <style>
+  /* Self-hosted — replaces the Google Fonts request these three families used
+     to load. Cormorant Garamond and DM Sans ship as variable fonts, so one
+     file each covers every weight declared below; DM Mono doesn't, hence two
+     files. Weight ranges and styles match exactly what the old Google Fonts
+     URL requested. */
+  @font-face{
+    font-family:'Cormorant Garamond';
+    font-style:italic;
+    font-weight:400 500;
+    font-display:swap;
+    src:url('/fonts/cormorant-garamond-italic.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'Cormorant Garamond';
+    font-style:normal;
+    font-weight:400 600;
+    font-display:swap;
+    src:url('/fonts/cormorant-garamond-normal.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'DM Sans';
+    font-style:normal;
+    font-weight:400 700;
+    font-display:swap;
+    src:url('/fonts/dm-sans.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'DM Mono';
+    font-style:normal;
+    font-weight:400;
+    font-display:swap;
+    src:url('/fonts/dm-mono-400.woff2') format('woff2');
+  }
+  @font-face{
+    font-family:'DM Mono';
+    font-style:normal;
+    font-weight:500;
+    font-display:swap;
+    src:url('/fonts/dm-mono-500.woff2') format('woff2');
+  }
   :root{
     --font-display:'Cormorant Garamond', Georgia, serif;
     --font-body:'DM Sans', -apple-system, sans-serif;
+    --font-mono:'DM Mono', 'Courier New', monospace;
     --navy:#0F1E33;
     --navy-deep:#1A1A2E;
     --accent:#C8622A;

@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   ogDescription="Correct SPF / DKIM / DMARC records and a staged path to enforcement. Browser-only, nothing submitted."
   wide
 >
-  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'sha256-3wjBG9ipjNbuot8TFbzAHV8Ger/PWAU/jXABxovbJ+s='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-3wjBG9ipjNbuot8TFbzAHV8Ger/PWAU/jXABxovbJ+s='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
   <header>
     <h1>SPF, DKIM &amp; DMARC builder</h1>
@@ -21,9 +21,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <p class="disclaimer">
       <strong>This is a learning tool.</strong> It runs entirely in your browser &mdash; nothing you type
       is submitted, stored or logged, and it never touches your DNS. This page&rsquo;s Content Security
-      Policy blocks it from ever sending anything you type anywhere, including the anonymous
-      visit-counter used elsewhere on the site (the only outbound requests this page makes are for
-      its own font files). It builds the records so you can
+      Policy blocks every request to anywhere outside cohenholmes.co.uk, including the anonymous
+      visit-counter used elsewhere on the site &mdash; even its fonts are served from this site, not
+      Google. It builds the records so you can
       understand them and publish them yourself. Always check them against your provider&rsquo;s own
       guidance (Microsoft&nbsp;365, Google Workspace) and a live DNS lookup before publishing, and watch
       the DMARC reports at each step &mdash; email-auth guidance shifts as standards like DMARCbis land.
