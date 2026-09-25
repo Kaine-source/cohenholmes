@@ -6,7 +6,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 <BaseLayout
-  title="CohenHolmes — Security, Identity &amp; AI"
+  title="CohenHolmes — Security, Identity & AI"
   description="CohenHolmes — Kaine Cohen's notes and tools on identity, security and AI governance across Microsoft 365. Conditional Access, AI governance, and email authentication."
   canonicalPath="/"
   ogDescription="Security, identity, and the practical realities of AI adoption."
