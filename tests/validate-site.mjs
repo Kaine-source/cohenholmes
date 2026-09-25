@@ -10,6 +10,7 @@ const pagePath = 'dist/ai-governance-check/index.html';
 const legacyPath = 'dist/ai-governance-readiness-check.html';
 const indexPath = 'dist/index.html';
 const sitemapPath = 'dist/sitemap.xml';
+const headersPath = 'dist/_headers';
 
 const assert = (condition, message) => {
   if (!condition) throw new Error(message);
@@ -18,11 +19,22 @@ const assert = (condition, message) => {
 assert(existsSync(pagePath), `${pagePath} is missing — run "npm run build" first`);
 assert(existsSync(indexPath), `${indexPath} is missing — run "npm run build" first`);
 assert(existsSync(sitemapPath), `${sitemapPath} is missing — run "npm run build" first`);
+assert(existsSync(headersPath), `${headersPath} is missing — run "npm run build" first`);
 assert(!existsSync(legacyPath), `${legacyPath} must not exist`);
 
 const page = readFileSync(pagePath, 'utf8');
 const index = readFileSync(indexPath, 'utf8');
 const sitemap = readFileSync(sitemapPath, 'utf8');
+const headers = readFileSync(headersPath, 'utf8');
+
+// Cloudflare Pages applies this file's rules to every response. These three headers
+// have no interaction with the tool pages' hash-locked CSP <meta> tags or with the
+// giscus.app script blog posts load, unlike Content-Security-Policy would — that one
+// needs a route-aware policy and is deliberately left for a separate pass.
+assert(/^\/\*$/m.test(headers), 'Wildcard path rule is missing from _headers');
+assert(/Strict-Transport-Security:\s*max-age=31536000; includeSubDomains/.test(headers), 'HSTS header is missing or misconfigured');
+assert(/X-Frame-Options:\s*SAMEORIGIN/.test(headers), 'X-Frame-Options header is missing or misconfigured');
+assert(/Permissions-Policy:\s*\S/.test(headers), 'Permissions-Policy header is missing');
 
 assert(page.includes('https://cohenholmes.co.uk/ai-governance-check'), 'Canonical route is incorrect');
 assert(index.includes('href="/ai-governance-check"'), 'Homepage route is missing');
