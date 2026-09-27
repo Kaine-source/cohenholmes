@@ -43,7 +43,9 @@ pages using `BaseLayout`, same as the rest of the site — but each carries a ha
 CSP (`script-src 'sha256-...'`) tied to its own inline `<script is:inline>` block. That
 script's exact text must never change (not even whitespace) without recomputing and
 updating the matching hash in the page's own CSP `<meta>` tag, or the policy breaks.
-`node tests/validate-site.mjs` checks this self-consistency on every build.
+`node tests/validate-site.mjs` checks this self-consistency for all three tool pages —
+run manually against a local build, and automatically in the `validate` GitHub Actions
+workflow on every pull request. It is not part of `npm run build` itself.
 
 Blog posts used to sync from Medium via a Pages Function; that dependency has been dropped.
 The blog is now native: content lives in `src/content/blog/` and renders at `/blog`.
