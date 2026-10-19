@@ -3,7 +3,7 @@ title: "AI agents don't skip ALM — they just make you watch it happen in real 
 description: "Retiring one tool and rebuilding another on this site surfaced the same lesson twice: build, test and review each catch things the one before it missed, whether the developer is human or an AI agent."
 pubDate: 2026-10-19
 tags: ["ai", "alm", "governance", "workflow"]
-draft: true
+draft: false
 ---
 
 A few days ago I asked an AI agent to retire one of the tools on this site and
