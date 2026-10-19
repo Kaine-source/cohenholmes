@@ -105,8 +105,9 @@ Those are genuinely different questions, and collapsing them into "the agent sai
 done" throws away the entire reason a lifecycle has separate stages in the first
 place.
 
-This is the same thread as the [AI governance piece](/blog/ai-governance-keeping-pace)
-I've just written: the discipline that was already necessary doesn't become optional
+This is the same thread as an AI governance piece I've got coming (not published yet,
+sitting a couple of weeks to see if anyone wants to weigh in first): the discipline
+that was already necessary doesn't become optional
 once AI is doing the work faster. It becomes the only thing standing between "looks
 done" and "is done" — because the agent will move through every stage you give it
 permission to skip, just as confidently whether that's the right call or not. Give it
