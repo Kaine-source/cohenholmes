@@ -6,7 +6,7 @@ tags: ["ai", "governance", "security"]
 draft: true
 ---
 
-I asked this question on LinkedIn a few weeks ago and got six likes, two reposts, and
+I asked this question on LinkedIn yesterday and got six likes, two reposts, and
 not one comment. That's not nothing, but it's also not the "let's hear real
 perspectives" conversation I was hoping to start. So I'm going to answer my own
 question first, in public, and leave the invitation open at the end — if you work in
