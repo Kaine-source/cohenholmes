@@ -114,6 +114,27 @@ the full lifecycle, with independent checks at each stage, and it'll show you ex
 where each one earns its keep. Skip a stage, and you won't find out it mattered until
 whatever it would have caught ships.
 
+## An open question, for anyone doing this for real
+
+Everything above happened on a two-file change to my own personal site, with nobody
+else's job on the line if I'd got it wrong. That's a long way from a team shipping a
+product, where a skipped test or an unresolved review comment can cost a release, not
+just an afternoon. It got me wondering how far this actually generalises: **how are
+developers actually handling ALM once an AI agent is doing real work inside it?**
+
+Specifically — are build, test and review still three separate gates in your
+pipeline, or does the agent's speed tempt you to collapse them into "the diff looks
+right, ship it"? What's actually catching the agent's mistakes before they reach
+production — a human reviewer who still reads every line, a second AI pass acting as
+a reviewer the way Codex did here, or mostly just trusting the test suite? And has
+something an agent got wrong actually shipped on your watch, the way it nearly did on
+mine twice in one afternoon, or has your process caught it every time so far?
+
+I don't think there's a settled answer yet, and I'd rather hear how this is actually
+going for people running it at a scale I'm not — tell me how your team's doing it,
+and I'll fold real answers into an update here, the same way I'm doing with the AI
+governance piece.
+
 The retirement and the rebuild are both live in
 [PR #43](https://github.com/Kaine-source/cohenholmes/pull/43) if you want the actual
 diffs, commit-by-commit, rather than my summary of them.
