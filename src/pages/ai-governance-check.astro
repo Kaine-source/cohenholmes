@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   ogDescription="Twelve practical questions. A private, browser-only result. No data submitted or stored."
   wide
 >
-  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-Bxiuow0EgCtSifOrfe7d5/IlSlMOeTa+5+HTCEPj98w='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-naviAezIF4Osad1nbqNHtF+P62pwrAfkvYJBkYzoaH8='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
     <section aria-labelledby="page-title">
       <p class="eyebrow">Practical assessment · 5 minutes</p>
@@ -31,10 +31,17 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <div id="progress-value" class="progress-value"></div>
       </div>
 
-      <div id="questions"></div>
+      <div class="card-stack">
+        <div id="card" class="card" aria-live="polite"></div>
+      </div>
+      <div class="card-nav">
+        <button id="card-back" class="button" type="button" disabled>&larr; Back</button>
+        <span id="card-position" class="card-position">Question 1 of 12</span>
+        <button id="card-next" class="button" type="button">Next &rarr;</button>
+      </div>
 
       <div class="form-actions">
-        <button class="button primary" type="submit">Show my readiness</button>
+        <button id="view-results" class="button primary" type="submit" disabled>Show my readiness</button>
         <button class="button" type="reset">Clear answers</button>
       </div>
       <p id="form-error" class="error" role="alert"></p>
@@ -153,8 +160,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     {max:24,label:'Adaptive',title:'Use evidence to improve continuously',description:'Your answers indicate a mature operating position. Keep testing assumptions, learning from incidents and adapting controls as models and use cases change.'}
   ];
 
-  const questionsEl = document.getElementById('questions');
   const form = document.getElementById('assessment');
+  const card = document.getElementById('card');
+  const cardPosition = document.getElementById('card-position');
+  const backBtn = document.getElementById('card-back');
+  const nextBtn = document.getElementById('card-next');
+  const viewResultsBtn = document.getElementById('view-results');
   const progressCopy = document.getElementById('progress-copy');
   const progressValue = document.getElementById('progress-value');
   const progressTrack = document.querySelector('.progress-track');
@@ -162,54 +173,109 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   const results = document.getElementById('results');
   let latestSummary = null;
 
-  questions.forEach((item,index) => {
-    const fieldset = document.createElement('fieldset');
-    const legend = document.createElement('legend');
+  const answers = new Array(questions.length).fill(null);
+  let currentIndex = 0;
+
+  function renderCard(){
+    const item = questions[currentIndex];
+    card.replaceChildren();
+    card.classList.remove('card-enter');
+
     const domain = document.createElement('span');
     domain.className = 'domain';
     domain.textContent = item.domain;
-    const question = document.createElement('span');
+    const question = document.createElement('p');
     question.className = 'question';
-    question.textContent = `${index + 1}. ${item.question}`;
-    const why = document.createElement('span');
+    question.textContent = item.question;
+    const why = document.createElement('p');
     why.className = 'why';
     why.textContent = item.why;
-    legend.append(domain,question,why);
-    fieldset.appendChild(legend);
 
     const choices = document.createElement('div');
-    choices.className = 'choices';
+    choices.className = 'card-choices';
     [[0,'Not yet'],[1,'Partly'],[2,'Consistently']].forEach(([value,label]) => {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'choice';
-      const input = document.createElement('input');
-      input.type = 'radio';
-      input.name = `q${index}`;
-      input.id = `q${index}-${value}`;
-      input.value = value;
-      const choiceLabel = document.createElement('label');
-      choiceLabel.htmlFor = input.id;
-      choiceLabel.textContent = label;
-      wrapper.append(input,choiceLabel);
-      choices.appendChild(wrapper);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'choice-btn';
+      button.textContent = label;
+      const isSelected = answers[currentIndex] === value;
+      button.setAttribute('aria-pressed',String(isSelected));
+      if(isSelected) button.classList.add('selected');
+      button.addEventListener('click',() => selectAnswer(value));
+      choices.appendChild(button);
     });
-    fieldset.appendChild(choices);
-    questionsEl.appendChild(fieldset);
-  });
 
-  function getAnswers(){
-    return questions.map((_,index) => {
-      const checked = form.querySelector(`input[name="q${index}"]:checked`);
-      return checked ? Number(checked.value) : null;
-    });
+    card.append(domain,question,why,choices);
+    cardPosition.textContent = `Question ${currentIndex + 1} of ${questions.length}`;
+    backBtn.disabled = currentIndex === 0;
+    nextBtn.disabled = currentIndex === questions.length - 1;
+    updateProgress();
+    // restart the entry animation; reduced-motion users get the global override
+    void card.offsetWidth;
+    card.classList.add('card-enter');
   }
 
+  let advanceTimer = null;
+
+  function clearPendingAdvance(){
+    if(advanceTimer !== null){
+      window.clearTimeout(advanceTimer);
+      advanceTimer = null;
+    }
+  }
+
+  // After any re-render triggered by navigation or an answer, renderCard() has just
+  // replaced the button the user's focus was on — move focus back onto the card
+  // (its selected choice if answered, else its first choice) so keyboard/screen-reader
+  // users land somewhere sensible instead of falling out to <body>.
+  function focusCurrentCard(){
+    const target = card.querySelector('.choice-btn.selected') || card.querySelector('.choice-btn');
+    if(target) target.focus();
+  }
+
+  function selectAnswer(value){
+    const answeredIndex = currentIndex;
+    answers[answeredIndex] = value;
+    renderCard();
+    focusCurrentCard();
+    clearPendingAdvance();
+    if(answeredIndex < questions.length - 1){
+      // Capture the destination now rather than reading currentIndex when this fires —
+      // if the user navigates again during this 180ms window, clearPendingAdvance()
+      // (called from goTo()) cancels this timer, so it can't fire against a currentIndex
+      // that's since moved on and skip a question.
+      advanceTimer = window.setTimeout(() => {
+        advanceTimer = null;
+        currentIndex = answeredIndex + 1;
+        renderCard();
+        focusCurrentCard();
+      },180);
+    }
+  }
+
+  function goTo(index){
+    clearPendingAdvance();
+    currentIndex = Math.max(0,Math.min(questions.length - 1,index));
+    renderCard();
+    focusCurrentCard();
+  }
+
+  backBtn.addEventListener('click',() => goTo(currentIndex - 1));
+  nextBtn.addEventListener('click',() => goTo(currentIndex + 1));
+  document.addEventListener('keydown',event => {
+    if(results.classList.contains('visible')) return;
+    if(event.key === 'ArrowLeft') goTo(currentIndex - 1);
+    if(event.key === 'ArrowRight' && currentIndex < questions.length - 1) goTo(currentIndex + 1);
+  });
+
   function updateProgress(){
-    const answered = getAnswers().filter(value => value !== null).length;
+    const answered = answers.filter(value => value !== null).length;
     progressCopy.textContent = `${answered} of ${questions.length} answered`;
     progressValue.style.width = `${(answered / questions.length) * 100}%`;
     progressTrack.setAttribute('aria-valuenow',String(answered));
-    if(answered === questions.length) formError.textContent = '';
+    const complete = answered === questions.length;
+    viewResultsBtn.disabled = !complete;
+    if(complete) formError.textContent = '';
   }
 
   function buildSummary(answers){
@@ -275,14 +341,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     results.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   }
 
-  form.addEventListener('change',updateProgress);
   form.addEventListener('submit',event => {
     event.preventDefault();
-    const answers = getAnswers();
     const missing = answers.findIndex(value => value === null);
     if(missing !== -1){
+      goTo(missing);
       formError.textContent = `Please answer question ${missing + 1} before viewing your result.`;
-      form.querySelector(`input[name="q${missing}"]`).focus();
       return;
     }
     formError.textContent = '';
@@ -292,7 +356,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   form.addEventListener('reset',() => {
     window.setTimeout(() => {
-      updateProgress();
+      clearPendingAdvance();
+      answers.fill(null);
+      currentIndex = 0;
+      renderCard();
       results.classList.remove('visible');
       latestSummary = null;
       formError.textContent = '';
@@ -300,6 +367,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   });
 
   document.getElementById('retake').addEventListener('click',() => {
+    currentIndex = answers.findIndex(value => value === null);
+    if(currentIndex === -1) currentIndex = 0;
+    renderCard();
     form.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
   });
 
@@ -330,7 +400,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     URL.revokeObjectURL(url);
   });
 
-  updateProgress();
+  renderCard();
 </script>
 </BaseLayout>
 
@@ -388,41 +458,53 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .progress-track{height:6px;margin:14px 0 34px;background:var(--paper-dim);border-radius:999px;overflow:hidden;}
   .progress-value{height:100%;width:0;background:var(--accent);transition:width .25s ease;}
 
-  :global(fieldset){
-    border:0;
-    padding:0 0 30px;
-    margin:0 0 30px;
-    border-bottom:1px solid var(--line);
+  .card-stack{margin-top:4px;}
+  .card{
+    padding:clamp(22px,4vw,34px);
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:var(--card);
   }
-  :global(legend){width:100%;}
-  :global(.domain){
+  .card.card-enter{animation:cardIn .22s ease both;}
+  @keyframes cardIn{
+    from{opacity:0;transform:translateX(10px);}
+    to{opacity:1;transform:translateX(0);}
+  }
+  :global(.card .domain){
     display:inline-block;
-    margin-bottom:8px;
+    margin-bottom:10px;
     font-family:var(--font-mono);
     font-size:.7rem;
     letter-spacing:.1em;
     text-transform:uppercase;
     color:var(--accent-text);
   }
-  :global(.question){display:block;max-width:64ch;font-size:1.08rem;font-weight:500;line-height:1.48;}
-  :global(.why){display:block;max-width:67ch;margin-top:7px;color:var(--muted);font-size:.9rem;}
-  :global(.choices){display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px;}
-  :global(.choice){position:relative;}
-  :global(.choice input){position:absolute;opacity:0;pointer-events:none;}
-  :global(.choice label){
-    display:block;
-    height:100%;
-    padding:12px 14px;
+  :global(.card .question){max-width:64ch;font-size:1.2rem;font-weight:500;line-height:1.46;}
+  :global(.card .why){max-width:60ch;margin-top:10px;color:var(--muted);font-size:.9rem;}
+  :global(.card-choices){display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px;}
+  :global(.choice-btn){
+    padding:14px;
     border:1px solid var(--line);
     border-radius:12px;
-    background:var(--card);
+    background:var(--cream);
     text-align:center;
-    font-size:.9rem;
+    font-size:.92rem;
+    font-weight:500;
+    color:var(--navy);
     transition:border-color .18s ease,background .18s ease,transform .18s ease;
   }
-  :global(.choice label:hover){border-color:var(--accent-text);transform:translateY(-1px);}
-  :global(.choice input:checked + label){border-color:var(--accent-text);background:#F1E2D6;box-shadow:inset 0 0 0 1px var(--accent);}
-  :global(.choice input:focus-visible + label){outline:3px solid rgba(200,98,42,.28);outline-offset:2px;}
+  :global(.choice-btn:hover){border-color:var(--accent-text);transform:translateY(-1px);}
+  :global(.choice-btn.selected){border-color:var(--accent-text);background:#F1E2D6;box-shadow:inset 0 0 0 1px var(--accent);}
+  :global(.choice-btn:focus-visible){outline:3px solid rgba(200,98,42,.28);outline-offset:2px;}
+
+  .card-nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:18px;
+  }
+  .card-position{font-family:var(--font-mono);font-size:.78rem;color:var(--muted);}
 
   .form-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
   .button{
@@ -441,6 +523,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   .button:hover{border-color:var(--accent-text);background:#F1E2D6;}
   .button.primary:hover{background:var(--accent-text);border-color:var(--accent-text);color:#fff;}
   .button:focus-visible{outline:3px solid rgba(200,98,42,.3);outline-offset:2px;}
+  .button:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+  .button:disabled:hover{background:var(--cream);border-color:var(--line);}
+  .button.primary:disabled:hover{background:var(--navy);border-color:var(--navy);}
   .error{min-height:1.5em;margin-top:12px;color:#9C2F2F;font-size:.9rem;}
   .noscript{margin-top:32px;padding:16px 18px;border:1px solid #9C2F2F;border-radius:14px;color:#7E2525;background:#FFF4F2;}
 
@@ -502,8 +587,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   @media(max-width:640px){
-    :global(.choices){grid-template-columns:1fr;}
-    :global(.choice label){text-align:left;}
+    :global(.card-choices){grid-template-columns:1fr;}
+    :global(.choice-btn){text-align:left;}
+    .card-nav{flex-wrap:wrap;}
     .result-grid{grid-template-columns:1fr;}
     :global(.domain-row){grid-template-columns:105px 1fr 48px;gap:10px;}
   }

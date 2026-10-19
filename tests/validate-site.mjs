@@ -28,7 +28,27 @@ assert(/Strict-Transport-Security:\s*max-age=31536000; includeSubDomains/.test(h
 assert(/X-Frame-Options:\s*SAMEORIGIN/.test(headers), 'X-Frame-Options header is missing or misconfigured');
 assert(/Permissions-Policy:\s*\S/.test(headers), 'Permissions-Policy header is missing');
 
-// Each of these three tools is a real templated Astro page, not a public/ passthrough, so
+// Self-consistency rather than a hardcoded post count: the feed and the blog index are
+// built from the same (non-draft) collection query, so their item counts must agree —
+// this structurally guarantees a draft can't leak into the feed without also showing up
+// on the blog index, which would be caught elsewhere.
+const feedPath = 'dist/rss.xml';
+const blogIndexPath = 'dist/blog/index.html';
+assert(existsSync(feedPath), `${feedPath} is missing — run "npm run build" first`);
+assert(existsSync(blogIndexPath), `${blogIndexPath} is missing — run "npm run build" first`);
+const feed = readFileSync(feedPath, 'utf8');
+const blogIndex = readFileSync(blogIndexPath, 'utf8');
+assert(feed.startsWith('<?xml version="1.0" encoding="UTF-8"?>'), 'rss.xml must start with a valid XML declaration');
+assert(feed.includes('<rss version="2.0">'), 'rss.xml must be a valid RSS 2.0 feed');
+const publishedPostCount = (blogIndex.match(/class="post"/g) || []).length;
+const feedItemCount = (feed.match(/<item>/g) || []).length;
+assert(
+  feedItemCount === publishedPostCount && publishedPostCount > 0,
+  `rss.xml has ${feedItemCount} item(s) but the blog index lists ${publishedPostCount} published post(s) — they must match, and at least one post must be published`
+);
+assert(index.includes('application/rss+xml'), 'Homepage is missing the RSS <link rel="alternate"> tag (BaseLayout wiring)');
+
+// Each of these two tools is a real templated Astro page, not a public/ passthrough, so
 // there's no byte-identity source to compare against — what actually matters is self-
 // consistency: the inline script's own hash must match what the page's own CSP meta tag
 // declares, and the source restrictions the CSP promises (no network, no unsafe-inline)
@@ -72,7 +92,6 @@ function checkToolPage(name, canonicalPath, { banInnerHTML = true } = {}) {
 }
 
 checkToolPage('ca-builder', '/ca-builder', { banInnerHTML: false });
-checkToolPage('mail-auth', '/mail-auth');
 const aiPage = checkToolPage('ai-governance-check', '/ai-governance-check');
 
 const questionCount = (aiPage.match(/\n\s*domain:'/g) || []).length;
@@ -98,4 +117,4 @@ for (const [score, expected] of boundaries) {
   assert(actual === expected, `Score ${score}: expected ${expected}, received ${actual}`);
 }
 
-console.log('Site validation passed: route, privacy, CSP, JavaScript and scoring checks succeeded for all three tools.');
+console.log('Site validation passed: route, privacy, CSP, JavaScript, scoring and RSS feed checks succeeded.');

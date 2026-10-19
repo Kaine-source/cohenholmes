@@ -25,7 +25,6 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/ca-builder', label: 'CA Builder' },
   { href: '/ai-governance-check', label: 'AI Check' },
-  { href: '/mail-auth', label: 'Mail Auth' },
   { href: '/blog', label: 'Blog' },
 ];
 ---
@@ -50,7 +49,15 @@ const navLinks = [
 <meta property="og:url" content={canonicalUrl}>
 <meta name="twitter:card" content="summary">
 <meta property="og:site_name" content="CohenHolmes">
+<link rel="alternate" type="application/rss+xml" title="CohenHolmes" href="/rss.xml">
 <slot name="head" />
+<!-- Cloudflare Web Analytics — anonymous visit counting only, no cookies, nothing
+     typed anywhere on the site is ever sent. Placed after the head slot above so
+     that on ca-builder/ai-governance-check/mail-auth, whose own stricter CSP meta
+     tag is emitted into that slot, this script is already covered by their
+     connect-src 'none' (and non-matching script-src hash) by the time it parses —
+     it only actually reports on pages with no such restriction (/, /blog, /404). -->
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "57522c0a2872438ba08f89975b97a4e4"}'></script>
 <style>
   /* Self-hosted — replaces the Google Fonts request these three families used
      to load. Cormorant Garamond and DM Sans ship as variable fonts, so one
@@ -197,10 +204,16 @@ const navLinks = [
   footer.site .wrap{
     padding:24px 28px;
     display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  footer.site .row{
+    display:flex;
     justify-content:space-between;
     flex-wrap:wrap;
     gap:8px;
   }
+  footer.site .note{ color:#8C8AA0; }
 </style>
 </head>
 <body>
@@ -231,8 +244,11 @@ const navLinks = [
 
 <footer class="site">
   <div class="wrap">
-    <span>CohenHolmes &mdash; Security, identity &amp; AI</span>
-    <span>cohenholmes.co.uk</span>
+    <div class="row">
+      <span>CohenHolmes &mdash; Security, identity &amp; AI</span>
+      <span>cohenholmes.co.uk</span>
+    </div>
+    <span class="note">Visits counted anonymously (Cloudflare Web Analytics) &mdash; never what you type.</span>
   </div>
 </footer>
 

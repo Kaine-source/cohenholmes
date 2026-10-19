@@ -11,7 +11,10 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   canonicalPath="/blog"
 >
   <h1>Blog</h1>
-  <p class="lede">Notes on identity, security and the move into AI engineering.</p>
+  <p class="lede">
+    Notes on identity, security and the move into AI engineering.
+    <a class="feed-link" href="/rss.xml">RSS feed</a>
+  </p>
 
   {posts.length === 0 ? (
     <p class="state">Nothing published here yet — check back soon.</p>
@@ -38,6 +41,12 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
     color:#4A4A5A;
     max-width:56ch;
     margin-bottom:36px;
+  }
+  .feed-link{
+    margin-left:10px;
+    font-size:13px;
+    font-weight:500;
+    white-space:nowrap;
   }
   .state{
     font-size:14px;
