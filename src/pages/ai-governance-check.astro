@@ -9,7 +9,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   ogDescription="Twelve practical questions. A private, browser-only result. No data submitted or stored."
   wide
 >
-  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-zEL7WORPIYzfJDyHNzHRUAhap/7wgZ0Bxcg4XiheyuM='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'sha256-naviAezIF4Osad1nbqNHtF+P62pwrAfkvYJBkYzoaH8='; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 
     <section aria-labelledby="page-title">
       <p class="eyebrow">Practical assessment · 5 minutes</p>
@@ -215,19 +215,49 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     card.classList.add('card-enter');
   }
 
+  let advanceTimer = null;
+
+  function clearPendingAdvance(){
+    if(advanceTimer !== null){
+      window.clearTimeout(advanceTimer);
+      advanceTimer = null;
+    }
+  }
+
+  // After any re-render triggered by navigation or an answer, renderCard() has just
+  // replaced the button the user's focus was on — move focus back onto the card
+  // (its selected choice if answered, else its first choice) so keyboard/screen-reader
+  // users land somewhere sensible instead of falling out to <body>.
+  function focusCurrentCard(){
+    const target = card.querySelector('.choice-btn.selected') || card.querySelector('.choice-btn');
+    if(target) target.focus();
+  }
+
   function selectAnswer(value){
-    answers[currentIndex] = value;
-    if(currentIndex < questions.length - 1){
-      renderCard();
-      window.setTimeout(() => { currentIndex++; renderCard(); },180);
-    } else {
-      renderCard();
+    const answeredIndex = currentIndex;
+    answers[answeredIndex] = value;
+    renderCard();
+    focusCurrentCard();
+    clearPendingAdvance();
+    if(answeredIndex < questions.length - 1){
+      // Capture the destination now rather than reading currentIndex when this fires —
+      // if the user navigates again during this 180ms window, clearPendingAdvance()
+      // (called from goTo()) cancels this timer, so it can't fire against a currentIndex
+      // that's since moved on and skip a question.
+      advanceTimer = window.setTimeout(() => {
+        advanceTimer = null;
+        currentIndex = answeredIndex + 1;
+        renderCard();
+        focusCurrentCard();
+      },180);
     }
   }
 
   function goTo(index){
+    clearPendingAdvance();
     currentIndex = Math.max(0,Math.min(questions.length - 1,index));
     renderCard();
+    focusCurrentCard();
   }
 
   backBtn.addEventListener('click',() => goTo(currentIndex - 1));
@@ -317,7 +347,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     if(missing !== -1){
       goTo(missing);
       formError.textContent = `Please answer question ${missing + 1} before viewing your result.`;
-      card.querySelector('.choice-btn').focus();
       return;
     }
     formError.textContent = '';
@@ -327,6 +356,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 
   form.addEventListener('reset',() => {
     window.setTimeout(() => {
+      clearPendingAdvance();
       answers.fill(null);
       currentIndex = 0;
       renderCard();
