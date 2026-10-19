@@ -18,8 +18,16 @@ interface FeedItem {
 
 function decodeEntities(value: string): string {
   return value
+    .replace(/&mdash;/g, '—')
+    .replace(/&ndash;/g, '–')
+    .replace(/&rsquo;/g, '’')
+    .replace(/&lsquo;/g, '‘')
+    .replace(/&ldquo;/g, '“')
+    .replace(/&rdquo;/g, '”')
+    .replace(/&nbsp;/g, ' ')
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&');
@@ -63,25 +71,35 @@ function extractProseText(html: string): string | null {
   // break every time the site rebuilds with a new scope hash.
   const match = html.match(/<div class="prose"[^>]*>([\s\S]*?)<\/div>\s*<\/article>/);
   if (!match) return null;
-  return match[1]
+  let body = match[1];
+
+  // Code blocks (and anything else inside <pre>, like the architecture diagram in
+  // the homelab post) carry meaningful indentation — pull them out before the prose
+  // whitespace-collapse below runs, so that collapse can't flatten them. By the time
+  // that collapse runs, every tag is already gone, so there'd be no way left to tell
+  // "this space is indentation" from "this space is between two prose words."
+  const codeBlocks: string[] = [];
+  body = body.replace(/<pre[^>]*>([\s\S]*?)<\/pre>/gi, (_match, inner: string) => {
+    const code = decodeEntities(inner.replace(/<[^>]+>/g, ''));
+    codeBlocks.push(code);
+    return `\n\n\u0000CODEBLOCK${codeBlocks.length - 1}\u0000\n\n`;
+  });
+
+  let text = body
     .replace(/<script[\s\S]*?<\/script>/gi, '')
     .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/<\/(p|div|h[1-6]|li|blockquote|pre)>/gi, '\n\n')
+    .replace(/<\/(p|div|h[1-6]|li|blockquote)>/gi, '\n\n')
     .replace(/<br\s*\/?>/gi, '\n')
     .replace(/<[^>]+>/g, '')
-    .replace(/&mdash;/g, '—')
-    .replace(/&ndash;/g, '–')
-    .replace(/&rsquo;/g, '’')
-    .replace(/&lsquo;/g, '‘')
-    .replace(/&ldquo;/g, '“')
-    .replace(/&rdquo;/g, '”')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
     .replace(/\n{3,}/g, '\n\n')
     .replace(/[ \t]+/g, ' ')
     .trim();
+  text = decodeEntities(text);
+
+  // Restore the protected code blocks verbatim, indentation intact.
+  text = text.replace(/\u0000CODEBLOCK(\d+)\u0000/g, (_match, index: string) => codeBlocks[Number(index)]);
+
+  return text;
 }
 
 function createServer(siteUrl: string): McpServer {

@@ -18,6 +18,21 @@ const FIXTURE_POST_HTML =
   '<div class="prose" data-astro-cid-fake123><p>Hello from the fixture post.</p></div>' +
   '</article></body></html>';
 
+// Mirrors the real site's syntax-highlighted code blocks (nested <span> tokens,
+// one per line) and, deliberately, an indented diagram-style line — this is the
+// exact shape that broke get_post before indentation inside <pre> was protected
+// from the prose whitespace collapse.
+const FIXTURE_CODE_POST_HTML =
+  '<!DOCTYPE html><html><body><article><h1>Second post</h1>' +
+  '<div class="prose" data-astro-cid-fake456>' +
+  '<p>Some   prose   with   extra   spaces   that   should   collapse.</p>' +
+  '<pre data-language="text"><code>' +
+  '<span class="line"><span>MacBook</span></span>\n' +
+  '<span class="line"><span>  └── indented child</span></span>' +
+  '</code></pre>' +
+  '<p>More   prose   after   the   code   block.</p>' +
+  '</div></article></body></html>';
+
 function fixtureFeed(port) {
   return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel>
 <item><title>First post</title><link>http://localhost:${port}/blog/first-post/</link><pubDate>Mon, 01 Jan 2026 00:00:00 GMT</pubDate><description>First summary</description><category>ai</category></item>
@@ -33,6 +48,9 @@ function startFixtureSite(port) {
     } else if (req.url === '/blog/first-post/') {
       res.writeHead(200, { 'content-type': 'text/html' });
       res.end(FIXTURE_POST_HTML);
+    } else if (req.url === '/blog/second-post/') {
+      res.writeHead(200, { 'content-type': 'text/html' });
+      res.end(FIXTURE_CODE_POST_HTML);
     } else {
       res.writeHead(404);
       res.end('not found');
@@ -92,6 +110,19 @@ assert(
 
 const badResult = await client.callTool({ name: 'get_post', arguments: { slug: 'does-not-exist' } });
 assert(badResult.isError === true, 'get_post with an unknown slug should set isError, not throw or silently succeed');
+
+// Regression: indentation inside <pre> (code blocks, aligned diagrams) must survive
+// the prose whitespace collapse — see src/index.ts's extractProseText.
+const codePostResult = await client.callTool({ name: 'get_post', arguments: { slug: 'second-post' } });
+const codePostText = codePostResult.content[0].text;
+assert(
+  codePostText.includes('  └── indented child'),
+  `Indentation inside <pre> was not preserved. Got:\n${codePostText}`
+);
+assert(
+  /Some prose with extra spaces that should collapse\./.test(codePostText),
+  `Ordinary prose whitespace should still collapse to single spaces. Got:\n${codePostText}`
+);
 
 await client.close();
 fixtureServer.close();
