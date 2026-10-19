@@ -1,0 +1,9 @@
+name = "cohenholmes-blog-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-10-19"
+
+# No storage, no secrets, no state — every request fetches the live site directly,
+# read-only. SITE_URL is the only configuration this Worker has; override it in
+# .dev.vars (gitignored) to point local dev at a fixture server instead.
+[vars]
+SITE_URL = "https://cohenholmes.co.uk"
