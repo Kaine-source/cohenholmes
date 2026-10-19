@@ -28,7 +28,7 @@ assert(/Strict-Transport-Security:\s*max-age=31536000; includeSubDomains/.test(h
 assert(/X-Frame-Options:\s*SAMEORIGIN/.test(headers), 'X-Frame-Options header is missing or misconfigured');
 assert(/Permissions-Policy:\s*\S/.test(headers), 'Permissions-Policy header is missing');
 
-// Each of these three tools is a real templated Astro page, not a public/ passthrough, so
+// Each of these two tools is a real templated Astro page, not a public/ passthrough, so
 // there's no byte-identity source to compare against — what actually matters is self-
 // consistency: the inline script's own hash must match what the page's own CSP meta tag
 // declares, and the source restrictions the CSP promises (no network, no unsafe-inline)
@@ -72,7 +72,6 @@ function checkToolPage(name, canonicalPath, { banInnerHTML = true } = {}) {
 }
 
 checkToolPage('ca-builder', '/ca-builder', { banInnerHTML: false });
-checkToolPage('mail-auth', '/mail-auth');
 const aiPage = checkToolPage('ai-governance-check', '/ai-governance-check');
 
 const questionCount = (aiPage.match(/\n\s*domain:'/g) || []).length;
@@ -98,4 +97,4 @@ for (const [score, expected] of boundaries) {
   assert(actual === expected, `Score ${score}: expected ${expected}, received ${actual}`);
 }
 
-console.log('Site validation passed: route, privacy, CSP, JavaScript and scoring checks succeeded for all three tools.');
+console.log('Site validation passed: route, privacy, CSP, JavaScript and scoring checks succeeded for both tools.');
