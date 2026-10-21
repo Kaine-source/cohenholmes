@@ -1,0 +1,312 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const MCP_URL = 'https://cohenholmes-blog-mcp.kaine-cohen.workers.dev/mcp';
+---
+<BaseLayout
+  title="Connect your agent to the CohenHolmes MCP — CohenHolmes"
+  description="A small, read-only MCP server exposing this blog to any AI agent — how MCP works, exactly what it can and can't do, and how to connect Claude, ChatGPT or your own agent to it."
+  canonicalPath="/mcp"
+  wide
+>
+  <p class="eyebrow">For AI agents &middot; read-only</p>
+  <h1>Connect your agent to the CohenHolmes MCP</h1>
+  <p class="lede">
+    This blog has a small <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener">MCP</a> server
+    sitting in front of it, so your own AI agent can read it directly instead of
+    you copy-pasting links into a chat. Here's how MCP works, exactly what this one is
+    allowed to do, and how to point your agent at it.
+  </p>
+
+  <section class="block">
+    <h2>How MCP works, in short</h2>
+    <p>
+      MCP (Model Context Protocol) is just a standard way for an AI agent to discover and
+      call a small set of named <em>tools</em> a server offers, instead of every integration
+      being its own bespoke plumbing. Your agent asks the server what it can do, the server
+      lists its tools, and the agent calls one when it's useful to what you asked.
+    </p>
+    <ol class="flow">
+      <li>
+        <span class="step-label">Your agent</span>
+        <p>Claude, ChatGPT, or anything else that speaks MCP.</p>
+      </li>
+      <li aria-hidden="true" class="arrow">&rarr;</li>
+      <li>
+        <span class="step-label">MCP</span>
+        <p>A standard request/response format for "what tools do you have" and "run this one".</p>
+      </li>
+      <li aria-hidden="true" class="arrow">&rarr;</li>
+      <li>
+        <span class="step-label">This server</span>
+        <p>A small Cloudflare Worker exposing exactly three tools. Nothing else.</p>
+      </li>
+      <li aria-hidden="true" class="arrow">&rarr;</li>
+      <li>
+        <span class="step-label">The live site</span>
+        <p>Every call reads cohenholmes.co.uk itself, at request time. Nothing is cached or stored by the server.</p>
+      </li>
+    </ol>
+  </section>
+
+  <section class="block">
+    <h2>What it can actually do</h2>
+    <p>
+      Read-only, on purpose. There is no tool that creates, edits or deletes anything —
+      this server can't publish a post, change a word of one, or touch anything else on
+      the site. No authentication is needed to use it, because there's nothing behind it
+      worth protecting: every tool just reads what's already public.
+    </p>
+    <div class="tools">
+      <div class="tool">
+        <code>list_posts</code>
+        <p>Every published post, newest first &mdash; title, slug, date, summary, tags.</p>
+      </div>
+      <div class="tool">
+        <code>get_latest_post</code>
+        <p>Just the most recent post's metadata.</p>
+      </div>
+      <div class="tool">
+        <code>get_post</code>
+        <p>The full text of one post, by slug.</p>
+      </div>
+    </div>
+    <p class="fine-print">
+      No account, no API key, no stored data of yours anywhere, no secrets on the server.
+      The source is public too &mdash; <a href="https://github.com/Kaine-source/cohenholmes/tree/main/mcp-server" target="_blank" rel="noopener">read exactly what it does</a> rather
+      than take my word for it.
+    </p>
+  </section>
+
+  <section class="block">
+    <h2>Connect it</h2>
+
+    <div class="connect-card">
+      <h3>Claude (Desktop, Claude.ai, Cowork)</h3>
+      <ol>
+        <li>Settings &rarr; Connectors &rarr; <strong>Add custom connector</strong></li>
+        <li>Paste the URL below</li>
+        <li>No authentication needed &mdash; leave that as is, and save</li>
+      </ol>
+      <p class="fine-print">On a Team or Enterprise workspace, only an owner or admin can add a
+      connector at the organisation level &mdash; everyone else just finds it already there once
+      that's done.</p>
+    </div>
+
+    <div class="connect-card">
+      <h3>Claude Code (CLI)</h3>
+      <p>One command, from any directory (<code>--scope user</code> makes it available in every
+      project, not just the one you happen to be standing in):</p>
+      <pre><code>claude mcp add --transport http --scope user cohenholmes {MCP_URL}</code></pre>
+      <p>Then run <code>/mcp</code> inside Claude Code to confirm it connected.</p>
+    </div>
+
+    <div class="connect-card">
+      <h3>ChatGPT</h3>
+      <p>Needs a paid ChatGPT plan with Developer Mode enabled &mdash; OpenAI's own <a href="https://developers.openai.com/api/docs/guides/custom-mcp-server" target="_blank" rel="noopener">connector docs</a>
+      list exactly which plans currently qualify and the precise menu path, since both shift from
+      time to time. As of writing:</p>
+      <ol>
+        <li>Settings &rarr; Apps &amp; Connectors &rarr; Advanced &rarr; enable <strong>Developer Mode</strong></li>
+        <li>Apps &amp; Connectors &rarr; <strong>Create</strong></li>
+        <li>Paste the URL below, authentication: <strong>None</strong></li>
+        <li>Start a <em>new</em> chat &mdash; existing ones won't pick it up</li>
+      </ol>
+    </div>
+
+    <div class="url-box">
+      <span class="url-label">Server URL</span>
+      <code>{MCP_URL}</code>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Questions worth trying</h2>
+    <ul class="questions">
+      <li>"What's the latest post on the CohenHolmes blog?"</li>
+      <li>"List everything Kaine's written about AI governance."</li>
+      <li>"Summarise the ALM post for me in three bullet points."</li>
+      <li>"Has he written anything about Conditional Access? What's the gist?"</li>
+    </ul>
+    <p class="story">
+      If your agent can call tools at all, any of these should trigger a real
+      <code>list_posts</code> or <code>get_post</code> call rather than a guess from training
+      data &mdash; worth checking, since that's the actual point of connecting it.
+    </p>
+  </section>
+</BaseLayout>
+
+<style>
+  :root{
+    --card:#FCFAF6;
+    --line:#E3DFD3;
+    --muted:#4A4A5A;
+  }
+  .eyebrow{
+    margin:0 0 16px;
+    font-family:var(--font-mono);
+    font-size:0.76rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--accent-text);
+  }
+  .lede{
+    max-width:70ch;
+    margin-top:18px;
+    font-size:clamp(1.02rem, 1.6vw, 1.18rem);
+    color:var(--muted);
+  }
+
+  .block{ margin-top:56px; }
+  .block > p{ max-width:72ch; }
+
+  .flow{
+    list-style:none;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:stretch;
+    gap:14px;
+    margin-top:24px;
+  }
+  .flow > li:not(.arrow){
+    flex:1 1 200px;
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+  .flow .step-label{
+    display:block;
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--accent-text);
+    margin-bottom:8px;
+  }
+  .flow p{ margin:0; font-size:0.92rem; color:var(--muted); }
+  .flow .arrow{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--accent);
+    font-size:1.4rem;
+    flex:0 0 auto;
+    padding:0 2px;
+  }
+  @media (max-width:760px){
+    .flow{ flex-direction:column; }
+    .flow .arrow{ transform:rotate(90deg); padding:4px 0; }
+  }
+
+  .tools{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:14px;
+    margin-top:22px;
+  }
+  .tool{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+  .tool code{
+    font-family:var(--font-mono);
+    font-size:0.88rem;
+    color:var(--navy);
+    background:#EDE8DD;
+    padding:0.15em 0.45em;
+    border-radius:5px;
+  }
+  .tool p{ margin:10px 0 0; font-size:0.9rem; color:var(--muted); }
+  .fine-print{ margin-top:18px; font-size:0.88rem; color:var(--muted); }
+
+  .connect-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px 22px;
+    margin-top:18px;
+    max-width:72ch;
+  }
+  .connect-card h3{
+    font-family:var(--font-display);
+    font-size:1.2rem;
+    font-weight:600;
+    color:var(--navy);
+    margin-bottom:10px;
+  }
+  .connect-card ol{ margin:0; padding-left:22px; }
+  .connect-card li{ margin-bottom:4px; font-size:0.95rem; }
+  .connect-card p{ margin:0 0 8px; font-size:0.95rem; }
+  .connect-card code{
+    font-family:var(--font-mono);
+    font-size:0.85rem;
+    background:#EDE8DD;
+    padding:0.15em 0.4em;
+    border-radius:5px;
+  }
+  .connect-card pre{
+    background:var(--navy-deep);
+    color:#E8E6F0;
+    border-radius:10px;
+    padding:14px 16px;
+    overflow-x:auto;
+    white-space:pre-wrap;
+    word-break:break-word;
+    margin:10px 0;
+  }
+  .connect-card pre code{ background:none; padding:0; font-size:0.85em; }
+
+  .url-box{
+    margin-top:22px;
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:12px;
+    background:var(--navy-deep);
+    border-radius:12px;
+    padding:16px 18px;
+    max-width:72ch;
+  }
+  .url-label{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:#AFC0FF;
+  }
+  .url-box code{
+    font-family:var(--font-mono);
+    font-size:0.88rem;
+    color:#E8E6F0;
+    word-break:break-all;
+  }
+
+  .questions{
+    list-style:none;
+    margin-top:20px;
+    display:grid;
+    gap:10px;
+    max-width:72ch;
+  }
+  .questions li{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 16px;
+    font-size:0.95rem;
+    color:var(--navy);
+    font-style:italic;
+  }
+  .story{ margin-top:18px; max-width:72ch; font-size:0.95rem; color:var(--muted); }
+  .story code{
+    font-family:var(--font-mono);
+    font-size:0.85em;
+    background:#EDE8DD;
+    padding:0.1em 0.35em;
+    border-radius:4px;
+    font-style:normal;
+  }
+</style>
