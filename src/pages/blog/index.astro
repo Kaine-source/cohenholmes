@@ -10,6 +10,8 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   description="Notes on identity, security and the move into AI engineering."
   canonicalPath="/blog"
 >
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+
   <h1>Blog</h1>
   <p class="lede">
     Notes on identity, security and the move into AI engineering.
