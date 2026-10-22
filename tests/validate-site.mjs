@@ -60,6 +60,12 @@ checkBaselineCsp('mcp', 'dist/mcp/index.html');
   assert(jsonLdMatch, 'homepage: JSON-LD script block is missing');
   const jsonLdHash = createHash('sha256').update(jsonLdMatch[1]).digest('base64');
   assert(policy.includes(`'sha256-${jsonLdHash}'`), "homepage: CSP script hash does not match the JSON-LD inline script");
+
+  // A <meta> CSP only governs content parsed after it — it must appear before the
+  // JSON-LD block in document order, not just be present somewhere on the page.
+  const cspIndex = index.indexOf('Content-Security-Policy');
+  const jsonLdIndex = index.indexOf('application/ld+json');
+  assert(cspIndex !== -1 && jsonLdIndex !== -1 && cspIndex < jsonLdIndex, 'homepage: CSP meta tag must come before the JSON-LD script in document order');
 }
 
 // Every built blog post (not the index) must allow giscus.app — client.js plus the
