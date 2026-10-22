@@ -11,6 +11,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
   canonicalPath="/"
   ogDescription="Security, identity, and the practical realities of AI adoption."
 >
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-TabMFQKHyLWsgCv5tUFaVRfF8UmRmqbgnhmKnzAMstg='; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
   <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Organization",

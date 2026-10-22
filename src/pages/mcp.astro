@@ -9,6 +9,8 @@ const MCP_URL = 'https://cohenholmes-blog-mcp.kaine-cohen.workers.dev/mcp';
   canonicalPath="/mcp"
   wide
 >
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+
   <p class="eyebrow">For AI agents &middot; read-only</p>
   <h1>Connect your agent to the CohenHolmes MCP</h1>
   <p class="lede">

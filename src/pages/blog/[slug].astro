@@ -21,6 +21,8 @@ const postHref = (p: CollectionEntry<'blog'>) => `/blog/${p.data.slug ?? p.id}/`
   description={post.data.description}
   canonicalPath={`/blog/${slug}`}
 >
+  <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://giscus.app; frame-src https://giscus.app; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
+
   <article>
     <span class="post-date">{post.data.pubDate.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} &middot; Blog by {post.data.author}</span>
     <h1>{post.data.title}</h1>
