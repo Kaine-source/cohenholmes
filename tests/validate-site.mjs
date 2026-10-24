@@ -53,6 +53,10 @@ function checkBaselineCsp(name, pagePath, { extra = [] } = {}) {
 checkBaselineCsp('404', 'dist/404.html');
 checkBaselineCsp('blog index', 'dist/blog/index.html');
 checkBaselineCsp('mcp', 'dist/mcp/index.html');
+checkBaselineCsp('about', 'dist/about/index.html');
+
+assert(index.includes('href="/about"'), 'Homepage nav is missing the /about link');
+assert(sitemap.includes('https://cohenholmes.co.uk/about'), 'about: sitemap route is missing');
 
 {
   const { policy } = checkBaselineCsp('homepage', 'dist/index.html');
