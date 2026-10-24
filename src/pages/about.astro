@@ -3,7 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout
   title="About Kaine Cohen — CohenHolmes"
-  description="Who's behind CohenHolmes — identity and security consulting in Microsoft 365, the move into AI engineering, and the tools and writing built along the way."
+  description="Who's behind CohenHolmes — not a CV, just who I actually am, what I'm into, and the tools and writing built along the way."
   canonicalPath="/about"
 >
   <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
@@ -11,11 +11,37 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <p class="eyebrow">About</p>
   <h1>The person behind CohenHolmes</h1>
   <p class="lede">
-    I'm Kaine Cohen. I work across identity, security and compliance in Microsoft 365, and
-    I'm moving into AI engineering and architecture — building things, not just reading about
-    them. This page is the short version of who that is; the blog and the tools below are the
-    long version.
+    Not a CV — that's what LinkedIn is for. Just who I actually am.
   </p>
+
+  <section class="block">
+    <h2>Who I am</h2>
+    <p>
+      I'm Kaine. I'm based in the UK — I'll leave it vaguer than that on purpose.
+    </p>
+    <p>
+      Technology is a genuine fascination for me, not just a job. How you secure an
+      application, how you manage an environment properly, and how all of that has to keep
+      adapting as something like AI reshapes the processes underneath it — that shift has had
+      a real impact on how I think, not just how I work.
+    </p>
+    <p>
+      I'm a serious AI enthusiast, and not only as a chat assistant. What interests me more is
+      AI as something that blends, creates and manipulates — this site is a good example. It's
+      built on Astro, and honestly I don't know the framework inside out. What I do know is how
+      to sit down with Claude, have a proper back-and-forth, and work out how to actually stand
+      something up.
+    </p>
+    <p>
+      Outside of all that: I run twice a week, and I'm in the gym twice a week too. I'm a
+      massive foodie — I love trying new food, and the best thing I've eaten recently was
+      Turkish lamb chops, quite possibly the best lamb chops of my life.
+    </p>
+    <p>
+      I've also got a dog, Dora — calm, relaxing, full of adventure, and owner of far too many
+      toys. And then there's Charley, the love of my life.
+    </p>
+  </section>
 
   <section class="block">
     <h2>What I've built</h2>
@@ -45,47 +71,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         <span class="more">Read the blog →</span>
       </a>
     </div>
-  </section>
-
-  <section class="block">
-    <h2>Experience</h2>
-    <p class="placeholder-note">
-      <!-- SCAFFOLD: replace each entry below with real role, company and dates. -->
-      Placeholder structure below — swap in the real roles, companies and dates.
-    </p>
-    <ol class="timeline">
-      <li class="timeline-item">
-        <span class="timeline-period">[Year–Year]</span>
-        <h3>[Role title] <span class="timeline-org">&middot; [Company]</span></h3>
-        <p>[One or two lines on what you actually owned or shipped there.]</p>
-      </li>
-      <li class="timeline-item">
-        <span class="timeline-period">[Year–Year]</span>
-        <h3>[Role title] <span class="timeline-org">&middot; [Company]</span></h3>
-        <p>[One or two lines on what you actually owned or shipped there.]</p>
-      </li>
-      <li class="timeline-item">
-        <span class="timeline-period">[Year–Year]</span>
-        <h3>[Role title] <span class="timeline-org">&middot; [Company]</span></h3>
-        <p>[One or two lines on what you actually owned or shipped there.]</p>
-      </li>
-    </ol>
-  </section>
-
-  <section class="block">
-    <h2>Certifications &amp; focus areas</h2>
-    <p>
-      Microsoft certified in information protection and compliance (SC-400) and Microsoft 365
-      administration (MS-102) — the grounding underneath everything else here.
-    </p>
-    <ul class="tags">
-      <li>Entra ID</li>
-      <li>Conditional Access</li>
-      <li>Intune</li>
-      <li>Purview</li>
-      <li>AI governance</li>
-      <li>AI engineering</li>
-    </ul>
   </section>
 
   <section class="block" id="contact">
@@ -118,7 +103,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   }
 
   .block{ margin-top:56px; }
-  .block > p{ max-width:72ch; }
+  .block > p{ max-width:68ch; }
 
   .grid{
     display:grid;
@@ -152,62 +137,6 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     margin-top:10px;
     font-size:0.85rem;
     color:var(--navy);
-  }
-
-  .placeholder-note{
-    margin-top:16px;
-    padding:12px 16px;
-    background:#FDF3E7;
-    border:1px dashed var(--accent);
-    border-radius:10px;
-    font-size:0.9rem;
-    color:var(--accent-text);
-  }
-
-  .timeline{
-    list-style:none;
-    margin-top:20px;
-    display:flex;
-    flex-direction:column;
-    gap:20px;
-  }
-  .timeline-item{
-    padding-left:20px;
-    border-left:2px solid #E3DFD3;
-  }
-  .timeline-period{
-    display:block;
-    font-family:var(--font-mono);
-    font-size:0.76rem;
-    letter-spacing:0.05em;
-    text-transform:uppercase;
-    color:var(--accent-text);
-    margin-bottom:4px;
-  }
-  .timeline-item h3{
-    font-family:var(--font-display);
-    font-size:1.15rem;
-    font-weight:600;
-    color:var(--navy);
-    margin-bottom:6px;
-  }
-  .timeline-org{ font-weight:400; color:#6B6975; }
-  .timeline-item p{ margin:0; color:#4A4A5A; font-size:0.95rem; }
-
-  .tags{
-    list-style:none;
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    margin-top:18px;
-  }
-  .tags li{
-    background:#EDE8DD;
-    color:var(--navy);
-    border-radius:100px;
-    padding:8px 16px;
-    font-size:0.85rem;
-    font-family:var(--font-mono);
   }
 
   .actions{
