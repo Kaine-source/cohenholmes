@@ -7,7 +7,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
 ---
 <BaseLayout
   title="CohenHolmes — Security, Identity & AI"
-  description="CohenHolmes — Kaine Cohen's notes and tools on identity, security and AI governance across Microsoft 365. Conditional Access, AI governance, and email authentication."
+  description="CohenHolmes — notes and tools on identity, security and AI governance across Microsoft 365. Conditional Access, AI governance, and email authentication."
   canonicalPath="/"
   ogDescription="Security, identity, and the practical realities of AI adoption."
 >
@@ -32,39 +32,25 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     ]
   })} />
 
-  <section class="hero" id="about">
+  <section class="hero" id="intro">
     <p class="eyebrow">Security, identity, AI</p>
-    <h1>I write about <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
+    <h1>Notes and tools on <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
 
     <p class="intro">
-      I work across identity, security and compliance in Microsoft 365 — and increasingly,
-      how organisations observe, govern and secure the AI agents now running inside it.
-      This is where I think out loud about both.
-    </p>
-
-    <p class="note">
-      Most of what's here started as something I had to work out properly myself: a
-      policy with no clean explanation anywhere, a rollout that could have gone wrong, a
-      check I wanted to run and couldn't. The write-ups and the tools are the result.
-    </p>
-
-    <p class="note">
-      I hold Microsoft certifications in information protection and compliance (SC-400)
-      and Microsoft 365 administration (MS-102) — the grounding underneath the identity,
-      security and AI-governance work above. I'm also dyslexic: a lot of how I explain
-      things comes from needing to make them make sense to myself first.
+      CohenHolmes collects writing on identity, security and AI governance across Microsoft
+      365, plus a handful of interactive tools built to answer real questions properly —
+      and an MCP server so your own AI agent can read the writing directly.
     </p>
 
     <div class="actions">
-      <a class="button primary" href="/blog">Read my writing</a>
-      <a class="button" href="/about">About me</a>
-      <a class="button" href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a class="button primary" href="/blog">Read the writing</a>
+      <a class="button" href="/about">About the person behind it →</a>
     </div>
   </section>
 
   <section class="section" id="focus">
     <div class="section-head">
-      <h2>What I'm thinking about</h2>
+      <h2>What's here</h2>
     </div>
 
     <div class="grid">
@@ -106,8 +92,8 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     </div>
 
     <p class="story">
-      <strong>The tools are the same instinct, made clickable</strong> — the thing I wanted
-      to exist while I was working it out.
+      <strong>The tools are the same instinct as the writing, made clickable</strong> — built
+      to answer a real question properly, not to pad out a portfolio.
     </p>
   </section>
 
@@ -117,7 +103,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     </div>
 
     <p class="story">
-      I write about identity, security, and where AI fits in — usually working something out
+      Notes on identity, security, and where AI fits in — usually working something out
       in public rather than reporting back once it's tidy.
     </p>
     <p class="story">
@@ -131,21 +117,6 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
           Latest: {latestPost.data.title} →
         </a>
       )}
-    </div>
-  </section>
-
-  <section class="section" id="contact">
-    <div class="section-head">
-      <h2>Say hello</h2>
-    </div>
-
-    <p class="story">
-      I'm on LinkedIn — happy to talk identity, security, compliance, or where AI fits
-      into any of them.
-    </p>
-
-    <div class="links">
-      <a href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener">LinkedIn ↗</a>
     </div>
   </section>
 </BaseLayout>
@@ -172,13 +143,6 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     font-size:clamp(1.1rem, 2vw, 1.4rem);
     color:#4A4A5A;
   }
-  .note{
-    max-width:60ch;
-    margin-top:18px;
-    font-size:1rem;
-    color:#2C2C3A;
-  }
-
   .actions{
     display:flex;
     flex-wrap:wrap;
