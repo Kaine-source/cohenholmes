@@ -14,10 +14,14 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <section aria-labelledby="page-title">
       <p class="eyebrow">Practical assessment · 5 minutes</p>
       <h1 id="page-title">How ready are you to govern <em>AI?</em></h1>
-      <p class="lede">Twelve questions across data, identity, governance, agents and human oversight. The result is a starting point for a better conversation — not a compliance certificate. You get a score, a breakdown by area, and three next actions to take away and act on yourself. For anything that matters, check it against a real framework — NIST AI RMF, ISO/IEC 42001, the EU AI Act — and get proper advice; this doesn't replace that.</p>
+      <p class="lede">Twelve questions across data, identity, governance, agents and human oversight. The result is a starting point for a better conversation, not a compliance certificate.</p>
+      <p class="lede">You get a score, a breakdown by area, and three next actions to take away and act on. For anything that matters, check it against a real framework — NIST AI RMF, ISO/IEC 42001, the EU AI Act — and get proper advice. This doesn't replace that.</p>
       <div class="privacy">
         <span aria-hidden="true">✓</span>
-        <div><strong>Your answers stay in this browser.</strong> No account, analytics, answer submission or browser storage is used by this assessment — this page&rsquo;s Content Security Policy blocks every request to anywhere outside cohenholmes.co.uk, including the anonymous visit-counter used elsewhere on the site &mdash; even its fonts are served from this site, not Google.</div>
+        <div>
+          <p><strong>Your answers stay in this browser.</strong> This assessment doesn&rsquo;t use an account, analytics, answer submission or browser storage.</p>
+          <p>This page&rsquo;s Content Security Policy blocks every request to anywhere outside cohenholmes.co.uk &mdash; including the anonymous visit-counter used elsewhere on the site. Even the fonts are served locally, not from Google.</p>
+        </div>
       </div>
     </section>
 
@@ -442,6 +446,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     font-size:.92rem;
   }
   .privacy strong{display:block;margin-bottom:2px;}
+  .privacy p{margin:0 0 10px;}
+  .privacy p:last-child{margin-bottom:0;}
   .privacy span[aria-hidden="true"]{color:var(--good);font-weight:600;}
 
   .assessment{margin-top:62px;}
