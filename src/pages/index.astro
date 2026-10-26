@@ -14,14 +14,14 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
   <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-TabMFQKHyLWsgCv5tUFaVRfF8UmRmqbgnhmKnzAMstg='; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
   <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify({
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "WebSite",
     "name": "CohenHolmes",
     "url": "https://cohenholmes.co.uk/",
     "sameAs": ["https://linkedin.com/in/kainecohen"],
-    "founder": {
+    "author": {
       "@type": "Person",
       "name": "Kaine Cohen",
-      "jobTitle": "Security and AI Governance Consultant"
+      "url": "https://cohenholmes.co.uk/about"
     },
     "knowsAbout": [
       "Microsoft 365 security",
@@ -93,8 +93,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
 
     <p class="story">
       <strong>The tools are the same instinct as the writing, made clickable</strong> — built
-      to answer a real question properly, not to pad out a portfolio. These are personal
-      experiments and learning projects, rather than products or consulting services.
+      to answer real questions and explore ideas. They're personal experiments and learning projects.
     </p>
   </section>
 
@@ -106,9 +105,6 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     <p class="story">
       Notes on identity, security, and where AI fits in — usually working something out
       in public rather than reporting back once it's tidy.
-    </p>
-    <p class="story">
-      Longer writing lives at the blog, hosted here rather than anywhere else.
     </p>
 
     <div class="links">
