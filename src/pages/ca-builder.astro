@@ -21,14 +21,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     </p>
     <p class="disclaimer">
       <strong>This is a learning tool.</strong> It builds the JSON so you can see the shape and copy
-      it into your own tenant &mdash; it never connects to anything or changes a setting. This page&rsquo;s
-      Content Security Policy blocks every request to anywhere outside cohenholmes.co.uk, including
-      the anonymous visit-counter used elsewhere on the site &mdash; even its fonts are served from
-      this site, not Google. Treat the
-      output as a starting point: review it in report-only mode first, and check the current
-      <a href="https://learn.microsoft.com/entra/identity/conditional-access/" target="_blank" rel="noopener">Microsoft
-      Conditional Access documentation</a> before you enforce anything, because the schema and the
-      licensing move over time.
+      it into your own tenant &mdash; it never connects to anything or changes a setting.
+    </p>
+    <p class="disclaimer">
+      This page&rsquo;s Content Security Policy blocks every request to anywhere outside
+      cohenholmes.co.uk. That includes the anonymous visit-counter used elsewhere on the site;
+      even the fonts here are served locally, not from Google.
+    </p>
+    <p class="disclaimer">
+      Treat the output as a starting point. Review it in report-only mode first, and check the
+      current <a href="https://learn.microsoft.com/entra/identity/conditional-access/" target="_blank" rel="noopener">Microsoft
+      Conditional Access documentation</a> before you enforce anything &mdash; the schema and the
+      licensing both move over time.
     </p>
     <p class="disclaimer">
       <strong>Your IDs are yours.</strong> Group, app and named-location IDs are specific to your
