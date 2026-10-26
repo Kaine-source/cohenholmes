@@ -8,8 +8,7 @@ CohenHolmes is a **personal website**, not a consultancy landing page. Keep the 
 - [ ] Audit blog discovery: compare published content entries with the blog index and sitemap. Confirm every non-draft post is accessible and linked.
 - [ ] Test navigation and interactive cards on keyboard, mobile and screen readers; check focus order, accessible names and colour contrast.
 - [ ] Run the repository build and tests, and check CSP headers on the deployed preview.
-- [ ] Review the homepage structured data: `Organization` may overstate a personal blog; consider `Person` or `WebSite` after checking SEO requirements.
-- [ ] Keep the separate future `.ai` product/business website in its **own repository**, with independent branding, analytics, legal pages and deployment. Do not turn this site into a sales funnel.
+- [x] Change homepage structured data from `Organization` to `WebSite` with a `Person` author; validate rendered JSON-LD in the preview.
 
 ## Intent
 
