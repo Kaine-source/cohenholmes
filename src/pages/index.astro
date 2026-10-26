@@ -7,9 +7,9 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
 ---
 <BaseLayout
   title="CohenHolmes — Security, Identity & AI"
-  description="CohenHolmes — notes and tools on identity, security and AI governance across Microsoft 365. Conditional Access, AI governance, and email authentication."
+  description="A personal corner of the internet for writing, experiments and practical tools about security, identity, AI and the decisions behind technology."
   canonicalPath="/"
-  ogDescription="Security, identity, and the practical realities of AI adoption."
+  ogDescription="Personal notes, experiments and practical tools on security, identity and AI."
 >
   <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com 'sha256-TabMFQKHyLWsgCv5tUFaVRfF8UmRmqbgnhmKnzAMstg='; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
   <script type="application/ld+json" slot="head" is:inline set:html={JSON.stringify({
@@ -33,18 +33,18 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
   })} />
 
   <section class="hero" id="intro">
-    <p class="eyebrow">Security, identity, AI</p>
+    <p class="eyebrow">Personal notes · security · identity · AI</p>
     <h1>Notes and tools on <em>security</em>, identity, and the strange, useful edges of <em>AI</em>.</h1>
 
     <p class="intro">
-      CohenHolmes collects writing on identity, security and AI governance across Microsoft
-      365, plus a handful of interactive tools built to answer real questions properly —
-      and an MCP server so your own AI agent can read the writing directly.
+      I’m Kaine. This is where I write through ideas about security, identity, AI and how
+      technology affects the people using it. I also build little tools as I learn — not
+      to pitch a service, but because figuring things out is half the fun.
     </p>
 
     <div class="actions">
       <a class="button primary" href="/blog">Read the writing</a>
-      <a class="button" href="/about">About the person behind it →</a>
+      <a class="button" href="/about">Meet the person behind it →</a>
     </div>
   </section>
 
@@ -93,7 +93,8 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
 
     <p class="story">
       <strong>The tools are the same instinct as the writing, made clickable</strong> — built
-      to answer a real question properly, not to pad out a portfolio.
+      to answer a real question properly, not to pad out a portfolio. These are personal
+      experiments and learning projects, rather than products or consulting services.
     </p>
   </section>
 
@@ -117,6 +118,15 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
           Latest: {latestPost.data.title} →
         </a>
       )}
+    </div>
+  </section>
+
+  <section class="section" id="say-hello">
+    <div class="section-head"><h2>Say hello</h2></div>
+    <p class="story">Found something interesting, want to compare notes, or have an idea worth exploring? I enjoy hearing from people working through similar questions.</p>
+    <div class="links">
+      <a href="/about#contact">Get in touch →</a>
+      <a href="https://linkedin.com/in/kainecohen" target="_blank" rel="noopener noreferrer">Find me on LinkedIn ↗</a>
     </div>
   </section>
 </BaseLayout>
