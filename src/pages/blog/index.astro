@@ -7,7 +7,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
 ---
 <BaseLayout
   title="Blog — CohenHolmes"
-  description="Notes on identity, security and the move into AI engineering."
+  description="Personal notes on identity, security, AI and the technology questions I'm exploring."
   canonicalPath="/blog"
 >
   <meta slot="head" http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; connect-src 'self' https://cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self'; object-src 'none'">
@@ -71,6 +71,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   }
   .title-link h2{ margin:2px 0 8px; }
   .title-link:hover h2{ color:var(--accent); }
+  .title-link:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
   .post-date{
     font-family:var(--font-body);
     font-size:12px;
