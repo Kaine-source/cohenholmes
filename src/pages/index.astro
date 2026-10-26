@@ -218,7 +218,7 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     font-family:var(--font-mono);
     font-size:0.7rem;
     letter-spacing:0.03em;
-    color:var(--muted);
+    color:#6B6975;
   }
   .card .more{
     display:inline-block;
@@ -252,4 +252,5 @@ const [latestPost] = (await getCollection('blog', ({ data }) => !data.draft))
     transition:border-color 0.2s ease;
   }
   .links a:hover{ border-color:var(--accent); }
+  .links a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 </style>
