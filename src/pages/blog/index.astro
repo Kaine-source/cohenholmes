@@ -71,6 +71,7 @@ const posts = (await getCollection('blog', ({ data }) => !data.draft))
   }
   .title-link h2{ margin:2px 0 8px; }
   .title-link:hover h2{ color:var(--accent); }
+  .title-link:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
   .post-date{
     font-family:var(--font-body);
     font-size:12px;
