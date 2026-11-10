@@ -1,12 +1,12 @@
 ---
 title: "Is AI governance keeping pace with innovation, or are we kidding ourselves?"
 description: "Most AI governance frameworks quietly assume mature identity and data governance already exist underneath them. In most organisations I see, that foundation isn't there yet — and that's the actual gap."
-pubDate: 2026-10-19
+pubDate: 2026-11-10
 tags: ["ai", "governance", "security"]
-draft: true
+draft: false
 ---
 
-I asked this question on LinkedIn yesterday and got six likes, two reposts, and
+I asked this question on LinkedIn a few weeks ago and got six likes, two reposts, and
 not one comment. That's not nothing, but it's also not the "let's hear real
 perspectives" conversation I was hoping to start. So I'm going to answer my own
 question first, in public, and leave the invitation open at the end — if you work in
