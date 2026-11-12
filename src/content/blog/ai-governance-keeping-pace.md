@@ -1,12 +1,12 @@
 ---
 title: "Is AI governance keeping pace with innovation, or are we kidding ourselves?"
 description: "Most AI governance frameworks quietly assume mature identity and data governance already exist underneath them. In most organisations I see, that foundation isn't there yet — and that's the actual gap."
-pubDate: 2026-10-19
+pubDate: 2026-11-10
 tags: ["ai", "governance", "security"]
-draft: true
+draft: false
 ---
 
-I asked this question on LinkedIn yesterday and got six likes, two reposts, and
+I asked this question on LinkedIn a few weeks ago and got six likes, two reposts, and
 not one comment. That's not nothing, but it's also not the "let's hear real
 perspectives" conversation I was hoping to start. So I'm going to answer my own
 question first, in public, and leave the invitation open at the end — if you work in
@@ -49,14 +49,19 @@ Four things come up often enough that I'd call them the real gap, not the except
 policy" sense — in a "if I ask you to name the five SharePoint sites an AI agent
 absolutely should not be able to touch, can you name them in under a minute" sense.
 Most can't, and Purview sensitivity labels that exist only in a policy document don't
-change that.
+change that. A 2026 ShareGate survey of Microsoft 365 environments put a number on
+exactly this mismatch: 93% of organisations said they were confident their governance
+could support AI use responsibly, while 29% admitted AI tools had already surfaced
+sensitive data they shouldn't have reached.
 
 **Agents and integrations don't have an identity model.** A human has a name, a
 manager, an access review, an offboarding process. A service principal or an agent
 connector frequently has none of that — it was set up once, given broad permissions
 because narrowing them was fiddly, and nobody's looked at it since. Conditional Access
 policies get built around users and devices; the same rigour rarely gets applied to
-what's effectively a non-human identity with its own reach into the tenant.
+what's effectively a non-human identity with its own reach into the tenant. Netwrix's
+2026 identity security research found a blunt version of the consequence: a 43% breach
+rate at organisations where AI expanded access, against 11% where it didn't.
 
 **There's no inventory.** Not of models, not of use cases, not of which team is using
 which tool with which data. You can't govern what you can't name, and most
